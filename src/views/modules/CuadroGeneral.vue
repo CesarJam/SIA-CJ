@@ -1,0 +1,322 @@
+<template>
+    <div class="fade-in relative min-h-screen pb-10">
+
+        <div
+            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Cuadro General de Clasificación</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Catálogo de secciones y funciones
+                    sustantivas/comunes.</p>
+            </div>
+
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <button @click="exportarCSV"
+                    class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors">
+                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                    </svg>
+                    Exportar
+                </button>
+
+                <button v-if="userRole === 'admin'" @click="abrirModalNuevo"
+                    class="flex-1 md:flex-none px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700 transition-colors">
+                    + Registrar
+                </button>
+            </div>
+        </div>
+
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+
+            <div
+                class="hidden md:flex items-center gap-4 px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-900/50 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <div class="w-1/5">Código</div>
+                <div class="w-1/5">Sección</div>
+                <div class="w-1/5">Función</div>
+                <div v-if="userRole === 'admin'" class="w-1/5 text-center">Acción</div>
+            </div>
+
+            <div class="divide-y divide-gray-100 dark:divide-gray-700/50">
+
+                <div v-for="item in listaCuadro" :key="item.id"
+                    class="p-4 md:px-6 md:py-3.5 flex flex-col md:flex-row md:items-center gap-2 md:gap-4 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/20">
+                    <div class="w-full md:w-1/5 flex items-center justify-between md:justify-start">
+                        <span class="md:hidden text-xs font-bold text-gray-400 uppercase">Código:</span>
+                        <span class="font-bold text-gray-900 dark:text-white text-sm">{{ item.codigo }}</span>
+                    </div>
+
+                    <div class="ww-full md:w-1/5 flex items-center justify-between md:justify-start">
+                        <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">Sección:</span>
+                        <span class="font-bold text-gray-800 dark:text-gray-200">{{ item.seccion }}</span>
+                    </div>
+
+                    <div class="w-full md:w-1/4 flex items-center justify-between md:justify-start mt-1 md:mt-0">
+                        <span class="md:hidden text-xs font-bold text-gray-400 uppercase">Función:</span>
+                        <span class="font-bold text-gray-800 dark:text-gray-200">{{ item.funcion }}</span>
+                    </div>
+
+                    <div v-if="userRole === 'admin'"
+                        class="flex items-center gap-2 mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-t-0 border-gray-100 dark:border-gray-700 w-full md:w-auto justify-end shrink-0">
+                        <button @click="abrirModalEdicion(item)"
+                            class="flex items-center gap-1.5 text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-semibold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                                </path>
+                            </svg>
+
+                        </button>
+                        <button @click="eliminarRegistro(item.id, item.codigo)"
+                            class="flex items-center gap-1.5 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-semibold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                </path>
+                            </svg>
+
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div v-if="listaCuadro.length === 0" class="text-center py-12">
+                <p class="text-gray-500 dark:text-gray-400">No hay secciones registradas en el catálogo.</p>
+            </div>
+        </div>
+
+        <div
+            :class="['fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6', modalAbierto ? 'pointer-events-auto' : 'pointer-events-none']">
+
+            <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0"
+                enter-to-class="opacity-100" leave-active-class="ease-in duration-200" leave-from-class="opacity-100"
+                leave-to-class="opacity-0">
+                <div v-if="modalAbierto" class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+                    @click="cerrarModal"></div>
+            </transition>
+
+            <transition enter-active-class="ease-out duration-300"
+                enter-from-class="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                enter-to-class="opacity-100 translate-y-0 sm:scale-100" leave-active-class="ease-in duration-200"
+                leave-from-class="opacity-100 translate-y-0 sm:scale-100"
+                leave-to-class="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+                <div v-if="modalAbierto"
+                    class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg flex flex-col border border-gray-100 dark:border-gray-700">
+
+                    <div
+                        class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900/40 rounded-t-2xl">
+                        <h2 class="text-lg font-bold text-gray-800 dark:text-white">{{ editandoId ? 'Editar Elemento' :
+                            'Registrar Elemento' }}</h2>
+                        <button @click="cerrarModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="p-6 space-y-5">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Código de
+                                Sección</label>
+                            <input v-model="form.codigo" type="text" placeholder="Ej: CJ.1"
+                                class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors disabled:opacity-60 disabled:bg-gray-100 dark:disabled:bg-gray-900 disabled:cursor-not-allowed"
+                                :disabled="editandoId">
+                            <p v-if="editandoId" class="text-xs text-orange-500 mt-1">El código no puede modificarse al
+                                editar.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nombre de
+                                la Sección</label>
+                            <input v-model="form.seccion" type="text" placeholder="Ej: PRUEBA LOCAL"
+                                class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors">
+                        </div>
+                        <div>
+                            <label
+                                class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Función</label>
+                            <select v-model="form.funcion"
+                                class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors">
+                                <option value="Sustantivas">Sustantivas</option>
+                                <option value="Comunes">Comunes</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div
+                        class="p-6 border-t border-gray-200 dark:border-gray-700 flex gap-3 bg-gray-50 dark:bg-gray-900/40 rounded-b-2xl">
+                        <button @click="cerrarModal"
+                            class="flex-1 py-2.5 text-gray-600 dark:text-gray-300 font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg transition-colors">Cancelar</button>
+                        <button @click="guardarRegistro"
+                            class="flex-1 py-2.5 bg-indigo-600 text-white rounded-lg font-bold shadow-md hover:bg-indigo-700 hover:shadow-lg transform transition-all active:scale-95">
+                            {{ editandoId ? 'Modificar' : 'Guardar' }}
+                        </button>
+                    </div>
+
+                </div>
+            </transition>
+        </div>
+
+        <ConfirmModal :isOpen="modalEliminar.abierto" title="Eliminar Sección"
+            :message="`¿Estás seguro de que deseas eliminar la sección '${modalEliminar.codigo}'? Esta acción no se puede deshacer.`"
+            confirmText="Sí, eliminar" @confirm="confirmarEliminacion" @cancel="cancelarEliminacion" />
+
+    </div>
+</template>
+
+<script setup>
+import { ref, onMounted, onUnmounted, defineAsyncComponent } from 'vue'
+import { useRoute } from 'vue-router'
+import { supabase } from '@/supabase'
+import { useToast } from '@/composables/useToast'
+
+const ConfirmModal = defineAsyncComponent(() => import('@/components/ConfirmModal.vue'))
+
+const route = useRoute()
+const userRole = ref(route.meta.userRole || 'cliente')
+
+const toast = useToast()
+
+const listaCuadro = ref([])
+// Cambiamos el nombre de panelAbierto a modalAbierto para ser semánticamente correctos
+const modalAbierto = ref(false)
+const editandoId = ref(null)
+
+const form = ref({
+    codigo: '',
+    seccion: '',
+    funcion: 'Sustantivas'
+})
+
+const modalEliminar = ref({
+    abierto: false,
+    id: null,
+    codigo: ''
+})
+
+// === CARGA DE DATOS ===
+const cargarDatos = async () => {
+    const { data, error } = await supabase
+        .from('cuadro_general')
+        .select('*')
+        .order('codigo', { ascending: true })
+
+    if (!error) listaCuadro.value = data || []
+}
+
+// === LÓGICA DE TECLADO (ACCESIBILIDAD) ===
+const handleKeydown = (e) => {
+    if (e.key === 'Escape') {
+        // Si el modal está abierto y NO hay un confirm modal bloqueando arriba
+        if (modalAbierto.value && !modalEliminar.value.abierto) {
+            cerrarModal()
+        }
+    }
+}
+
+onMounted(async () => {
+    await cargarDatos()
+    document.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+    document.removeEventListener('keydown', handleKeydown)
+})
+
+// === GESTIÓN DEL MODAL ===
+const abrirModalNuevo = () => {
+    editandoId.value = null
+    form.value = { codigo: '', seccion: '', funcion: 'Sustantivas' }
+    modalAbierto.value = true
+}
+
+const abrirModalEdicion = (item) => {
+    editandoId.value = item.id
+    form.value = { codigo: item.codigo, seccion: item.seccion, funcion: item.funcion }
+    modalAbierto.value = true
+}
+
+const cerrarModal = () => {
+    modalAbierto.value = false
+}
+
+// === CRUD ===
+const guardarRegistro = async () => {
+    if (!form.value.codigo || !form.value.seccion) {
+        alert("Por favor completa el código y la sección.")
+        return
+    }
+
+    if (editandoId.value) {
+        const { error } = await supabase
+            .from('cuadro_general')
+            .update({ seccion: form.value.seccion, funcion: form.value.funcion })
+            .eq('id', editandoId.value)
+        toast.success('Sección actualizada correctamente')
+
+        if (error) console.error("Error al actualizar:", error)
+    } else {
+        const { error } = await supabase
+            .from('cuadro_general')
+            .insert([{
+                codigo: form.value.codigo.trim(),
+                seccion: form.value.seccion.trim(),
+                funcion: form.value.funcion
+            }])
+        toast.success('Nueva sección registrada con éxito')
+
+        if (error) {
+            if (error.code === '23505') {
+                toast.error('Ese código de sección ya existe')
+            } else {
+                toast.error('Ocurrió un error en el servidor')
+            }
+        }
+    }
+
+    await cargarDatos()
+    cerrarModal()
+}
+
+// === ELIMINAR ===
+const eliminarRegistro = (id, codigo) => {
+    modalEliminar.value = { abierto: true, id, codigo }
+}
+
+const confirmarEliminacion = async () => {
+    if (modalEliminar.value.id) {
+        await supabase.from('cuadro_general').delete().eq('id', modalEliminar.value.id)
+        await cargarDatos()
+    }
+    modalEliminar.value.abierto = false
+}
+
+const cancelarEliminacion = () => {
+    modalEliminar.value.abierto = false
+}
+
+// === EXPORTAR A CSV (Nativo, sin librerías) ===
+const exportarCSV = () => {
+    if (listaCuadro.value.length === 0) {
+        alert("No hay datos para exportar")
+        return
+    }
+
+    let csvContent = "Código;Sección;Función\n"
+
+    listaCuadro.value.forEach(item => {
+        csvContent += `"${item.codigo}";"${item.seccion}";"${item.funcion}"\n`
+    })
+
+    const blob = new Blob(["\ufeff", csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+
+    const link = document.createElement("a")
+    link.setAttribute("href", url)
+    link.setAttribute("download", "CuadroGeneral.csv")
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+}
+</script>
