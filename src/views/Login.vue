@@ -5,41 +5,58 @@
       
       <div class="flex justify-center mb-6">
         <div class="bg-indigo-100 dark:bg-indigo-900/30 p-4 rounded-full">
-                      <img src="@/assets/logo-transparente.png" class="h-16 w-auto" alt="Logo">
-
+          <img src="@/assets/logo-transparente.png" class="h-16 w-auto" alt="Logo">
         </div>
       </div>
 
       <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-2">
         Sistema Integral de Archivos
       </h1>
-      <h2 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-2">SIA - CJ</h2>
-      <p class="text-gray-500 dark:text-gray-400 mb-8 text-sm">
-        Acceso exclusivo. Inicia sesión para verificar tu identidad.
-      </p>
+      <h2 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-6">SIA - CJ</h2>
       
-      <button 
-        @click="iniciarSesion" 
-        :disabled="cargando"
-        class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-semibold py-3.5 px-4 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all transform hover:-translate-y-0.5 duration-300 flex items-center justify-center"
-      >
-        <span v-if="cargando" class="flex items-center gap-2">
-          <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          Conectando...
-        </span>
-        <span v-else class="flex items-center gap-3">
-          <svg class="w-5 h-5 bg-white rounded-full p-0.5" viewBox="0 0 48 48">
-            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-          </svg>
-          Acceder con Google
-        </span>
-      </button>
+      <form @submit.prevent="iniciarSesion" class="space-y-4 text-left">
+        
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Correo Electrónico</label>
+          <input 
+            id="email" 
+            v-model="email" 
+            type="email" 
+            required
+            class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+            placeholder="usuario@ejemplo.com"
+          >
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contraseña</label>
+          <input 
+            id="password" 
+            v-model="password" 
+            type="password" 
+            required
+            class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+            placeholder="••••••••"
+          >
+        </div>
+
+        <button 
+          type="submit" 
+          :disabled="cargando"
+          class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-semibold py-3.5 px-4 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all transform hover:-translate-y-0.5 duration-300 flex items-center justify-center"
+        >
+          <span v-if="cargando" class="flex items-center gap-2">
+            <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Iniciando sesión...
+          </span>
+          <span v-else>
+            Ingresar al Sistema
+          </span>
+        </button>
+      </form>
 
       <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
         <p class="text-xs text-gray-500 dark:text-gray-400">
@@ -51,7 +68,7 @@
 
     <div class="absolute bottom-6 text-center w-full z-0">
       <p class="text-xs text-gray-400 dark:text-gray-500 font-mono tracking-wide">
-        v1.0 | git: cesarjam
+        v1.0 | Red Local
       </p>
     </div>
 
@@ -60,17 +77,23 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { authService } from '../services/authService'
 
+const router = useRouter()
+const email = ref('')
+const password = ref('')
 const cargando = ref(false)
 
 const iniciarSesion = async () => {
   try {
     cargando.value = true
-    await authService.loginWithGoogle()
+    await authService.loginWithEmail(email.value, password.value)
+    router.push('/')
+    
   } catch (error) {
-    console.error("Error al iniciar sesión:", error)
-    alert("No se pudo iniciar sesión. Verifica tu conexión.")
+    console.error("Error al iniciar sesión:", error.message)
+    alert("Credenciales incorrectas. Verifica tu correo y contraseña.")
   } finally {
     cargando.value = false
   }

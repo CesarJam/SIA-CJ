@@ -2,16 +2,12 @@ import { supabase } from '../supabase.js'
 
 export const authService = {
   /**
-   * Inicia el flujo de autenticación con Google OAuth.
-   * Supabase redirigirá automáticamente a la URL proporcionada.
+   * Inicia sesión con Correo y Contraseña administrados por tu Supabase local.
    */
-  async loginWithGoogle() {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        // Redirige al root o a una vista de "callback/loading"
-        redirectTo: window.location.origin
-      }
+  async loginWithEmail(email, password) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password
     })
     
     if (error) throw error
@@ -28,7 +24,6 @@ export const authService = {
 
   /**
    * Recupera la sesión actual almacenada localmente (localStorage).
-   * Esencial para persistencia de sesión y escenarios Lie-Fi (red inestable).
    */
   async getSession() {
     const { data, error } = await supabase.auth.getSession()
@@ -39,14 +34,12 @@ export const authService = {
   /**
    * Verifica la Lista Blanca (Whitelist).
    * Cruza el email autenticado con la tabla 'usuarios' para obtener el rol.
-   * * @param {string} email - El correo del usuario autenticado en Google.
+   * @param {string} email - El correo del usuario autenticado.
    * @returns {Object|null} - Retorna los datos del usuario (id, rol, nombre) o null si no tiene acceso.
    */
   async checkWhitelist(email) {
     if (!email) return null
 
-    // Usamos .single() porque el email es UNIQUE. 
-    // Si no lo encuentra, arroja un error que capturamos para denegar el acceso.
     const { data, error } = await supabase
       .from('usuarios')
       .select('*')
