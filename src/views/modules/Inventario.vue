@@ -1049,34 +1049,43 @@ const obtenerValorArreglo = (valor) => {
 // === CARGAS DE BASE DE DATOS ===
 const inicializarUsuario = async () => {
     try {
-        const {
-            data: { user },
-        } = await supabase.auth.getUser();
+        const { data: { user } } = await supabase.auth.getUser();
         const { data: userData } = await supabase
             .from("usuarios")
-            .select("id, secciones_permitidas")
+            .select("id, secciones_permitidas, rol")
             .eq("email", user.email)
             .single();
+            
         usuarioActual.value = userData.id;
 
-        if (
-            userData.secciones_permitidas &&
-            userData.secciones_permitidas.length > 0
-        ) {
-            const { data: secciones } = await supabase
-                .from("cuadro_general")
-                .select("id, codigo, seccion")
-                .in("codigo", userData.secciones_permitidas)
-                .order("codigo");
-            areasUsuario.value = secciones || [];
+        // Construimos la consulta base de áreas
+        let querySec = supabase.from("cuadro_general").select("id, codigo, seccion").order("codigo");
 
-            if (areasUsuario.value.length > 0) {
-                seccionSeleccionada.value = areasUsuario.value[0].id;
-                await cargarBandeja();
+        // Si NO es admin, validamos estrictamente sus secciones permitidas
+        if (userData.rol !== 'admin') {
+            if (!userData.secciones_permitidas || userData.secciones_permitidas.length === 0) {
+                loading.value = false; // Apagamos el loader si no tiene áreas
+                return; 
             }
+            querySec = querySec.in("codigo", userData.secciones_permitidas);
         }
+
+        // Ejecutamos la consulta
+        const { data: secciones } = await querySec;
+        areasUsuario.value = secciones || [];
+
+        // Si tiene áreas (o es admin y cargó todas), cargamos la primera
+        if (areasUsuario.value.length > 0) {
+            seccionSeleccionada.value = areasUsuario.value[0].id;
+            await cargarBandeja();
+        } else {
+            loading.value = false; // Apagamos el loader si la tabla cuadro_general está vacía
+        }
+        
     } catch (error) {
+        console.error("Error inicializando:", error);
         toast.error("Error al inicializar sesión.");
+        loading.value = false; // Seguro contra fallos
     }
 };
 
@@ -1098,15 +1107,16 @@ const cargarBandeja = async () => {
             .order("hora_registro", { ascending: false });
 
         // Lógica dinámica del filtro
-        // Lógica dinámica del filtro
         if (vistaActual.value === "entrada") {
-            // BANDEJA DE ENTRADA: Lo que me enviaron (incluyendo los locales que me envié a mí mismo)
-            query = query.eq("id_seccion_turnada", seccionSeleccionada.value);
+            // BANDEJA DE ENTRADA: 
+            query = query
+                .eq("id_seccion_turnada", seccionSeleccionada.value)
+                .neq("tipo_registro", "Enviado");
         } else {
-            // MIS ENVIADOS: Lo que yo envié A OTROS (excluimos mi propia área del destino)
+            // MIS ENVIADOS: 
             query = query
                 .eq("id_seccion_registro", seccionSeleccionada.value)
-                .neq("id_seccion_turnada", seccionSeleccionada.value);
+                .or(`id_seccion_turnada.neq.${seccionSeleccionada.value},tipo_registro.eq.Enviado`);
         }
 
         const { data: expedientes, error } = await query;

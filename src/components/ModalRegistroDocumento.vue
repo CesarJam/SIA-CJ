@@ -73,7 +73,7 @@
                     
                     <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
                         <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 border-b border-gray-200 dark:border-gray-700 pb-2">1. Datos del Documento</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">No. Consecutivo</label>
                                 <input v-model="form.numero_consecutivo" type="text" placeholder="Ej: CJ-2026-001" required class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
@@ -90,7 +90,14 @@
                                     <option value="Extraordinario">Extraordinario</option>
                                 </select>
                             </div>
-                            <div class="md:col-span-3">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Tipo de Registro</label>
+                                <select v-model="form.tipo_registro" class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
+                                    <option value="Recibido">Recibido / Interno</option>
+                                    <option value="Enviado">Enviado (Salida Externa)</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-4">
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Asunto</label>
                                 <textarea v-model="form.asunto" rows="2" placeholder="Descripción breve del oficio..." required class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"></textarea>
                             </div>
@@ -205,6 +212,7 @@ const form = ref({
     fojas: 1,
     asunto: '',
     caracter: 'Ordinario',
+    tipo_registro: 'Recibido',
     dependencias_ids: [],
     areas_destino: [],
     id_seccion_turnada: null,
@@ -334,6 +342,7 @@ const ejecutarTurnado = async () => {
             numero_consecutivo: form.value.numero_consecutivo,
             asunto: form.value.asunto.trim(),
             fojas: form.value.fojas,
+            tipo_registro: form.value.tipo_registro,
             dependencias_ids: form.value.dependencias_ids,
             id_seccion_registro: props.origenId, // Quién lo crea
             id_seccion_turnada: idDestino,       // A quién va
@@ -373,6 +382,7 @@ const ejecutarEdicion = async () => {
             numero_consecutivo: form.value.numero_consecutivo,
             asunto: form.value.asunto.trim(),
             fojas: form.value.fojas,
+            tipo_registro: form.value.tipo_registro,
             dependencias_ids: form.value.dependencias_ids,
             id_seccion_turnada: form.value.id_seccion_turnada,
             id_usuario_actualizacion: usuarioActual.value,
