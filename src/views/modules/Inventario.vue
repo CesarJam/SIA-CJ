@@ -49,7 +49,7 @@
                     <option value="Recepcionado">Recepcionado (Nuevos)</option>
                     <option value="En trámite">En trámite</option>
                     <option value="Concluido">Concluido (Archivados)</option>
-                    <option value="Cancelado">Cancelados</option> 
+                    <option value="Cancelado">Cancelados</option>
                 </select>
 
                 <button @click="abrirModalNuevoInterno"
@@ -82,8 +82,10 @@
                         'relative z-0': menuActivoId !== item.id,
                     }">
                     <div class="w-full md:w-1/6 flex flex-col md:block">
-                        <span class="font-bold text-gray-900 dark:text-white text-sm">{{ item.numero_consecutivo }}</span>
-                        <span v-if="item.caracter === 'Urgente' || item.caracter === 'Extraordinario'" class="ml-1 inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 border border-red-200 dark:border-red-800 mb-0.5">
+                        <span class="font-bold text-gray-900 dark:text-white text-sm">{{ item.numero_consecutivo
+                        }}</span>
+                        <span v-if="item.caracter === 'Urgente' || item.caracter === 'Extraordinario'"
+                            class="ml-1 inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 border border-red-200 dark:border-red-800 mb-0.5">
                             {{ item.caracter }}
                         </span>
                         <div class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
@@ -165,16 +167,17 @@
                                     <div v-if="menuActivoId === item.id"
                                         class="absolute right-0 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-100 dark:border-gray-700 z-30 overflow-hidden flex flex-col"
                                         :class="expedientesFiltrados.length > 3 &&
-                                                index >= expedientesFiltrados.length - 2
-                                                ? 'bottom-full mb-1 origin-bottom-right'
-                                                : 'top-full mt-1 origin-top-right'
+                                            index >= expedientesFiltrados.length - 2
+                                            ? 'bottom-full mb-1 origin-bottom-right'
+                                            : 'top-full mt-1 origin-top-right'
                                             ">
                                         <template
                                             v-if="vistaActual === 'enviados' && item.id_seccion_turnada !== seccionSeleccionada">
                                             <button @click="
                                                 abrirModalDetalles(item);
                                             cerrarMenu();
-                                            " class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors">
+                                            "
+                                                class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -187,14 +190,15 @@
                                                 Ver Detalles
                                             </button>
                                         </template>
-                                        
+
 
                                         <template v-else>
                                             <template v-if="item.estatus === 'Recepcionado'">
                                                 <button @click="
                                                     abrirModalAtender(item);
                                                 cerrarMenu();
-                                                " class="w-full text-left px-4 py-2.5 text-xs font-semibold text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
+                                                "
+                                                    class="w-full text-left px-4 py-2.5 text-xs font-semibold text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -205,7 +209,8 @@
                                                 <button @click="
                                                     abrirModalDetalles(item);
                                                 cerrarMenu();
-                                                " class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors">
+                                                "
+                                                    class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -218,15 +223,16 @@
                                                     </svg>
                                                     Ver Detalles
                                                 </button>
-                                                
+
                                             </template>
 
                                             <template v-if="item.estatus === 'En trámite'">
-                                                
+
                                                 <button @click="
                                                     abrirModalConcluir(item);
                                                 cerrarMenu();
-                                                " class="w-full text-left px-4 py-2.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/30 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
+                                                "
+                                                    class="w-full text-left px-4 py-2.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/30 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -237,7 +243,8 @@
                                                 <button @click="
                                                     abrirModalAtender(item);
                                                 cerrarMenu();
-                                                " class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
+                                                "
+                                                    class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -251,7 +258,8 @@
                                                 <button @click="
                                                     abrirModalDetalles(item);
                                                 cerrarMenu();
-                                                " class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors">
+                                                "
+                                                    class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -264,38 +272,57 @@
                                                     </svg>
                                                     Ver Detalles
                                                 </button>
-                                                
-                                                
+
+
                                             </template>
 
                                             <template v-if="item.estatus === 'Concluido'">
                                                 <button @click="abrirModalDetalles(item); cerrarMenu();"
                                                     class="w-full text-left px-4 py-2.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-900/30 flex items-center gap-2.5 transition-colors">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+                                                        </path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                        </path>
                                                     </svg>
                                                     Auditar Expediente
                                                 </button>
                                             </template>
-                                            
-                                            <template v-if="item.estatus === 'Cancelado' ">
-                                                <button @click="abrirModalDetalles(item); cerrarMenu();" 
+
+                                            <template v-if="item.estatus === 'Cancelado'">
+                                                <button @click="abrirModalDetalles(item); cerrarMenu();"
                                                     class="w-full text-left px-4 py-2.5 text-xs font-semibold text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 flex items-center gap-2.5 transition-colors">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+                                                        </path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                        </path>
                                                     </svg>
                                                     Ver Motivo de Cancelación
                                                 </button>
                                             </template>
-                                            <button v-if="item.id_seccion_registro === item.id_seccion_turnada && item.estatus !== 'Concluido' && item.estatus !== 'Cancelado' && item.estatus !== 'En trámite'" 
-                                                @click="abrirModalCancelar(item); cerrarMenu();" 
+                                            <button
+                                                v-if="item.id_seccion_registro === item.id_seccion_turnada && item.estatus !== 'Concluido' && item.estatus !== 'Cancelado' && item.estatus !== 'En trámite'"
+                                                @click="abrirModalCancelar(item); cerrarMenu();"
                                                 class="w-full text-left px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 flex items-center gap-2.5 transition-colors border-t border-gray-100 dark:border-gray-700">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                    </path>
+                                                </svg>
                                                 Cancelar Trámite
                                             </button>
-                                            
+
                                         </template>
                                     </div>
                                 </transition>
@@ -421,15 +448,25 @@
                                         placeholder="Ej: Archivo de Trámite"
                                         class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500" />
                                 </div>
-                                <div class="md:col-span-2">
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">URL /
-                                        Ubicación
-                                        Digital</label>
-                                    <input v-model="formAtender.ubicacion_url" type="url"
-                                        placeholder="Ej: https://nube.consejeria.gob/..."
-                                        class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500" />
+
+                                <div
+                                    class="bg-gray-50 dark:bg-gray-900/50 p-2 rounded-xl border border-gray-200 dark:border-gray-700">
+                                    <h3
+                                        class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 border-b border-gray-200 dark:border-gray-700 pb-2 flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                            </path>
+                                        </svg>
+                                        3. Archivos Digitales (Anexos)
+                                    </h3>
+                                    <GestorDocumental v-if="expedienteAAtender" :expedienteId="expedienteAAtender.id"
+                                        :folio="expedienteAAtender.numero_consecutivo" modo="escritura" />
                                 </div>
+
                             </div>
+
                         </div>
                     </div>
 
@@ -604,6 +641,7 @@
                     @click="cerrarModalDetalles"></div>
             </transition>
 
+            <!--Modal detalle-->
             <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0 scale-95"
                 enter-to-class="opacity-100 scale-100" leave-active-class="ease-in duration-200"
                 leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
@@ -630,9 +668,13 @@
                         </button>
                     </div>
 
-                    <div v-if="expedienteDetalle?.estatus === 'Cancelado'" class="px-6 py-4 bg-red-50 border-b border-red-100 dark:bg-red-900/20 dark:border-red-800/30 flex items-start gap-3 shrink-0">
-                        <svg class="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    <div v-if="expedienteDetalle?.estatus === 'Cancelado'"
+                        class="px-6 py-4 bg-red-50 border-b border-red-100 dark:bg-red-900/20 dark:border-red-800/30 flex items-start gap-3 shrink-0">
+                        <svg class="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                            </path>
                         </svg>
                         <div>
                             <h4 class="text-sm font-bold text-red-800 dark:text-red-300">Motivo de Cancelación</h4>
@@ -711,7 +753,7 @@
                                     <span
                                         class="block text-[10px] font-bold text-gray-500 uppercase">Soporte</span><span
                                         class="text-xs font-semibold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">{{
-                                        obtenerValorArreglo(expedienteDetalle?.soporte) }}</span>
+                                            obtenerValorArreglo(expedienteDetalle?.soporte) }}</span>
                                 </div>
                                 <div>
                                     <span class="block text-[10px] font-bold text-gray-500 uppercase">Acceso</span><span
@@ -734,7 +776,7 @@
                                         <span
                                             class="block text-[10px] font-bold text-emerald-600 uppercase">Subserie</span><span
                                             class="text-sm font-bold text-gray-800 dark:text-gray-200">{{
-                                            expedienteDetalle.snapshot_cadido.codigo_subserie }} -
+                                                expedienteDetalle.snapshot_cadido.codigo_subserie }} -
                                             {{
                                                 expedienteDetalle.snapshot_cadido.nombre_subserie
                                             }}</span>
@@ -765,19 +807,18 @@
                                 Clasificación intelectual pendiente (Se definirá al concluir).
                             </div>
 
-                            <div v-if="expedienteDetalle?.ubicacion_url"
-                                class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
-                                <span class="block text-[10px] font-bold text-gray-500 uppercase mb-1">URL (Ubicación
-                                    Digital)</span>
-                                <a :href="expedienteDetalle.ubicacion_url" target="_blank"
-                                    class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline break-all flex items-center gap-1">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14">
-                                        </path>
-                                    </svg>
-                                    Abrir documento digital
-                                </a>
+                            <div class="mt-5 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                <h4 class="text-xs font-bold text-gray-500 uppercase mb-3 flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                    Documentos Digitales Anexos
+                                </h4>
+                                
+                                <GestorDocumental 
+                                    v-if="expedienteDetalle" 
+                                    :expedienteId="expedienteDetalle.id" 
+                                    :folio="expedienteDetalle.numero_consecutivo" 
+                                    modo="lectura"
+                                />
                             </div>
                         </div>
 
@@ -831,7 +872,7 @@
                                                     </path>
                                                 </svg>
                                                 {{ mov.usuario.nombre || 'Desconocido' }} /
-                                                {{  mov.usuario.email || 'Desconocido' }}
+                                                {{ mov.usuario.email || 'Desconocido' }}
                                             </span>
                                         </div>
 
@@ -852,43 +893,65 @@
                                             {{
                                                 mov.detalles?.estatus_nuevo ||
                                                 mov.detalles?.estatus_inicial ||
-                                            "Recepcionado"
+                                                "Recepcionado"
                                             }}
                                         </span>
                                     </div>
-                                    
-                                    
+
+
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </transition>
-        
-               
-            </div> 
-            <div :class="['fixed inset-0 z-[70] flex items-center justify-center p-4', modalCancelarAbierto ? 'pointer-events-auto' : 'pointer-events-none']">
-            <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0" enter-to-class="opacity-100" leave-active-class="ease-in duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0">
-                <div v-if="modalCancelarAbierto" class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="cerrarModalCancelar"></div>
+
+
+        </div>
+        <div
+            :class="['fixed inset-0 z-[70] flex items-center justify-center p-4', modalCancelarAbierto ? 'pointer-events-auto' : 'pointer-events-none']">
+            <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0"
+                enter-to-class="opacity-100" leave-active-class="ease-in duration-200" leave-from-class="opacity-100"
+                leave-to-class="opacity-0">
+                <div v-if="modalCancelarAbierto" class="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                    @click="cerrarModalCancelar"></div>
             </transition>
-            <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0 scale-95 translate-y-4" enter-to-class="opacity-100 scale-100 translate-y-0" leave-active-class="ease-in duration-200" leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95 translate-y-4">
-                <div v-if="modalCancelarAbierto" class="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col border border-red-200 dark:border-red-900/50">
-                    <div class="px-5 py-4 border-b border-red-100 dark:border-red-900/50 bg-red-50 dark:bg-red-900/20 flex gap-3 items-center">
-                        <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0 scale-95 translate-y-4"
+                enter-to-class="opacity-100 scale-100 translate-y-0" leave-active-class="ease-in duration-200"
+                leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95 translate-y-4">
+                <div v-if="modalCancelarAbierto"
+                    class="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col border border-red-200 dark:border-red-900/50">
+                    <div
+                        class="px-5 py-4 border-b border-red-100 dark:border-red-900/50 bg-red-50 dark:bg-red-900/20 flex gap-3 items-center">
+                        <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                            </path>
+                        </svg>
                         <h2 class="text-base font-bold text-red-800 dark:text-red-300">Cancelar Registro Local</h2>
                     </div>
                     <div class="p-5 space-y-4">
                         <p class="text-sm text-gray-600 dark:text-gray-300">
-                            Estás a punto de cancelar el folio <strong class="text-gray-900 dark:text-white">{{ folioACancelar }}</strong>.
+                            Estás a punto de cancelar el folio <strong class="text-gray-900 dark:text-white">{{
+                                folioACancelar
+                            }}</strong>.
                         </p>
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Motivo de la cancelación <span class="text-red-500">*</span></label>
-                            <textarea v-model="motivoCancelacion" rows="3" placeholder="Justificación obligatoria..." required class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 transition-colors"></textarea>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Motivo de la
+                                cancelación <span class="text-red-500">*</span></label>
+                            <textarea v-model="motivoCancelacion" rows="3" placeholder="Justificación obligatoria..."
+                                required
+                                class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 transition-colors"></textarea>
                         </div>
                     </div>
-                    <div class="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/40">
-                        <button @click="cerrarModalCancelar" :disabled="procesandoCancelacion" class="px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-200">Abortar</button>
-                        <button @click="ejecutarCancelacion" :disabled="procesandoCancelacion || !motivoCancelacion.trim()" class="px-4 py-2 text-sm bg-red-600 text-white rounded-lg font-bold shadow-md hover:bg-red-700 flex items-center gap-2 disabled:opacity-50">
+                    <div
+                        class="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/40">
+                        <button @click="cerrarModalCancelar" :disabled="procesandoCancelacion"
+                            class="px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-200">Abortar</button>
+                        <button @click="ejecutarCancelacion"
+                            :disabled="procesandoCancelacion || !motivoCancelacion.trim()"
+                            class="px-4 py-2 text-sm bg-red-600 text-white rounded-lg font-bold shadow-md hover:bg-red-700 flex items-center gap-2 disabled:opacity-50">
                             <span v-if="procesandoCancelacion" class="animate-pulse">Procesando...</span>
                             <span v-else>Confirmar Cancelación</span>
                         </button>
@@ -896,13 +959,9 @@
                 </div>
             </transition>
         </div>
-        
-        <ModalRegistroDocumento 
-            v-model="modalNuevoAbierto" 
-            :origenId="seccionSeleccionada || ''"
-            titulo="Nuevo Oficio Interno" 
-            @registro-exitoso="onRegistroInternoExitoso" 
-        />
+
+        <ModalRegistroDocumento v-model="modalNuevoAbierto" :origenId="seccionSeleccionada || ''"
+            titulo="Nuevo Oficio Interno" @registro-exitoso="onRegistroInternoExitoso" />
     </div>
 
 </template>
@@ -912,6 +971,7 @@ import { ref, onMounted, computed } from "vue";
 import { supabase } from "@/supabase";
 import { useToast } from "@/composables/useToast";
 import ModalRegistroDocumento from '@/components/ModalRegistroDocumento.vue';
+import GestorDocumental from '@/components/GestorDocumental.vue';
 
 const toast = useToast();
 
@@ -1055,7 +1115,7 @@ const inicializarUsuario = async () => {
             .select("id, secciones_permitidas, rol")
             .eq("email", user.email)
             .single();
-            
+
         usuarioActual.value = userData.id;
 
         // Construimos la consulta base de áreas
@@ -1065,7 +1125,7 @@ const inicializarUsuario = async () => {
         if (userData.rol !== 'admin') {
             if (!userData.secciones_permitidas || userData.secciones_permitidas.length === 0) {
                 loading.value = false; // Apagamos el loader si no tiene áreas
-                return; 
+                return;
             }
             querySec = querySec.in("codigo", userData.secciones_permitidas);
         }
@@ -1081,7 +1141,7 @@ const inicializarUsuario = async () => {
         } else {
             loading.value = false; // Apagamos el loader si la tabla cuadro_general está vacía
         }
-        
+
     } catch (error) {
         console.error("Error inicializando:", error);
         toast.error("Error al inicializar sesión.");
@@ -1291,7 +1351,7 @@ const ejecutarCancelacion = async () => {
     procesandoCancelacion.value = true
     try {
         const notaJustificacion = `[CANCELADO POR ÁREA LOCAL]: ${motivoCancelacion.value}`
-        
+
         const { error } = await supabase
             .from('expedientes')
             .update({
