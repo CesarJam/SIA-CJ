@@ -83,7 +83,7 @@
                     }">
                     <div class="w-full md:w-1/6 flex flex-col md:block">
                         <span class="font-bold text-gray-900 dark:text-white text-sm">{{ item.numero_consecutivo
-                        }}</span>
+                            }}</span>
                         <span v-if="item.caracter === 'Urgente' || item.caracter === 'Extraordinario'"
                             class="ml-1 inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 border border-red-200 dark:border-red-800 mb-0.5">
                             {{ item.caracter }}
@@ -347,25 +347,27 @@
             </div>
         </div>
 
-        <ModalAtender 
-            v-model="modalAtenderAbierto" 
-            :expediente="expedienteAAtender" 
-            :usuarioActual="usuarioActual || ''" 
-            @guardado="cargarBandeja" 
+        <ModalRegistroDocumento 
+            v-model="modalNuevoAbierto" 
+            :origenId="seccionSeleccionada || ''"
+            @guardado="onRegistroInternoExitoso"
         />
 
-        <ModalConcluir
-            v-model="modalConcluirAbierto"
-            :expediente="expedienteAConcluir"
-            :catalogoSeries="catalogoSeriesEstructurado"
-            :usuarioActual="usuarioActual || ''"
-            @guardado="cargarBandeja"
-        />
+        <ModalAtender v-model="modalAtenderAbierto" :expediente="expedienteAAtender"
+            :usuarioActual="usuarioActual || ''" @guardado="cargarBandeja" />
 
-        <ModalDetalles
-            v-model="modalDetallesAbierto"
-            :expediente="expedienteDetalle"
-        />
+        <ModalConcluir v-model="modalConcluirAbierto" :expediente="expedienteAConcluir"
+            :catalogoSeries="catalogoSeriesEstructurado" :usuarioActual="usuarioActual || ''"
+            @guardado="cargarBandeja" />
+
+        <ModalDetalles v-model="modalDetallesAbierto" :expediente="expedienteDetalle" />
+
+        <ModalCancelar
+         v-model="modalCancelarAbierto"
+         :expediente="expedienteACancelar"
+         :usuarioActual="usuarioActual || ''"
+         @guardado="cargarBandeja"
+     />
     </div>
 
 </template>
@@ -378,8 +380,7 @@ import ModalRegistroDocumento from '@/components/ModalRegistroDocumento.vue';
 import ModalAtender from '@/components/ModalAtender.vue';
 import ModalConcluir from '@/components/ModalConcluir.vue';
 import ModalDetalles from '@/components/ModalDetalles.vue';
-//import GestorDocumental from '@/components/GestorDocumental.vue';
-
+import ModalCancelar from '@/components/ModalCancelar.vue';
 
 const toast = useToast();
 
@@ -599,52 +600,17 @@ const abrirModalConcluir = (item) => {
     modalConcluirAbierto.value = true;
 };
 
+// === ESTADOS MODAL 4: CANCELAR ===
+const modalCancelarAbierto = ref(false);
+const expedienteACancelar = ref(null);
+
+const abrirModalCancelar = (item) => {
+    expedienteACancelar.value = item;
+    modalCancelarAbierto.value = true;
+};
 
 
 // === ESTADOS Y LÓGICA DE CANCELACIÓN (LOCAL) ===
-const modalCancelarAbierto = ref(false)
-const procesandoCancelacion = ref(false)
-const cancelarId = ref(null)
-const folioACancelar = ref('')
-const motivoCancelacion = ref('')
-
-const abrirModalCancelar = (item) => {
-    cancelarId.value = item.id
-    folioACancelar.value = item.numero_consecutivo
-    motivoCancelacion.value = ''
-    modalCancelarAbierto.value = true
-}
-
-const cerrarModalCancelar = () => {
-    if (!procesandoCancelacion.value) modalCancelarAbierto.value = false
-}
-
-const ejecutarCancelacion = async () => {
-    motivoCancelacion.value = motivoCancelacion.value.trim()
-    procesandoCancelacion.value = true
-    try {
-        const notaJustificacion = `[CANCELADO POR ÁREA LOCAL]: ${motivoCancelacion.value}`
-
-        const { error } = await supabase
-            .from('expedientes')
-            .update({
-                estatus: 'Cancelado',
-                observaciones: notaJustificacion,
-                id_usuario_actualizacion: usuarioActual.value
-            })
-            .eq('id', cancelarId.value)
-
-        if (error) throw error
-
-        toast.success(`Folio ${folioACancelar.value} cancelado exitosamente.`)
-        await cargarBandeja()
-        modalCancelarAbierto.value = false
-    } catch (err) {
-        toast.error(err.message || "Error al intentar cancelar el registro.")
-    } finally {
-        procesandoCancelacion.value = false
-    }
-}
 
 // === UTILIDADES VISUALES ===
 const formatFecha = (fechaISO) => {

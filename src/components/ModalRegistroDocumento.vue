@@ -1,5 +1,6 @@
 <template>
-    <div :class="['fixed inset-0 z-[70] flex items-center justify-center p-4', modalDependenciaAbierto ? 'pointer-events-auto' : 'pointer-events-none']">
+    <div>
+        <div :class="['fixed inset-0 z-[70] flex items-center justify-center p-4', modalDependenciaAbierto ? 'pointer-events-auto' : 'pointer-events-none']">
         <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0" enter-to-class="opacity-100" leave-active-class="ease-in duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0">
             <div v-if="modalDependenciaAbierto" class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="cerrarModalDependencia"></div>
         </transition>
@@ -181,6 +182,7 @@
             </div>
         </transition>
     </div>
+    </div>
 </template>
 
 <script setup>
@@ -195,7 +197,7 @@ const props = defineProps({
     datosEditar: { type: Object, default: null } // Si viene lleno, es modo edición
 })
 
-const emit = defineEmits(['update:modelValue', 'registro-exitoso'])
+const emit = defineEmits(['update:modelValue', 'registro-exitoso', 'guardado'])
 const toast = useToast()
 
 const procesando = ref(false)
@@ -363,7 +365,8 @@ const ejecutarTurnado = async () => {
             : `Folio registrado localmente con éxito.`
             
         toast.success(msj)
-        emit('registro-exitoso')
+        //emit('registro-exitoso')
+        emit('guardado')
         cerrarModal()
     } catch (err) {
         toast.error(err.message || "Error al intentar registrar el documento.")
