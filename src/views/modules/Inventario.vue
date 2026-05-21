@@ -83,7 +83,7 @@
                     }">
                     <div class="w-full md:w-1/6 flex flex-col md:block">
                         <span class="font-bold text-gray-900 dark:text-white text-sm">{{ item.numero_consecutivo
-                            }}</span>
+                        }}</span>
                         <span v-if="item.caracter === 'Urgente' || item.caracter === 'Extraordinario'"
                             class="ml-1 inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 border border-red-200 dark:border-red-800 mb-0.5">
                             {{ item.caracter }}
@@ -347,11 +347,8 @@
             </div>
         </div>
 
-        <ModalRegistroDocumento 
-            v-model="modalNuevoAbierto" 
-            :origenId="seccionSeleccionada || ''"
-            @guardado="onRegistroInternoExitoso"
-        />
+        <ModalRegistroDocumento v-model="modalNuevoAbierto" :origenId="seccionSeleccionada || ''"
+            @guardado="onRegistroInternoExitoso" />
 
         <ModalAtender v-model="modalAtenderAbierto" :expediente="expedienteAAtender"
             :usuarioActual="usuarioActual || ''" @guardado="cargarBandeja" />
@@ -362,12 +359,8 @@
 
         <ModalDetalles v-model="modalDetallesAbierto" :expediente="expedienteDetalle" />
 
-        <ModalCancelar
-         v-model="modalCancelarAbierto"
-         :expediente="expedienteACancelar"
-         :usuarioActual="usuarioActual || ''"
-         @guardado="cargarBandeja"
-     />
+        <ModalCancelar v-model="modalCancelarAbierto" :expediente="expedienteACancelar"
+            :usuarioActual="usuarioActual || ''" @guardado="cargarBandeja" />
     </div>
 
 </template>

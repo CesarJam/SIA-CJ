@@ -197,7 +197,7 @@ const props = defineProps({
     datosEditar: { type: Object, default: null } // Si viene lleno, es modo edición
 })
 
-const emit = defineEmits(['update:modelValue', 'registro-exitoso', 'guardado'])
+const emit = defineEmits(['update:modelValue', 'guardado'])
 const toast = useToast()
 
 const procesando = ref(false)
@@ -365,7 +365,6 @@ const ejecutarTurnado = async () => {
             : `Folio registrado localmente con éxito.`
             
         toast.success(msj)
-        //emit('registro-exitoso')
         emit('guardado')
         cerrarModal()
     } catch (err) {
@@ -398,7 +397,6 @@ const ejecutarEdicion = async () => {
         }
 
         toast.success("Registro actualizado correctamente")
-        emit('registro-exitoso')
         cerrarModal()
     } catch (err) {
         toast.error(err.message || "Error al actualizar el registro.")
