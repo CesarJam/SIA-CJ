@@ -350,364 +350,22 @@
         <ModalAtender 
             v-model="modalAtenderAbierto" 
             :expediente="expedienteAAtender" 
-            :usuarioActual="usuarioActual" 
+            :usuarioActual="usuarioActual || ''" 
             @guardado="cargarBandeja" 
         />
 
-        <div :class="[
-            'fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6',
-            modalConcluirAbierto ? 'pointer-events-auto' : 'pointer-events-none',
-        ]">
-            <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0"
-                enter-to-class="opacity-100" leave-active-class="ease-in duration-200" leave-from-class="opacity-100"
-                leave-to-class="opacity-0">
-                <div v-if="modalConcluirAbierto" class="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                    @click="cerrarModalConcluir"></div>
-            </transition>
+        <ModalConcluir
+            v-model="modalConcluirAbierto"
+            :expediente="expedienteAConcluir"
+            :catalogoSeries="catalogoSeriesEstructurado"
+            :usuarioActual="usuarioActual || ''"
+            @guardado="cargarBandeja"
+        />
 
-            <!--Modal de Clasificación Archivística Final-->
-            <ModalConcluir
-        v-model="modalConcluirAbierto"
-        :expediente="expedienteAConcluir"
-        :catalogoSeries="catalogoSeriesEstructurado"
-        :usuarioActual="usuarioActual"
-        @guardado="cargarBandeja"
-    />
-        </div>
-
-        <div :class="[
-            'fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6',
-            modalDetallesAbierto ? 'pointer-events-auto' : 'pointer-events-none',
-        ]">
-            <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0"
-                enter-to-class="opacity-100" leave-active-class="ease-in duration-200" leave-from-class="opacity-100"
-                leave-to-class="opacity-0">
-                <div v-if="modalDetallesAbierto" class="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                    @click="cerrarModalDetalles"></div>
-            </transition>
-
-            <!--Modal Expediente detalle-->
-            <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0 scale-95"
-                enter-to-class="opacity-100 scale-100" leave-active-class="ease-in duration-200"
-                leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
-                <div v-if="modalDetallesAbierto"
-                    class="relative bg-gray-50 dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col border border-gray-200 dark:border-gray-700 h-[85vh]">
-                    <div
-                        class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex justify-between items-center shrink-0">
-                        <div class="flex items-center gap-3">
-                            <h2 class="text-xl font-bold text-gray-800 dark:text-white">
-                                Expediente: {{ expedienteDetalle?.numero_consecutivo }}
-                            </h2>
-                            <span class="px-2.5 py-1 text-xs font-bold rounded-full"
-                                :class="badgeColor(expedienteDetalle?.estatus)">
-                                {{ expedienteDetalle?.estatus }}
-                            </span>
-                        </div>
-                        <button @click="cerrarModalDetalles"
-                            class="text-gray-400 hover:text-gray-600 transition-colors bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 p-1.5 rounded-full">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12">
-                                </path>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div v-if="expedienteDetalle?.estatus === 'Cancelado'"
-                        class="px-6 py-4 bg-red-50 border-b border-red-100 dark:bg-red-900/20 dark:border-red-800/30 flex items-start gap-3 shrink-0">
-                        <svg class="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                            </path>
-                        </svg>
-                        <div>
-                            <h4 class="text-sm font-bold text-red-800 dark:text-red-300">Motivo de Cancelación</h4>
-                            <p class="text-sm text-red-600 dark:text-red-400 mt-1 font-medium">
-                                {{ expedienteDetalle?.observaciones || 'No se especificó motivo en el sistema.' }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="p-6 overflow-y-auto flex-1 space-y-6">
-                        <div
-                            class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                            <h3
-                                class="text-sm font-bold text-indigo-700 dark:text-indigo-400 mb-4 flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                Información General
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6">
-                                <div>
-                                    <span class="block text-[11px] font-bold text-gray-500 uppercase">Asunto</span>
-                                    <p class="text-sm text-gray-800 dark:text-gray-200">
-                                        {{ expedienteDetalle?.asunto }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <span class="block text-[11px] font-bold text-gray-500 uppercase">Origen</span>
-                                    <p class="text-sm text-gray-800 dark:text-gray-200">
-                                        {{ expedienteDetalle?.area_origen?.codigo }} -
-                                        {{ expedienteDetalle?.area_origen?.seccion }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <span class="block text-[11px] font-bold text-gray-500 uppercase">Responsable
-                                        Actual</span>
-                                    <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">
-                                        {{
-                                            expedienteDetalle?.responsable_tramite || "Sin asignar"
-                                        }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <span
-                                        class="block text-[11px] font-bold text-gray-500 uppercase">Indicaciones</span>
-                                    <p class="text-sm text-gray-800 dark:text-gray-200 italic">
-                                        {{ expedienteDetalle?.indicaciones_tramite || "Ninguna" }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div
-                            class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                            <h3
-                                class="text-sm font-bold text-emerald-700 dark:text-emerald-400 mb-4 flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4">
-                                    </path>
-                                </svg>
-                                Datos de Archivo (CADIDO)
-                            </h3>
-
-                            <div
-                                class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 pb-4 border-b border-gray-100 dark:border-gray-700">
-                                <div>
-                                    <span
-                                        class="block text-[10px] font-bold text-gray-500 uppercase">Tradición</span><span
-                                        class="text-xs font-semibold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">{{
-                                            obtenerValorArreglo(expedienteDetalle?.tradicion)
-                                        }}</span>
-                                </div>
-                                <div>
-                                    <span
-                                        class="block text-[10px] font-bold text-gray-500 uppercase">Soporte</span><span
-                                        class="text-xs font-semibold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">{{
-                                            obtenerValorArreglo(expedienteDetalle?.soporte) }}</span>
-                                </div>
-                                <div>
-                                    <span class="block text-[10px] font-bold text-gray-500 uppercase">Acceso</span><span
-                                        class="text-xs font-semibold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">{{
-                                            obtenerValorArreglo(expedienteDetalle?.condicion_acceso)
-                                        }}</span>
-                                </div>
-                                <div>
-                                    <span class="block text-[10px] font-bold text-gray-500 uppercase">Inmueble /
-                                        Gaveta</span><span class="text-xs text-gray-800 dark:text-gray-200">{{
-                                            expedienteDetalle?.inmueble || "No definido"
-                                        }}</span>
-                                </div>
-                            </div>
-
-                            <div v-if="expedienteDetalle?.snapshot_cadido"
-                                class="bg-emerald-50/50 dark:bg-emerald-900/10 p-3 rounded-lg border border-emerald-100 dark:border-emerald-800/30">
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                    <div class="md:col-span-2">
-                                        <span
-                                            class="block text-[10px] font-bold text-emerald-600 uppercase">Subserie</span><span
-                                            class="text-sm font-bold text-gray-800 dark:text-gray-200">{{
-                                                expedienteDetalle.snapshot_cadido.codigo_subserie }} -
-                                            {{
-                                                expedienteDetalle.snapshot_cadido.nombre_subserie
-                                            }}</span>
-                                    </div>
-                                    <div>
-                                        <span class="block text-[10px] font-bold text-emerald-600 uppercase">Valor
-                                            Documental</span><span class="text-sm text-gray-800 dark:text-gray-200">{{
-                                                expedienteDetalle.snapshot_cadido.valor_documental
-                                            }}</span>
-                                    </div>
-                                    <div>
-                                        <span class="block text-[10px] font-bold text-emerald-600 uppercase">Años
-                                            Trámite</span><span
-                                            class="text-sm font-bold text-gray-800 dark:text-gray-200">{{
-                                                expedienteDetalle.snapshot_cadido.anios_tramite
-                                            }}</span>
-                                    </div>
-                                    <div class="md:col-span-2">
-                                        <span class="block text-[10px] font-bold text-emerald-600 uppercase">Años
-                                            Concentración</span><span
-                                            class="text-sm font-bold text-gray-800 dark:text-gray-200">{{
-                                                expedienteDetalle.snapshot_cadido.anios_concentracion
-                                            }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div v-else class="text-center py-2 text-xs text-gray-400 italic">
-                                Clasificación intelectual pendiente (Se definirá al concluir).
-                            </div>
-
-                            <div class="mt-5 pt-4 border-t border-gray-100 dark:border-gray-700">
-                                <h4 class="text-xs font-bold text-gray-500 uppercase mb-3 flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                                    Documentos Digitales Anexos
-                                </h4>
-                                
-                                <GestorDocumental 
-                                    v-if="expedienteDetalle" 
-                                    :expedienteId="expedienteDetalle.id" 
-                                    :folio="expedienteDetalle.numero_consecutivo" 
-                                    modo="lectura"
-                                />
-                            </div>
-                        </div>
-
-                        <div
-                            class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                            <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
-                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                Trazabilidad (Línea de Tiempo)
-                            </h3>
-
-                            <div v-if="loadingBitacora" class="flex justify-center py-6 text-indigo-500">
-                                <svg class="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                        stroke-width="4">
-                                    </circle>
-                                    <path class="opacity-75" fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <div v-else-if="historialBitacora.length === 0"
-                                class="text-center py-4 text-xs text-gray-400">
-                                No se encontraron registros en la bitácora para este expediente.
-                            </div>
-                            <div v-else
-                                class="relative border-l-2 border-gray-200 dark:border-gray-700 ml-3 space-y-6 pb-2">
-                                <div v-for="(mov, idx) in historialBitacora" :key="idx" class="relative pl-6">
-                                    <div
-                                        class="absolute -left-[9px] top-1 w-4 h-4 rounded-full border-2 border-white dark:border-gray-800 bg-indigo-500 shadow-sm">
-                                    </div>
-
-                                    <div
-                                        class="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 mb-1">
-                                        <div class="flex items-center gap-2 flex-wrap">
-                                            <h4 class="text-sm font-bold text-gray-800 dark:text-gray-200">
-                                                {{ mov.accion || "Actualización de Estatus" }}
-                                            </h4>
-
-                                            <span v-if="mov.usuario"
-                                                class="text-[10px] text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700/50 px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-600 flex items-center gap-1">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
-                                                    </path>
-                                                </svg>
-                                                {{ mov.usuario.nombre || 'Desconocido' }} /
-                                                {{ mov.usuario.email || 'Desconocido' }}
-                                            </span>
-                                        </div>
-
-                                        <time class="text-[11px] font-bold text-gray-400 whitespace-nowrap">
-                                            {{ formatFechaHora(mov.fecha_hora) }}
-                                        </time>
-                                    </div>
-
-                                    <div class="text-xs text-gray-600 dark:text-gray-400 mt-2">
-                                        <span class="font-semibold text-gray-700 dark:text-gray-300">Estatus:
-                                        </span>
-                                        <span :class="badgeColor(
-                                            mov.detalles?.estatus_nuevo ||
-                                            mov.detalles?.estatus_inicial ||
-                                            'Recepcionado',
-                                        )
-                                            " class="px-1.5 py-0.5 rounded ml-1 border">
-                                            {{
-                                                mov.detalles?.estatus_nuevo ||
-                                                mov.detalles?.estatus_inicial ||
-                                                "Recepcionado"
-                                            }}
-                                        </span>
-                                    </div>
-
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </transition>
-
-
-        </div>
-        <div
-            :class="['fixed inset-0 z-[70] flex items-center justify-center p-4', modalCancelarAbierto ? 'pointer-events-auto' : 'pointer-events-none']">
-            <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0"
-                enter-to-class="opacity-100" leave-active-class="ease-in duration-200" leave-from-class="opacity-100"
-                leave-to-class="opacity-0">
-                <div v-if="modalCancelarAbierto" class="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                    @click="cerrarModalCancelar"></div>
-            </transition>
-            <!--Modal Cancelar Registro Local-->
-            <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0 scale-95 translate-y-4"
-                enter-to-class="opacity-100 scale-100 translate-y-0" leave-active-class="ease-in duration-200"
-                leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95 translate-y-4">
-                <div v-if="modalCancelarAbierto"
-                    class="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col border border-red-200 dark:border-red-900/50">
-                    <div
-                        class="px-5 py-4 border-b border-red-100 dark:border-red-900/50 bg-red-50 dark:bg-red-900/20 flex gap-3 items-center">
-                        <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                            </path>
-                        </svg>
-                        <h2 class="text-base font-bold text-red-800 dark:text-red-300">Cancelar Registro Local</h2>
-                    </div>
-                    <div class="p-5 space-y-4">
-                        <p class="text-sm text-gray-600 dark:text-gray-300">
-                            Estás a punto de cancelar el folio <strong class="text-gray-900 dark:text-white">{{
-                                folioACancelar
-                            }}</strong>.
-                        </p>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Motivo de la
-                                cancelación <span class="text-red-500">*</span></label>
-                            <textarea v-model="motivoCancelacion" rows="3" placeholder="Justificación obligatoria..."
-                                required
-                                class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 transition-colors"></textarea>
-                        </div>
-                    </div>
-                    <div
-                        class="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/40">
-                        <button @click="cerrarModalCancelar" :disabled="procesandoCancelacion"
-                            class="px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-200">Abortar</button>
-                        <button @click="ejecutarCancelacion"
-                            :disabled="procesandoCancelacion || !motivoCancelacion.trim()"
-                            class="px-4 py-2 text-sm bg-red-600 text-white rounded-lg font-bold shadow-md hover:bg-red-700 flex items-center gap-2 disabled:opacity-50">
-                            <span v-if="procesandoCancelacion" class="animate-pulse">Procesando...</span>
-                            <span v-else>Confirmar Cancelación</span>
-                        </button>
-                    </div>
-                </div>
-            </transition>
-        </div>
-
-        <ModalRegistroDocumento v-model="modalNuevoAbierto" :origenId="seccionSeleccionada || ''"
-            titulo="Nuevo Oficio Interno" @registro-exitoso="onRegistroInternoExitoso" />
+        <ModalDetalles
+            v-model="modalDetallesAbierto"
+            :expediente="expedienteDetalle"
+        />
     </div>
 
 </template>
@@ -719,7 +377,8 @@ import { useToast } from "@/composables/useToast";
 import ModalRegistroDocumento from '@/components/ModalRegistroDocumento.vue';
 import ModalAtender from '@/components/ModalAtender.vue';
 import ModalConcluir from '@/components/ModalConcluir.vue';
-import GestorDocumental from '@/components/GestorDocumental.vue';
+import ModalDetalles from '@/components/ModalDetalles.vue';
+//import GestorDocumental from '@/components/GestorDocumental.vue';
 
 
 const toast = useToast();
@@ -770,46 +429,15 @@ const catalogoSeriesEstructurado = ref([]);
 // === ESTADOS MODAL 3: DETALLES Y BITÁCORA ===
 const modalDetallesAbierto = ref(false);
 const expedienteDetalle = ref(null);
-const historialBitacora = ref([]);
-const loadingBitacora = ref(false);
+
 
 // === FLUJO 3: DETALLES ===
 const abrirModalDetalles = async (item) => {
     expedienteDetalle.value = item;
     modalDetallesAbierto.value = true;
-
-    // Cargar la línea de tiempo inmutable
-    await cargarBitacora(item.id);
-};
-
-const cargarBitacora = async (idExpediente) => {
-    loadingBitacora.value = true;
-    try {
-        // NUEVO: Agregamos el JOIN con la tabla de usuarios
-        const { data, error } = await supabase
-            .from("bitacora_movimientos")
-            .select(`
-        *,
-        usuario:id_usuario (nombre, email) 
-      `)
-            .eq("id_expediente", idExpediente)
-            .order("fecha_hora", { ascending: false });
-
-        if (error) throw error;
-        historialBitacora.value = data || [];
-    } catch (error) {
-        console.error("Error al cargar bitácora:", error);
-        toast.error("No se pudo cargar el historial de trazabilidad.");
-    } finally {
-        loadingBitacora.value = false;
-    }
 };
 
 
-const cerrarModalDetalles = () => {
-    modalDetallesAbierto.value = false;
-    historialBitacora.value = []; // Limpiamos al cerrar
-};
 
 // === COMPUTADOS ===
 const expedientesFiltrados = computed(() => {
