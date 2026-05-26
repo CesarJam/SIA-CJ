@@ -83,9 +83,9 @@
                     }">
                     <div class="w-full md:w-1/6 flex flex-col md:block">
                         <span class="font-bold text-gray-900 dark:text-white text-sm">{{ item.numero_consecutivo
-                        }}</span>
+                            }}</span>
                         <span v-if="item.caracter === 'Urgente' || item.caracter === 'Extraordinario'"
-                            class="ml-1 inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 border border-red-200 dark:border-red-800 mb-0.5">
+                            :class="claseBadgeCaracter(item.caracter)">
                             {{ item.caracter }}
                         </span>
                         <div class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
@@ -653,6 +653,24 @@ const onRegistroInternoExitoso = async () => {
     modalNuevoAbierto.value = false; // Cerramos el modal inmediatamente
     await cargarBandeja();           // Recargamos la tabla con el nuevo registro
 };
+
+// Función para asignar colores dinámicos al badge de Carácter en la tabla
+const claseBadgeCaracter = (caracter) => {
+    const c = (caracter || '').toLowerCase()
+
+    // Clases base que comparten todos los badges del inventario
+    const clasesBase = "ml-1 inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border mb-0.5 "
+
+    if (c.includes('urgente')) {
+        return clasesBase + "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 border-red-200 dark:border-red-800"
+    }
+    if (c.includes('extraordinario') || c.includes('extra')) {
+        return clasesBase + "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400 border-purple-200 dark:border-purple-800"
+    }
+
+    // Por si en un futuro decides mostrar también el Ordinario
+    return clasesBase + "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700"
+}
 
 onMounted(() => {
     inicializarUsuario();
