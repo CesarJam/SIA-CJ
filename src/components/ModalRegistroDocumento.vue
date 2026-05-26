@@ -104,59 +104,68 @@
 
                     <div class="p-6 overflow-y-auto space-y-5">
 
+                        <!-- 1 Datos del documento-->
                         <div
                             class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
                             <h3
                                 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 border-b border-gray-200 dark:border-gray-700 pb-2">
                                 1. Datos del Documento</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                                <div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-stretch">
+
+                                <div class="flex flex-col">
                                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">No.
                                         Consecutivo</label>
                                     <input v-model="form.numero_consecutivo" type="text" placeholder="Ej: CJ-2026-001"
                                         required
-                                        class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
+                                        class="mt-auto w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
                                 </div>
-                                <div>
+
+                                <div class="flex flex-col">
                                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Fecha
-                                        Documento <span class="text-red-500"></span></label>
+                                        Documento <span class="text-red-500">*</span></label>
                                     <input v-model="form.fecha_registro" type="date" required
-                                        class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
+                                        class="mt-auto w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:[color-scheme:dark]">
                                 </div>
-                                <div>
+
+                                <div class="flex flex-col">
                                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">No.
                                         Fojas</label>
                                     <input v-model.number="form.fojas" type="number" min="1" required
-                                        class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
+                                        class="mt-auto w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
                                 </div>
-                                <div>
+
+                                <div class="flex flex-col">
                                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Carácter /
                                         Prioridad</label>
                                     <select v-model="form.caracter"
-                                        class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
+                                        class="mt-auto w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
                                         <option value="Ordinario">Ordinario</option>
                                         <option value="Urgente">Urgente</option>
                                         <option value="Extraordinario">Extraordinario</option>
                                     </select>
                                 </div>
-                                <div>
+
+                                <div class="flex flex-col">
                                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Tipo de
                                         Registro</label>
                                     <select v-model="form.tipo_registro"
-                                        class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
+                                        class="mt-auto w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
                                         <option value="Recibido">Recibido / Interno</option>
                                         <option value="Enviado">Enviado (Salida Externa)</option>
                                     </select>
                                 </div>
-                                <div class="md:col-span-5">
+
+                                <div class="md:col-span-5 flex flex-col">
                                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Asunto</label>
                                     <textarea v-model="form.asunto" rows="2"
                                         placeholder="Descripción breve del oficio..." required
-                                        class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"></textarea>
+                                        class="mt-auto w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"></textarea>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- 2 Dependencias involucradas-->
                         <div
                             class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
                             <div
@@ -214,6 +223,7 @@
                             </div>
                         </div>
 
+                        <!-- 3 Area destino-->
                         <div
                             class="bg-indigo-50/50 dark:bg-indigo-900/10 p-4 rounded-xl border border-indigo-100 dark:border-indigo-800/30">
                             <div
