@@ -10,7 +10,6 @@
                     Bandeja de entrada y gestor de tareas del área:
                     <strong class="text-indigo-600 dark:text-indigo-400">{{ miSeccion?.codigo }}</strong>
                 </p>
-
                 <div
                     class="flex bg-gray-100 dark:bg-gray-900 p-1 rounded-lg w-fit border border-gray-200 dark:border-gray-700 shadow-inner">
                     <button @click="cambiarVista('entrada')"
@@ -40,6 +39,13 @@
                     class="w-full md:w-auto truncate max-w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 shadow-sm cursor-pointer">
                     <option v-for="area in areasUsuario" :key="area.id" :value="area.id">
                         {{ area.codigo }} - {{ area.seccion }}
+                    </option>
+                </select>
+
+                <select v-model="filtroAnio" @change="cargarBandeja"
+                    class="w-full md:w-auto px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 shadow-sm cursor-pointer font-bold">
+                    <option v-for="anio in opcionesAnios" :key="anio" :value="anio">
+                        Año {{ anio }}
                     </option>
                 </select>
 
@@ -391,6 +397,11 @@ const miSeccion = ref(null);
 const filtroEstatus = ref("Todos");
 const vistaActual = ref("entrada"); // 'entrada' | 'enviados'
 
+const anioActual = new Date().getFullYear();
+// Crea un arreglo de 8 elementos (El año actual + 7 hacia atrás)
+const opcionesAnios = ref(Array.from({ length: 8 }, (_, i) => anioActual - i));
+const filtroAnio = ref(anioActual);
+
 const cambiarVista = async (nuevaVista) => {
     if (vistaActual.value === nuevaVista) return;
     vistaActual.value = nuevaVista;
@@ -424,14 +435,11 @@ const catalogoSeriesEstructurado = ref([]);
 const modalDetallesAbierto = ref(false);
 const expedienteDetalle = ref(null);
 
-
 // === FLUJO 3: DETALLES ===
 const abrirModalDetalles = async (item) => {
     expedienteDetalle.value = item;
     modalDetallesAbierto.value = true;
 };
-
-
 
 // === COMPUTADOS ===
 const expedientesFiltrados = computed(() => {
@@ -521,10 +529,11 @@ const cargarBandeja = async () => {
     );
 
     try {
-        // NUEVO: La consulta ahora pide también el área_destino
         let query = supabase
             .from("expedientes")
             .select("*, area_origen:id_seccion_registro (codigo, seccion), area_destino:id_seccion_turnada (codigo, seccion)")
+            .gte("fecha_registro", `${filtroAnio.value}-01-01`)
+            .lte("fecha_registro", `${filtroAnio.value}-12-31`)
             .order("fecha_registro", { ascending: false })
             .order("hora_registro", { ascending: false });
 
@@ -601,7 +610,6 @@ const abrirModalCancelar = (item) => {
     expedienteACancelar.value = item;
     modalCancelarAbierto.value = true;
 };
-
 
 // === ESTADOS Y LÓGICA DE CANCELACIÓN (LOCAL) ===
 
