@@ -118,7 +118,7 @@
 </template>
 
 <script setup>
-import { ref, watch, computed, nextTick } from 'vue'
+import { ref, watch, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/supabase'
 import { useToast } from '@/composables/useToast'
 
@@ -230,4 +230,20 @@ const ejecutarConclusion = async () => {
         procesando.value = false
     }
 }
+
+// === LÓGICA DE TECLADO (Cerrar con ESC) ===
+const handleKeydown = (e) => {
+    // Evita cerrar si está archivando el expediente
+    if (e.key === 'Escape' && props.modelValue && !procesando.value) {
+        cerrarModal() 
+    }
+}
+
+onMounted(() => {
+    window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('keydown', handleKeydown)
+})
 </script>

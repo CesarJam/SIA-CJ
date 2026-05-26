@@ -1,5 +1,8 @@
 <template>
-    <div v-if="modelValue" class="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
+    <div v-if="modelValue" class="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
+            tabindex="0"
+            ref="visorContenedor"
+            @keydown.esc.stop.prevent="cerrarVisor">
         <div class="relative w-full h-full max-w-6xl flex flex-col bg-gray-900 rounded-xl overflow-hidden shadow-2xl border border-gray-700">
             
             <div class="px-4 py-3 bg-gray-800 flex justify-between items-center text-white shrink-0 border-b border-gray-700">
@@ -40,7 +43,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, nextTick, computed, onMounted, onUnmounted, watch } from 'vue'
 
 const props = defineProps({
     modelValue: { type: Boolean, required: true },
@@ -50,6 +53,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue'])
+
+const visorContenedor = ref(null)
 
 const esImagen = computed(() => {
     if (!props.tipoArchivo) return false
@@ -62,16 +67,29 @@ const esPdf = computed(() => {
     return props.tipoArchivo.toLowerCase().includes('pdf')
 })
 
-// Bloquear el scroll del fondo cuando el visor está abierto
-watch(() => props.modelValue, (isOpen) => {
+
+
+onUnmounted(() => {
+    document.body.style.overflow = ''
+})
+
+const cerrarVisor = () => {
+    emit('update:modelValue', false)
+}
+
+watch(() => props.modelValue, async (isOpen) => {
     if (isOpen) {
         document.body.style.overflow = 'hidden'
+        // Esperamos a que Vue dibuje el modal en el DOM
+        await nextTick()
+        // Le damos el foco obligatoriamente
+        if (visorContenedor.value) {
+            visorContenedor.value.focus()
+        }
     } else {
         document.body.style.overflow = ''
     }
 })
 
-onUnmounted(() => {
-    document.body.style.overflow = ''
-})
+
 </script>

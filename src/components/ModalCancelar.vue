@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/supabase'
 import { useToast } from '@/composables/useToast'
 
@@ -96,4 +96,20 @@ const ejecutarCancelacion = async () => {
         procesando.value = false
     }
 }
+
+// === LÓGICA DE TECLADO (Cerrar con ESC) ===
+const handleKeydown = (e) => {
+    // Solo cierra si el modal está abierto y NO está procesando la cancelación
+    if (e.key === 'Escape' && props.modelValue && !procesando.value) {
+        cerrarModal() 
+    }
+}
+
+onMounted(() => {
+    window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('keydown', handleKeydown)
+})
 </script>

@@ -1,5 +1,8 @@
 <template>
-    <div :class="['fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6', modelValue ? 'pointer-events-auto' : 'pointer-events-none']">
+    <div :class="['fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6', modelValue ? 'pointer-events-auto' : 'pointer-events-none']"
+        tabindex="0"
+        ref="detallesContenedor"
+        @keydown.esc.stop.prevent="cerrarModal">
         
         <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0" enter-to-class="opacity-100" leave-active-class="ease-in duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0">
             <div v-if="modelValue" class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="cerrarModal"></div>
@@ -197,7 +200,7 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/supabase'
 import GestorDocumental from '@/components/GestorDocumental.vue'
 
@@ -283,4 +286,23 @@ const badgePrioridad = (prioridad) => {
     // Ordinario / Normal / Baja
     return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 px-2 py-0.5 rounded text-xs font-bold border border-gray-200 dark:border-gray-700"
 }
+
+// Añade la referencia al contenedor
+const detallesContenedor = ref(null)
+
+// Modifica el watch existente de modelValue
+watch(() => props.modelValue, async (isOpen) => {
+    if (isOpen && props.expediente) {
+        await cargarBitacora(props.expediente.id)
+        // Agrega esto para el foco
+        await nextTick()
+        if (detallesContenedor.value) {
+            detallesContenedor.value.focus()
+        }
+    } else {
+        historialBitacora.value = []
+    }
+})
+
+
 </script>

@@ -100,7 +100,7 @@
 </template>
 
 <script setup>
-import { ref, watch} from 'vue'
+import { ref, watch, onMounted, onUnmounted} from 'vue'
 import { supabase } from '@/supabase'
 import { useToast } from '@/composables/useToast'
 import GestorDocumental from '@/components/GestorDocumental.vue'
@@ -194,4 +194,19 @@ const ejecutarAtencion = async () => {
         procesando.value = false
     }
 }
+// === LÓGICA DE TECLADO (Cerrar con ESC) ===
+const handleKeydown = (e) => {
+    // Solo cierra si el modal está abierto y NO está procesando/guardando
+    if (e.key === 'Escape' && props.modelValue && !procesando.value) {
+        cerrarModal() 
+    }
+}
+
+onMounted(() => {
+    window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('keydown', handleKeydown)
+})
 </script>

@@ -282,7 +282,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/supabase'
 import { useToast } from '@/composables/useToast'
 
@@ -516,4 +516,26 @@ const ejecutarEdicion = async () => {
         procesando.value = false
     }
 }
+
+// === LÓGICA DE TECLADO (Cerrar con ESC) ===
+const handleKeydown = (e) => {
+    if (e.key === 'Escape') {
+        // Primero verificamos si el modal secundario está abierto
+        if (modalDependenciaAbierto.value) {
+            cerrarModalDependencia()
+        } 
+        // Si no, cerramos el modal principal
+        else if (props.modelValue) {
+            cerrarModal()
+        }
+    }
+}
+
+onMounted(() => {
+    window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('keydown', handleKeydown)
+})
 </script>
