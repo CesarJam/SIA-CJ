@@ -82,9 +82,21 @@
 
             </div>
 
-            <div v-if="listaCuadro.length === 0" class="text-center py-12">
+            <!--Estado de Carga y Estado Vacío -->
+            <div v-if="loading" class="text-center py-12 text-gray-500 flex flex-col items-center">
+                <svg class="animate-spin h-8 w-8 text-indigo-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                </svg>
+                Cargando Cuadro General...
+            </div>
+            <div v-else-if="listaCuadro.length === 0" class="text-center py-12">
                 <p class="text-gray-500 dark:text-gray-400">No hay secciones registradas en el catálogo.</p>
             </div>
+            
         </div>
 
         <div
@@ -175,11 +187,9 @@ const ConfirmModal = defineAsyncComponent(() => import('@/components/ConfirmModa
 
 const route = useRoute()
 const userRole = ref(route.meta.userRole || 'cliente')
-
 const toast = useToast()
-
+const loading = ref(true)
 const listaCuadro = ref([])
-// Cambiamos el nombre de panelAbierto a modalAbierto para ser semánticamente correctos
 const modalAbierto = ref(false)
 const editandoId = ref(null)
 
@@ -196,13 +206,25 @@ const modalEliminar = ref({
 })
 
 // === CARGA DE DATOS ===
+// === CARGA DE DATOS ===
 const cargarDatos = async () => {
-    const { data, error } = await supabase
-        .from('cuadro_general')
-        .select('*')
-        .order('codigo', { ascending: true })
+    loading.value = true
+    
+    try {
+        const { data, error } = await supabase
+            .from('cuadro_general')
+            .select('*')
+            .order('codigo', { ascending: true })
 
-    if (!error) listaCuadro.value = data || []
+        if (error) throw error
+        listaCuadro.value = data || []
+        
+    } catch (error) {
+        console.error("Error al cargar Cuadro General:", error)
+        toast.error("Error al cargar el catálogo de secciones.")
+    } finally {
+        loading.value = false 
+    }
 }
 
 // === LÓGICA DE TECLADO (ACCESIBILIDAD) ===
