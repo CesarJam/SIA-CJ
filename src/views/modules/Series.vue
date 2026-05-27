@@ -127,8 +127,20 @@
 
                 </div>
             </div>
-            <div v-if="listaSeries.length === 0" class="text-center py-12 text-gray-500">No hay series registradas en
-                tus secciones permitidas.</div>
+            
+            <div v-if="loading" class="text-center py-12 text-gray-500 flex flex-col items-center">
+                <svg class="animate-spin h-8 w-8 text-indigo-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                </svg>
+                Cargando series documentales...
+            </div>
+            <div v-else-if="seriesFiltradas.length === 0" class="text-center py-12 text-gray-500">
+                No hay series registradas en la sección seleccionada.
+            </div>
         </div>
 
         <div
@@ -237,6 +249,7 @@ import { useToast } from '@/composables/useToast'
 const ConfirmModal = defineAsyncComponent(() => import('@/components/ConfirmModal.vue'))
 
 const toast = useToast()
+const loading = ref(true)
 const listaSeries = ref([])
 const seccionesDisponibles = ref([])
 const modalAbierto = ref(false)
@@ -272,25 +285,35 @@ const seriesFiltradas = computed(() => {
 
 // === LÓGICA DE DATOS ===
 const cargarInformacion = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    const { data: userData } = await supabase.from('usuarios').select('secciones_permitidas, rol').eq('email', user.email).single()
-
-    let querySec = supabase.from('cuadro_general').select('id, codigo, seccion').order('codigo')
-    if (userData.rol !== 'admin') {
-        querySec = querySec.in('codigo', userData.secciones_permitidas)
-    }
-    const { data: secciones } = await querySec
+    loading.value = true 
     
-    // Asignamos las secciones
-    seccionesDisponibles.value = secciones || []
+    try {
+        const { data: { user } } = await supabase.auth.getUser()
+        const { data: userData } = await supabase.from('usuarios').select('secciones_permitidas, rol').eq('email', user.email).single()
 
-    // Seleccionar la primera coincidencia automáticamente si el filtro está vacío
-    if (seccionesDisponibles.value.length > 0 && !filtroSeccion.value) {
-        filtroSeccion.value = seccionesDisponibles.value[0].id
+        let querySec = supabase.from('cuadro_general').select('id, codigo, seccion').order('codigo')
+        if (userData.rol !== 'admin') {
+            querySec = querySec.in('codigo', userData.secciones_permitidas)
+        }
+        const { data: secciones } = await querySec
+        
+        // Asignamos las secciones
+        seccionesDisponibles.value = secciones || []
+
+        // Seleccionar la primera coincidencia automáticamente si el filtro está vacío
+        if (seccionesDisponibles.value.length > 0 && !filtroSeccion.value) {
+            filtroSeccion.value = seccionesDisponibles.value[0].id
+        }
+
+        const { data: series } = await supabase.from('series').select('*, cuadro_general(codigo, seccion)').order('codigo_serie')
+        listaSeries.value = series || []
+        
+    } catch (error) {
+        console.error("Error al cargar Series:", error)
+        toast.error("Error al cargar el catálogo de series.")
+    } finally {
+        loading.value = false 
     }
-
-    const { data: series } = await supabase.from('series').select('*, cuadro_general(codigo, seccion)').order('codigo_serie')
-    listaSeries.value = series || []
 }
 
 // === ACCIONES ===
