@@ -1,10 +1,12 @@
 <template>
     <div class="fade-in relative min-h-screen pb-10">
-        
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+
+        <div
+            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
             <div>
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Oficialía de Partes</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Recepción, captura y turnado de correspondencia.</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Recepción, captura y turnado de
+                    correspondencia.</p>
             </div>
 
             <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
@@ -31,12 +33,8 @@
             </div>
         </div>
 
-        <ModalRegistroDocumento 
-            v-model="modalRegistroAbierto" 
-            :origenId="idSeccionOficialia || ''" 
-            :datosEditar="expedienteAEditar"
-            @guardado="cargarDatos" 
-        />
+        <ModalRegistroDocumento v-model="modalRegistroAbierto" :origenId="idSeccionOficialia || ''"
+            :datosEditar="expedienteAEditar" @guardado="cargarDatos" />
 
         <div
             class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -54,9 +52,9 @@
 
                     <div class="w-full md:w-1/6 flex flex-col md:block">
                         <span class="font-bold text-gray-900 dark:text-white text-sm">{{ item.numero_consecutivo
-                        }}</span><br>
+                            }}</span><br>
                         <span class="text-xs text-gray-500 dark:text-gray-400">{{ formatFecha(item.fecha_registro)
-                        }}</span>
+                            }}</span>
                     </div>
 
                     <div class="w-full md:w-1/3 flex flex-col md:block mt-1 md:mt-0">
@@ -114,8 +112,18 @@
                 </div>
             </div>
 
-            <div v-if="listaExpedientes.length === 0" class="text-center py-12 text-gray-500">
-                Aún no hay registros capturados en Oficialía de Partes.
+            <div v-if="loading" class="text-center py-12 text-gray-500 flex flex-col items-center">
+                <svg class="animate-spin h-8 w-8 text-indigo-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                </svg>
+                Cargando registros...
+            </div>
+            <div v-else-if="listaExpedientes.length === 0" class="text-center py-12 text-gray-500">
+                Aún no hay registros capturados en Oficialía de Partes en este periodo.
             </div>
         </div>
         <div
@@ -188,6 +196,7 @@ import ModalRegistroDocumento from '@/components/ModalRegistroDocumento.vue'
 const toast = useToast()
 
 // === ESTADOS GLOBALES ===
+const loading = ref(true)
 const listaExpedientes = ref([])
 const idSeccionOficialia = ref(null)
 const usuarioActual = ref(null)
@@ -245,40 +254,51 @@ const cerrarModalDependencia = () => {
 
 
 // === CARGA INICIAL Y FILTRADA ===
+// === CARGA INICIAL Y FILTRADA ===
 const cargarDatos = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    const { data: userData } = await supabase.from('usuarios').select('id, rol, secciones_permitidas').eq('email', user.email).single()
-    usuarioActual.value = userData.id
+    loading.value = true
 
-    const codigoOficialia = 'OFP'
+    try {
+        const { data: { user } } = await supabase.auth.getUser()
+        const { data: userData } = await supabase.from('usuarios').select('id, rol, secciones_permitidas').eq('email', user.email).single()
+        usuarioActual.value = userData.id
 
-    if (userData.rol === 'admin' || (userData.secciones_permitidas && userData.secciones_permitidas.includes(codigoOficialia))) {
-        const { data: sec } = await supabase.from('cuadro_general')
-            .select('id')
-            .eq('codigo', codigoOficialia)
-            .single()
+        const codigoOficialia = 'OFP'
 
-        idSeccionOficialia.value = sec?.id
-    }
+        if (userData.rol === 'admin' || (userData.secciones_permitidas && userData.secciones_permitidas.includes(codigoOficialia))) {
+            const { data: sec } = await supabase.from('cuadro_general')
+                .select('id')
+                .eq('codigo', codigoOficialia)
+                .single()
 
-    if (idSeccionOficialia.value) {
-        // CONSTRUCCIÓN DINÁMICA DE LA CONSULTA
-        let query = supabase
-            .from('expedientes')
-            .select(`*, area_destino:id_seccion_turnada (codigo, seccion)`)
-            .eq('id_seccion_registro', idSeccionOficialia.value)
-            .gte("fecha_registro", `${filtroAnio.value}-01-01`)
-            .lte("fecha_registro", `${filtroAnio.value}-12-31`)
-            .order('fecha_registro', { ascending: false })
-            .order('hora_registro', { ascending: false })
-
-        // APLICAR FILTRO DE ESTATUS SI NO ES "Todos"
-        if (filtroEstatus.value !== "Todos") {
-            query = query.eq('estatus', filtroEstatus.value)
+            idSeccionOficialia.value = sec?.id
         }
 
-        const { data: expedientes } = await query
-        listaExpedientes.value = expedientes || []
+        if (idSeccionOficialia.value) {
+            // CONSTRUCCIÓN DINÁMICA DE LA CONSULTA
+            let query = supabase
+                .from('expedientes')
+                .select(`*, area_destino:id_seccion_turnada (codigo, seccion)`)
+                .eq('id_seccion_registro', idSeccionOficialia.value)
+                .gte("fecha_registro", `${filtroAnio.value}-01-01`)
+                .lte("fecha_registro", `${filtroAnio.value}-12-31`)
+                .order('fecha_registro', { ascending: false })
+                .order('hora_registro', { ascending: false })
+
+            // APLICAR FILTRO DE ESTATUS SI NO ES "Todos"
+            if (filtroEstatus.value !== "Todos") {
+                query = query.eq('estatus', filtroEstatus.value)
+            }
+
+            const { data: expedientes, error } = await query
+            if (error) throw error
+            listaExpedientes.value = expedientes || []
+        }
+    } catch (error) {
+        console.error("Error al cargar datos de Oficialía:", error)
+        toast.error("Error al cargar los registros.")
+    } finally {
+        loading.value = false
     }
 }
 
@@ -324,7 +344,7 @@ const ejecutarCancelacion = async () => {
         if (error) throw error
 
         toast.success(`Folio ${folioACancelar.value} cancelado exitosamente.`)
-        await cargarDatos() 
+        await cargarDatos()
         modalCancelarAbierto.value = false
 
     } catch (err) {
@@ -339,16 +359,16 @@ const ejecutarCancelacion = async () => {
 // UTILIDAD PARA ARREGLOS DE BD (Soporte, Tradición, Condición)
 const obtenerValorArreglo = (valor) => {
     if (!valor) return ''
-    
+
     // Si es un arreglo nativo de JavaScript
     if (Array.isArray(valor)) return valor[0]
-    
+
     // Si viene como string crudo desde la BD (ej. '["Original"]' o '{"Original"}')
     if (typeof valor === 'string') {
         // Limpieza con Expresión Regular: quita corchetes, llaves y comillas dobles
         return valor.replace(/[[\]"{}]/g, '').trim()
     }
-    
+
     return valor
 }
 
