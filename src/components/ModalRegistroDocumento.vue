@@ -477,12 +477,12 @@ const ejecutarTurnado = async () => {
 
         toast.success(msj)
         emit('guardado')
+        procesando.value = false
         cerrarModal()
     } catch (err) {
         toast.error(err.message || "Error al intentar registrar el documento.")
-    } finally {
         procesando.value = false
-    }
+    } 
 }
 
 const ejecutarEdicion = async () => {
@@ -509,9 +509,12 @@ const ejecutarEdicion = async () => {
         }
 
         toast.success("Registro actualizado correctamente")
+        emit('guardado')
+        procesando.value = false
         cerrarModal()
     } catch (err) {
         toast.error(err.message || "Error al actualizar el registro.")
+        procesando.value = false
     } finally {
         procesando.value = false
     }
