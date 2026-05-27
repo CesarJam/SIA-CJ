@@ -10,8 +10,17 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      // Le decimos a Vite que '@' significa 'la carpeta src'
       '@': fileURLToPath(new URL('./src', import.meta.url))
+    }
+  },
+  server: {
+    proxy: {
+      // Intercepta las llamadas que empiecen con /api-proceso
+      '/api-proceso': {
+        target: 'https://www.proceso.com.mx',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api-proceso/, '')
+      }
     }
   }
 })
