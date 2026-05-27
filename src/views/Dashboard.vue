@@ -11,8 +11,21 @@
 
 
       <div class="p-6 text-center border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/20">
-        <img :src="userProfile.avatar" alt="Avatar"
-          class="w-20 h-20 rounded-full mx-auto shadow-md border-2 border-indigo-500 p-0.5 object-cover" />
+        
+        <div class="relative w-20 h-20 mx-auto group cursor-pointer" @click="triggerFileInput">
+          <img :src="userProfile.avatar" alt="Avatar"
+            class="w-full h-full rounded-full shadow-md border-2 border-indigo-500 p-0.5 object-cover transition-opacity"
+            :class="{'opacity-50': uploadingAvatar}" />
+          
+          <div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <svg v-if="!uploadingAvatar" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            
+            <svg v-else class="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          </div>
+          
+          <input type="file" ref="fileInput" accept="image/png, image/jpeg, image/jpg" class="hidden" @change="subirAvatar" />
+        </div>
+
         <h2 class="mt-3 font-semibold text-gray-800 dark:text-white truncate px-2">
           Hola, {{ userProfile.name }}
         </h2>
@@ -152,14 +165,19 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { authService } from '../services/authService'
+import { supabase } from '@/supabase'
+import { useToast } from '@/composables/useToast'
 
 const router = useRouter()
 const route = useRoute()
+const toast = useToast()
 
-// Estado responsivo
+// Estado responsivo y de carga
 const isMobileMenuOpen = ref(false)
+const uploadingAvatar = ref(false)
+const fileInput = ref(null)
 
-// Datos del usuario (con valores por defecto)
+// Datos del usuario
 const userRole = ref(route.meta.userRole || 'cliente')
 const userSecciones = ref(route.meta.userSecciones || [])
 const userProfile = ref({
@@ -167,21 +185,88 @@ const userProfile = ref({
   avatar: 'https://ui-avatars.com/api/?name=Usuario&background=random'
 })
 
-// Cargar datos de la sesión al montar el componente
+// === CARGA INICIAL ===
 onMounted(async () => {
   try {
     const session = await authService.getSession()
     if (session?.user) {
-      // Extraemos la foto y el nombre que Google le entrega a Supabase
       const metadata = session.user.user_metadata
       userProfile.value.name = metadata.full_name || metadata.name || session.user.email
-      // Fallback si no hay avatar en Google
       userProfile.value.avatar = metadata.avatar_url || metadata.picture || `https://ui-avatars.com/api/?name=${userProfile.value.name}&background=random`
     }
   } catch (error) {
     console.error("Error al obtener la sesión en el Dashboard:", error)
   }
 })
+
+// === LÓGICA DE SUBIDA DE IMAGEN ===
+const triggerFileInput = () => {
+  if (!uploadingAvatar.value) {
+    fileInput.value.click()
+  }
+}
+
+const subirAvatar = async (event) => {
+  const file = event.target.files[0]
+  if (!file) return
+
+  // Validar que sea imagen y menor a 2MB
+  if (!file.type.startsWith('image/')) {
+    return toast.error('Por favor, selecciona un archivo de imagen válido.')
+  }
+  if (file.size > 2 * 1024 * 1024) {
+    return toast.error('La imagen debe pesar menos de 2MB.')
+  }
+
+  uploadingAvatar.value = true
+  
+  try {
+    const session = await authService.getSession()
+    const user = session?.user
+    if (!user) throw new Error('No hay sesión activa')
+
+    // 1. Crear nombre único para la imagen
+    const fileExt = file.name.split('.').pop()
+    const filePath = `${user.id}/avatar-${Date.now()}.${fileExt}`
+
+    // 2. Subir a Supabase Storage (Bucket 'avatars')
+    // 2. Subir a Supabase Storage (Bucket 'avatars')
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, file, { 
+        upsert: true,
+        contentType: file.type, // <-- ESTO EVITA QUE SE CORROMPA
+        cacheControl: '3600'
+      })
+
+    if (uploadError) throw uploadError
+
+    // 3. Obtener la URL pública de la nueva imagen
+    const { data: publicUrlData } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(filePath)
+
+    const newAvatarUrl = publicUrlData.publicUrl
+
+    // 4. Actualizar los metadatos del usuario en Supabase Auth
+    const { error: updateError } = await supabase.auth.updateUser({
+      data: { avatar_url: newAvatarUrl }
+    })
+
+    if (updateError) throw updateError
+
+    // 5. Actualizar la interfaz
+    userProfile.value.avatar = newAvatarUrl
+    toast.success('Foto de perfil actualizada correctamente')
+
+  } catch (error) {
+    console.error('Error subiendo avatar:', error)
+    toast.error('Error al subir imagen. Verifica que el bucket "avatars" exista y sea público.')
+  } finally {
+    uploadingAvatar.value = false
+    event.target.value = '' // Limpiar el input para permitir subir la misma imagen otra vez si falla
+  }
+}
 
 // Cerramos el menú móvil automáticamente al cambiar de ruta
 router.afterEach(() => {

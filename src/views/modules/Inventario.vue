@@ -89,7 +89,7 @@
                     }">
                     <div class="w-full md:w-1/6 flex flex-col md:block">
                         <span class="font-bold text-gray-900 dark:text-white text-sm">{{ item.numero_consecutivo
-                            }}</span>
+                        }}</span>
                         <span v-if="item.caracter === 'Urgente' || item.caracter === 'Extraordinario'"
                             :class="claseBadgeCaracter(item.caracter)">
                             {{ item.caracter }}

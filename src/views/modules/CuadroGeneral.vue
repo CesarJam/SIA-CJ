@@ -96,7 +96,7 @@
             <div v-else-if="listaCuadro.length === 0" class="text-center py-12">
                 <p class="text-gray-500 dark:text-gray-400">No hay secciones registradas en el catálogo.</p>
             </div>
-            
+
         </div>
 
         <div
@@ -206,10 +206,9 @@ const modalEliminar = ref({
 })
 
 // === CARGA DE DATOS ===
-// === CARGA DE DATOS ===
 const cargarDatos = async () => {
     loading.value = true
-    
+
     try {
         const { data, error } = await supabase
             .from('cuadro_general')
@@ -218,12 +217,12 @@ const cargarDatos = async () => {
 
         if (error) throw error
         listaCuadro.value = data || []
-        
+
     } catch (error) {
         console.error("Error al cargar Cuadro General:", error)
         toast.error("Error al cargar el catálogo de secciones.")
     } finally {
-        loading.value = false 
+        loading.value = false
     }
 }
 

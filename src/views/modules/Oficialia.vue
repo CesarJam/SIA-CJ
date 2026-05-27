@@ -52,9 +52,9 @@
 
                     <div class="w-full md:w-1/6 flex flex-col md:block">
                         <span class="font-bold text-gray-900 dark:text-white text-sm">{{ item.numero_consecutivo
-                            }}</span><br>
+                        }}</span><br>
                         <span class="text-xs text-gray-500 dark:text-gray-400">{{ formatFecha(item.fecha_registro)
-                            }}</span>
+                        }}</span>
                     </div>
 
                     <div class="w-full md:w-1/3 flex flex-col md:block mt-1 md:mt-0">
