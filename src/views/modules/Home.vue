@@ -4,8 +4,62 @@
     <!-- Encabezado de Bienvenida -->
     <div class="bg-blue-900 rounded-2xl p-8 shadow-lg text-white">
       <h1 class="text-3xl font-bold mb-2">¡Bienvenido al SIA!</h1>
-      <p class="text-blue-100 text-lg">Sistema Integral de Archivos. Selecciona un módulo en el menú lateral para
+      <p class="text-blue-100 text-lg">Sistema Integral de Archivos.
+        Selecciona un módulo en el menú lateral o un acceso rápido inferior para
         comenzar tu jornada.</p>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <router-link to="/cuadro-general"
+        class="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:-translate-y-1 hover:border-blue-500 transition-all group text-center">
+        <div
+          class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+            </path>
+          </svg>
+        </div>
+        <span class="text-sm font-bold text-gray-800 dark:text-gray-200">Cuadro General</span>
+      </router-link>
+
+      <router-link to="/cadido"
+        class="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:-translate-y-1 hover:border-blue-500 transition-all group text-center">
+        <div
+          class="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
+            </path>
+          </svg>
+        </div>
+        <span class="text-sm font-bold text-gray-800 dark:text-gray-200">Consultar CADIDO</span>
+      </router-link>
+
+      <router-link to="/inventario"
+        class="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:-translate-y-1 hover:border-blue-500 transition-all group text-center">
+        <div
+          class="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+            </path>
+          </svg>
+        </div>
+        <span class="text-sm font-bold text-gray-800 dark:text-gray-200">Ir al Inventario</span>
+      </router-link>
+
+      <router-link to="/oficialia"
+        class="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:-translate-y-1 hover:border-blue-500 transition-all group text-center">
+        <div
+          class="w-12 h-12 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2">
+            </path>
+          </svg>
+        </div>
+        <span class="text-sm font-bold text-gray-800 dark:text-gray-200">Oficialía de Partes</span>
+      </router-link>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -77,25 +131,30 @@
             <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <a v-for="(noticia, index) in noticiasRss" :key="index" :href="noticia.link" target="_blank"
                 class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-blue-800 dark:hover:border-blue-500 transition-all group flex flex-col justify-between">
-                <div>
+                
+                <div class="flex flex-col h-full">
+                  <div v-if="noticia.imagen" class="w-full h-40 mb-4 overflow-hidden rounded-lg shrink-0 border border-gray-100 dark:border-gray-700">
+                    <img :src="noticia.imagen" alt="Noticia" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                  </div>
+
                   <span
-                    class="text-[10px] font-bold uppercase tracking-wider text-blue-900 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-full mb-3 inline-block">
+                    class="text-[10px] font-bold uppercase tracking-wider text-blue-900 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-full mb-3 inline-block self-start">
                     {{ formatearFecha(noticia.pubDate) }}
                   </span>
-                  <h3
-                    class="text-md font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-800 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+                  
+                  <h3 class="text-md font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-800 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
                     {{ noticia.title }}
                   </h3>
-                  <!-- Extraemos un fragmento limpio de la descripción -->
-                  <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 text-ellipsis overflow-hidden"
-                    v-html="noticia.description"></p>
+                  
+                  <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 text-ellipsis overflow-hidden">
+                    {{ noticia.description }}
+                  </p>
                 </div>
-                <div class="mt-4 text-xs font-semibold text-blue-800 dark:text-blue-400 flex items-center gap-1">
+                
+                <div class="mt-4 text-xs font-semibold text-blue-800 dark:text-blue-400 flex items-center gap-1 shrink-0">
                   Leer artículo completo
-                  <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                  <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                   </svg>
                 </div>
               </a>
@@ -151,19 +210,18 @@
 
           <div class="space-y-3">
             <a href="https://guerrero.gob.mx/" target="_blank"
-  class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group">
-  <div
-    class="p-2 bg-gray-100 dark:bg-gray-900 rounded-md group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-    <!-- Ajuste de tamaño con w-8 h-8 y object-contain para evitar deformaciones -->
-    <img src="https://www.guerrero.gob.mx/wp-content/themes/guerrero2022/img/logoGuerreroEscudo.png" 
-         alt="Logo Gobierno de Guerrero" 
-         class="w-12 h-12 object-contain">
-  </div>
-  <div>
-    <p class="text-sm font-bold text-gray-800 dark:text-gray-200">Gobierno de Guerrero</p>
-    <p class="text-xs text-gray-500 dark:text-gray-400">Sitio web oficial</p>
-  </div>
-</a>
+              class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group">
+              <div
+                class="p-2 bg-gray-100 dark:bg-gray-900 rounded-md group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                <!-- Ajuste de tamaño con w-8 h-8 y object-contain para evitar deformaciones -->
+                <img src="https://www.guerrero.gob.mx/wp-content/themes/guerrero2022/img/logoGuerreroEscudo.png"
+                  alt="Logo Gobierno de Guerrero" class="w-12 h-12 object-contain">
+              </div>
+              <div>
+                <p class="text-sm font-bold text-gray-800 dark:text-gray-200">Gobierno de Guerrero</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Sitio web oficial</p>
+              </div>
+            </a>
 
             <!-- Redes Sociales -->
             <div class="flex gap-3 pt-2">
@@ -183,8 +241,6 @@
                 </svg>
                 X (Twitter)
               </a>
-
-
             </div>
           </div>
         </div>
@@ -276,61 +332,44 @@ const cargarFacebookSDK = () => {
   document.body.appendChild(script)
 }
 
-/*
 const obtenerRss = async () => {
   try {
-    // Hacemos fetch a nuestro proxy en Vite, añadiendo la ruta del XML
-    const response = await fetch('/api-proceso/rss/feed.html?r=1')
-    if (!response.ok) throw new Error('Error al obtener el feed')
-
-    // Obtenemos la respuesta como texto (XML puro)
-    const textData = await response.text()
-
-    // Convertimos el texto XML en un objeto navegable
-    const parser = new DOMParser()
-    const xmlDoc = parser.parseFromString(textData, 'text/xml')
-
-    // Al ser un feed Atom, las noticias están dentro de <entry>
-    const entries = xmlDoc.querySelectorAll('entry')
-
-    // Mapeamos los primeros 4 resultados
-    noticiasRss.value = Array.from(entries).slice(0, 4).map(entry => {
-      // textContent extrae el texto ignorando las etiquetas CDATA
-      const title = entry.querySelector('title')?.textContent || 'Sin título'
-
-      // En Atom, el enlace viene como un atributo href dentro de <link>
-      const link = entry.querySelector('link')?.getAttribute('href') || '#'
-      const pubDate = entry.querySelector('updated')?.textContent || ''
-      const description = entry.querySelector('content')?.textContent || ''
-
-      return { title, link, pubDate, description }
-    })
-
-  } catch (error) {
-    console.error('Error al parsear las noticias:', error)
-  } finally {
-    loadingRss.value = false
-  }
-}
-  */
- const obtenerRss = async () => {
-  try {
-    // Usamos el conversor público que se salta los escudos Anti-Bot
     const url = 'https://api.rss2json.com/v1/api.json?rss_url=https://www.proceso.com.mx/rss/feed.html?r=1'
-    
+
     const response = await fetch(url)
     if (!response.ok) throw new Error('Error al obtener el feed')
 
     const data = await response.json()
 
-    // rss2json nos entrega un arreglo limpio llamado "items"
     noticiasRss.value = data.items.slice(0, 4).map(item => {
-      return { 
-        title: item.title, 
-        link: item.link, 
-        pubDate: item.pubDate, 
-        // Pasamos la descripción por nuestra lavadora de texto
-        description: limpiarHTML(item.description) 
+      // 1. Creamos un elemento virtual para usar el motor del navegador
+      const divVirtual = document.createElement('div')
+      
+      // 2. Primer paso de limpieza (por si viene doblemente escapado)
+      divVirtual.innerHTML = item.description || item.content || ''
+      let htmlDecodificado = divVirtual.textContent || divVirtual.innerText || ''
+      
+      // 3. Segundo paso: lo inyectamos ahora sí como HTML real
+      divVirtual.innerHTML = htmlDecodificado
+
+      // 4. Buscar la imagen usando selectores nativos (mucho más seguro que Regex)
+      let imagen = item.thumbnail || (item.enclosure && item.enclosure.link)
+      if (!imagen) {
+        const imgEtiqueta = divVirtual.querySelector('img')
+        if (imgEtiqueta) {
+          imagen = imgEtiqueta.src
+        }
+      }
+
+      // 5. Extraer el texto puro sin ninguna etiqueta basura
+      let textoLimpio = divVirtual.textContent || divVirtual.innerText || ''
+
+      return {
+        title: item.title,
+        link: item.link,
+        pubDate: item.pubDate,
+        imagen: imagen, 
+        description: textoLimpio.trim() // Quitamos espacios en blanco extra
       }
     })
 
@@ -340,15 +379,7 @@ const obtenerRss = async () => {
     loadingRss.value = false
   }
 }
-const limpiarHTML = (htmlCodificado) => {
-  if (!htmlCodificado) return '';
-  // Creamos un elemento virtual en la memoria
-  const elementoVirtual = document.createElement('div');
-  // Al asignarle el texto, el navegador traduce los '&lt;' automáticamente a '<'
-  elementoVirtual.innerHTML = htmlCodificado;
-  // textContent ignora todas las etiquetas HTML y nos devuelve solo el texto puro
-  return elementoVirtual.textContent || elementoVirtual.innerText || '';
-}
+
 
 onMounted(() => {
   obtenerClimaLocal()
