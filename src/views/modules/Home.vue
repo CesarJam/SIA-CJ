@@ -2,20 +2,21 @@
   <div class="fade-in space-y-6 pb-10">
 
     <!-- Encabezado de Bienvenida -->
-    <div class="bg-blue-900 rounded-2xl p-8 shadow-lg text-white">
+    <div class="bg-gradient-to-r from-blue-900 to-blue-500 rounded-2xl p-8 shadow-lg text-white">
       <h1 class="text-3xl font-bold mb-2">¡Bienvenido al SIA!</h1>
       <p class="text-blue-100 text-lg">Sistema Integral de Archivos.
         Selecciona un módulo en el menú lateral o un acceso rápido inferior para
         comenzar tu jornada.</p>
     </div>
+    <!--Accesos rapidos-->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <router-link to="/cuadro-general"
-        class="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:-translate-y-1 hover:border-blue-500 transition-all group text-center">
+        class="flex flex-col items-center py-3 px-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:-translate-y-1 hover:border-blue-500 transition-all group text-center">
         <div
-          class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+              d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4">
             </path>
           </svg>
         </div>
@@ -23,12 +24,12 @@
       </router-link>
 
       <router-link to="/cadido"
-        class="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:-translate-y-1 hover:border-blue-500 transition-all group text-center">
+        class="flex flex-col items-center py-3 px-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:-translate-y-1 hover:border-blue-500 transition-all group text-center">
         <div
-          class="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          class="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z">
             </path>
           </svg>
         </div>
@@ -36,10 +37,10 @@
       </router-link>
 
       <router-link to="/inventario"
-        class="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:-translate-y-1 hover:border-blue-500 transition-all group text-center">
+        class="flex flex-col items-center py-3 px-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:-translate-y-1 hover:border-blue-500 transition-all group text-center">
         <div
-          class="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          class="w-10 h-10 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
             </path>
@@ -49,12 +50,12 @@
       </router-link>
 
       <router-link to="/oficialia"
-        class="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:-translate-y-1 hover:border-blue-500 transition-all group text-center">
+        class="flex flex-col items-center py-3 px-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:-translate-y-1 hover:border-blue-500 transition-all group text-center">
         <div
-          class="w-12 h-12 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          class="w-10 h-10 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2">
+              d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
             </path>
           </svg>
         </div>
@@ -67,7 +68,7 @@
       <!-- COLUMNA PRINCIPAL: Noticias Relevantes (Ocupa 2/3) -->
       <div class="lg:col-span-2 space-y-6">
         <div class="flex items-center gap-2 mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
-          <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z">
             </path>
@@ -107,7 +108,7 @@
           </div>
           <div class="lg:col-span-2 space-y-6">
             <div class="flex items-center gap-2 mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
-              <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z">
                 </path>
@@ -199,11 +200,43 @@
                     d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
                 </svg>
               </div>
+              <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700/50 flex justify-end">
+                <a href="https://www.msn.com/es-mx/el-tiempo/mapas/temperature/in-Chilpancingo-de-los-Bravo,GRO?loc=eyJsIjoiQ2hpbHBhbmNpbmdvIGRlIGxvcyBCcmF2byIsInIiOiJHUk8iLCJjIjoiTcOpeGljbyIsImkiOiJNWCIsImciOiJlcy1teCIsIngiOiItOTkuNTAwNTk4OTA3NDcwNyIsInkiOiIxNy41NTE1NzIyMDk3Mjc1MjgifQ%3D%3D&weadegreetype=C&zoom=7" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="inline-flex items-center gap-1 text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors group">
+                  Ver mapa en tiempo real
+                  <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                  </svg>
+                </a>
+              </div>
+              
             </div>
           </div>
         </div>
 
-        <!-- WIDGET ENLACES DE INTERÉS -->
+        
+
+                  <!-- WIDGET FACEBOOK -->
+        <div>
+          <div
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col items-center overflow-hidden">
+            <h3
+              class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 w-full text-left">
+              Actividad Reciente</h3>
+
+            <!-- Contenedor extra para forzar el centrado del iframe de Facebook -->
+            <div class="w-full flex justify-center">
+              <div class="fb-page" data-href="https://www.facebook.com/ConsejeriaGuerrero"
+                data-tabs="timeline,events,messages" data-width="350" data-adapt-container-width="true"
+                data-hide-cover="false" data-show-facepile="true">
+              </div>
+            </div>
+
+          </div>
+        </div>
+<!-- WIDGET ENLACES DE INTERÉS -->
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Enlaces Oficiales
           </h3>
@@ -244,26 +277,6 @@
             </div>
           </div>
         </div>
-
-        <div>
-          <!-- WIDGET FACEBOOK -->
-          <div
-            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col items-center overflow-hidden">
-            <h3
-              class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 w-full text-left">
-              Actividad Reciente</h3>
-
-            <!-- Contenedor extra para forzar el centrado del iframe de Facebook -->
-            <div class="w-full flex justify-center">
-              <div class="fb-page" data-href="https://www.facebook.com/ConsejeriaGuerrero"
-                data-tabs="timeline,events,messages" data-width="350" data-adapt-container-width="true"
-                data-hide-cover="false" data-show-facepile="true">
-              </div>
-            </div>
-
-          </div>
-        </div>
-
       </div>
     </div>
   </div>

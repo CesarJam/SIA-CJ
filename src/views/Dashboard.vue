@@ -9,27 +9,41 @@
       isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
     ]">
 
-
       <div class="p-6 text-center border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/20">
-        
+
         <div class="relative w-20 h-20 mx-auto group cursor-pointer" @click="triggerFileInput">
           <img :src="userProfile.avatar" alt="Avatar"
-            class="w-full h-full rounded-full shadow-md border-2 border-indigo-500 p-0.5 object-cover transition-opacity"
-            :class="{'opacity-50': uploadingAvatar}" />
-          
-          <div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <svg v-if="!uploadingAvatar" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-            
-            <svg v-else class="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            class="w-full h-full rounded-full shadow-md border-2 border-blue-500 p-0.5 object-cover transition-opacity"
+            :class="{ 'opacity-50': uploadingAvatar }" />
+
+          <div
+            class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <svg v-if="!uploadingAvatar" class="w-6 h-6 text-white" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
+              </path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+
+            <svg v-else class="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+              </path>
+            </svg>
           </div>
-          
-          <input type="file" ref="fileInput" accept="image/png, image/jpeg, image/jpg" class="hidden" @change="subirAvatar" />
+
+          <input type="file" ref="fileInput" accept="image/png, image/jpeg, image/jpg" class="hidden"
+            @change="subirAvatar" />
         </div>
 
         <h2 class="mt-3 font-semibold text-gray-800 dark:text-white truncate px-2">
           Hola, {{ userProfile.name }}
         </h2>
-        <span class="text-xs text-indigo-600 dark:text-indigo-400 font-medium uppercase tracking-wider">
+        <span class="text-xs text-blue-600 dark:text-blue-400 font-medium uppercase tracking-wider">
           {{ userRole }}
         </span>
       </div>
@@ -37,7 +51,7 @@
       <nav class="flex-1 overflow-y-auto py-4 space-y-1 px-3">
         <router-link to="/"
           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          exact-active-class="bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 font-semibold">
+          exact-active-class="bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 font-semibold">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
@@ -45,9 +59,10 @@
           </svg>
           Inicio
         </router-link>
+        
         <router-link to="/cuadro-general"
           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          active-class="bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 font-semibold">
+          active-class="bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 font-semibold">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
@@ -56,27 +71,28 @@
         </router-link>
 
         <router-link to="/series"
-          class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
-          active-class="bg-indigo-50 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-400 font-bold">
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          active-class="bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 font-semibold">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
-            </path>
+              d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
           </svg>
           Series Documentales
         </router-link>
+
         <router-link to="/cadido"
-          class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
-          active-class="bg-indigo-50 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-400 font-bold">
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          active-class="bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 font-semibold">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
           CADIDO
         </router-link>
+
         <router-link to="/inventario"
-          class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
-          active-class="bg-indigo-50 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-400 font-bold">
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          active-class="bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 font-semibold">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
@@ -84,10 +100,10 @@
           </svg>
           Inventario
         </router-link>
-        <router-link v-if="userRole === 'admin' || userSecciones.includes('OFP')" to="/oficialia"
-          class="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
-          active-class="bg-indigo-50 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-400 font-bold">
 
+        <router-link v-if="userRole === 'admin' || userSecciones.includes('OFP')" to="/oficialia"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          active-class="bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 font-semibold">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
@@ -95,9 +111,10 @@
           </svg>
           Oficialía de Partes
         </router-link>
+
         <router-link v-if="userRole === 'admin'" to="/usuarios"
           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          active-class="bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 font-semibold">
+          active-class="bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 font-semibold">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
@@ -219,7 +236,7 @@ const subirAvatar = async (event) => {
   }
 
   uploadingAvatar.value = true
-  
+
   try {
     const session = await authService.getSession()
     const user = session?.user
@@ -230,12 +247,11 @@ const subirAvatar = async (event) => {
     const filePath = `${user.id}/avatar-${Date.now()}.${fileExt}`
 
     // 2. Subir a Supabase Storage (Bucket 'avatars')
-    // 2. Subir a Supabase Storage (Bucket 'avatars')
     const { error: uploadError } = await supabase.storage
       .from('avatars')
-      .upload(filePath, file, { 
+      .upload(filePath, file, {
         upsert: true,
-        contentType: file.type, // <-- ESTO EVITA QUE SE CORROMPA
+        contentType: file.type,
         cacheControl: '3600'
       })
 
