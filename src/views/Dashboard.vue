@@ -181,7 +181,7 @@
         <div class="flex items-center gap-2">
           <span>Desarrollado por <span class="font-semibold text-blue-600 dark:text-blue-400">cesarjam94</span></span>
           
-          <a href="https://github.com/cesarjam94" target="_blank" rel="noopener noreferrer" 
+          <a href="https://github.com/CesarJam/SIA-CJ" target="_blank" rel="noopener noreferrer" 
              class="text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
              title="Ver perfil de GitHub">
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
