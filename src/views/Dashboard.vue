@@ -165,8 +165,8 @@
         </button>
       </header>
 
-      <main class="flex-1 overflow-y-auto p-4 md:p-8">
-        <router-view v-slot="{ Component }">
+      <main class="flex-1 overflow-y-auto overscroll-none p-4 md:p-8">
+          <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in">
             <component :is="Component" />
           </transition>
