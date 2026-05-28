@@ -276,6 +276,7 @@ const cargarFacebookSDK = () => {
   document.body.appendChild(script)
 }
 
+/*
 const obtenerRss = async () => {
   try {
     // Hacemos fetch a nuestro proxy en Vite, añadiendo la ruta del XML
@@ -310,6 +311,43 @@ const obtenerRss = async () => {
   } finally {
     loadingRss.value = false
   }
+}
+  */
+ const obtenerRss = async () => {
+  try {
+    // Usamos el conversor público que se salta los escudos Anti-Bot
+    const url = 'https://api.rss2json.com/v1/api.json?rss_url=https://www.proceso.com.mx/rss/feed.html?r=1'
+    
+    const response = await fetch(url)
+    if (!response.ok) throw new Error('Error al obtener el feed')
+
+    const data = await response.json()
+
+    // rss2json nos entrega un arreglo limpio llamado "items"
+    noticiasRss.value = data.items.slice(0, 4).map(item => {
+      return { 
+        title: item.title, 
+        link: item.link, 
+        pubDate: item.pubDate, 
+        // Pasamos la descripción por nuestra lavadora de texto
+        description: limpiarHTML(item.description) 
+      }
+    })
+
+  } catch (error) {
+    console.error('Error al descargar las noticias:', error)
+  } finally {
+    loadingRss.value = false
+  }
+}
+const limpiarHTML = (htmlCodificado) => {
+  if (!htmlCodificado) return '';
+  // Creamos un elemento virtual en la memoria
+  const elementoVirtual = document.createElement('div');
+  // Al asignarle el texto, el navegador traduce los '&lt;' automáticamente a '<'
+  elementoVirtual.innerHTML = htmlCodificado;
+  // textContent ignora todas las etiquetas HTML y nos devuelve solo el texto puro
+  return elementoVirtual.textContent || elementoVirtual.innerText || '';
 }
 
 onMounted(() => {
