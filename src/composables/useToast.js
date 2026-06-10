@@ -1,7 +1,6 @@
 import { ref } from 'vue'
 
-// Estado global reactivo: Este arreglo vivirá fuera del componente, 
-// por lo que todos los módulos compartirán la misma lista de notificaciones.
+
 const toasts = ref([])
 let toastId = 0
 
@@ -11,7 +10,6 @@ export function useToast() {
     
     toasts.value.push({ id, message, type })
 
-    // Auto-eliminar después del tiempo especificado
     if (duration > 0) {
       setTimeout(() => {
         removeToast(id)

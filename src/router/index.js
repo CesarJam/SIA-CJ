@@ -28,7 +28,7 @@ const routes = [
         meta: { requiresAuth: true },
         children: [
             {
-                path: '', // Ruta por defecto al entrar al Dashboard
+                path: '',
                 name: 'Home',
                 component: Home
             },
@@ -43,21 +43,21 @@ const routes = [
                 component: CuadroGeneral
             },
             {
-                path: 'series', // CORREGIDO: Sin el '/' inicial
+                path: 'series', 
                 name: 'Series',
-                component: () => import('../views/modules/Series.vue'), // CORREGIDO: Usando '../'
+                component: () => import('../views/modules/Series.vue'), 
                 meta: { requiresAuth: true }
             },
             {
                 path: 'cadido',
                 name: 'Cadido',
-                component: () => import('../views/modules/Cadido.vue'), // CORREGIDO: Usando '../'
+                component: () => import('../views/modules/Cadido.vue'),
                 meta: { requiresAuth: true }
             },
             {
                 path: 'oficialia',
                 name: 'Oficialia',
-                component: () => import('../views/modules/Oficialia.vue'), // CORREGIDO: Usando '../'
+                component: () => import('../views/modules/Oficialia.vue'), 
                 meta: { 
                     requiresAuth: true,
                     requiresOficialia: true
@@ -66,7 +66,7 @@ const routes = [
             {
                 path: 'inventario', 
                 name: 'Inventario',
-                component: () => import('../views/modules/Inventario.vue'), // CORREGIDO: Usando '../'
+                component: () => import('../views/modules/Inventario.vue'),
                 meta: { requiresAuth: true }
             },
         ]
@@ -88,29 +88,25 @@ router.beforeEach(async (to, from, next) => {
         if (!session) {
             next({ name: 'Login' })
         } else {
-            // Obtenemos los datos del usuario desde la Lista Blanca
             const userData = await authService.checkWhitelist(session.user.email)
             
             if (!userData) {
                 await authService.logout()
                 next({ name: 'Denegado' })
             } else {
-                // Inyectamos el rol y las áreas permitidas para que el Dashboard las pueda leer
+
                 to.meta.userRole = userData.rol
                 to.meta.userSecciones = userData.secciones_permitidas || []
 
-                // === EL CANDADO DE OFICIALÍA ===
+                // === OFICIALÍA ===
                 if (to.matched.some(record => record.meta.requiresOficialia)) {
-                    // Validamos: ¿Es administrador o tiene el código 'OFP' en sus secciones?
-                    // CAMBIA 'OFP' POR TU CÓDIGO REAL DE BASE DE DATOS
                     const tieneAcceso = userData.rol === 'admin' || to.meta.userSecciones.includes('OFP')
                     
                     if (!tieneAcceso) {
                         console.warn("Acceso denegado a Oficialía: Falta de privilegios.")
-                        return next({ name: 'Home' }) // Lo regresamos al inicio
+                        return next({ name: 'Home' }) 
                     }
                 }
-
                 next()
             }
         }
