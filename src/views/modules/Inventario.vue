@@ -57,14 +57,34 @@
                     <option value="Concluido">Concluido (Archivados)</option>
                     <option value="Cancelado">Cancelados</option>
                 </select>
+                
+                <button @click="abrirModalExportar"
+                    class="w-full md:w-auto px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    CSV
+                </button>
+
+                <button @click="abrirModalExportarPDF"
+                    class="w-full md:w-auto px-4 py-2 text-sm font-semibold text-white bg-[#AB0033] hover:bg-[#8A0029] rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                    PDF
+                </button>
 
                 <button @click="abrirModalNuevoInterno"
                     class="w-full md:w-auto px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
-                    Nuevo Registro
+                    Nuevo 
                 </button>
+
+                
+
+                
             </div>
         </div>
 
@@ -367,6 +387,22 @@
 
         <ModalCancelar v-model="modalCancelarAbierto" :expediente="expedienteACancelar"
             :usuarioActual="usuarioActual || ''" @guardado="cargarBandeja" />
+
+        <ModalExportar 
+            v-model="modalExportarAbierto" 
+            :seccionId="seccionSeleccionada"
+            :miSeccion="miSeccion"
+            :opcionesAnios="opcionesAnios"
+            :anioDefecto="filtroAnio"
+        />
+
+        <ModalExportarPDF 
+            v-model="modalExportarPDFAbierto" 
+            :seccionId="seccionSeleccionada"
+            :miSeccion="miSeccion"
+            :opcionesAnios="opcionesAnios"
+            :anioDefecto="filtroAnio"
+        />
     </div>
 
 </template>
@@ -380,6 +416,8 @@ import ModalAtender from '@/components/ModalAtender.vue';
 import ModalConcluir from '@/components/ModalConcluir.vue';
 import ModalDetalles from '@/components/ModalDetalles.vue';
 import ModalCancelar from '@/components/ModalCancelar.vue';
+import ModalExportar from "@/components/ModalExportar.vue";
+import ModalExportarPDF from '@/components/ModalExportarPDF.vue';
 
 const toast = useToast();
 
@@ -434,6 +472,8 @@ const catalogoSeriesEstructurado = ref([]);
 // === ESTADOS MODAL 3: DETALLES Y BITÁCORA ===
 const modalDetallesAbierto = ref(false);
 const expedienteDetalle = ref(null);
+
+
 
 // === FLUJO 3: DETALLES ===
 const abrirModalDetalles = async (item) => {
@@ -660,6 +700,24 @@ const abrirModalNuevoInterno = () => {
 const onRegistroInternoExitoso = async () => {
     modalNuevoAbierto.value = false; // Cerramos el modal inmediatamente
     await cargarBandeja();           // Recargamos la tabla con el nuevo registro
+};
+
+// ==ESTADOS MODAL 5: MODAL EXPORTAR ===
+const modalExportarAbierto = ref(false);
+
+const abrirModalExportar = () => {
+    if (!seccionSeleccionada.value) {
+        return toast.error("Selecciona un área en la cabecera primero.");
+    }
+    modalExportarAbierto.value = true;
+};
+
+// ==ESTADOS MODAL 6: MODAL EXPORTAR PDF ===
+const modalExportarPDFAbierto = ref(false);
+
+const abrirModalExportarPDF = () => {
+    if (!seccionSeleccionada.value) return toast.error("Selecciona un área en la cabecera primero.");
+    modalExportarPDFAbierto.value = true;
 };
 
 // Función para asignar colores dinámicos al badge de Carácter en la tabla
