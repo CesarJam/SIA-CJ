@@ -347,7 +347,8 @@ const cargarFacebookSDK = () => {
 
 const obtenerRss = async () => {
   try {
-    const url = 'https://api.rss2json.com/v1/api.json?rss_url=https://www.proceso.com.mx/rss/feed.html?r=1'
+    const rssURL = 'https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/mexico/portada';
+    const url = 'https://api.rss2json.com/v1/api.json?rss_url='+rssURL;
 
     const response = await fetch(url)
     if (!response.ok) throw new Error('Error al obtener el feed')
