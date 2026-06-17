@@ -16,7 +16,7 @@
                 <div
                     class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-emerald-50 dark:bg-emerald-900/20 flex justify-between items-center shrink-0">
                     <h2 class="text-lg font-bold text-emerald-800 dark:text-emerald-400">
-                        Clasificación Archivística Final componente
+                        Clasificación Archivística Final
                     </h2>
                     <button @click="cerrarModal" class="text-gray-400 hover:text-gray-600 transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,7 +125,7 @@ import { useToast } from '@/composables/useToast'
 const props = defineProps({
     modelValue: { type: Boolean, required: true },
     expediente: { type: Object, default: null },
-    catalogoSeries: { type: Array, required: true }, // Se lo pasamos desde Inventario para no hacer queries extra
+    catalogoSeries: { type: Array, required: true },
     usuarioActual: { type: String, required: true }
 })
 
@@ -159,14 +159,17 @@ const seleccionarSubserie = (sub) => {
     busquedaActiva.value = false
 }
 
-// Observar cuando cambia el expediente para precargar datos
+// === CORRECCIÓN 1: Limpiar variables cuando cambia el expediente ===
 watch(() => props.expediente, (nuevoExpediente) => {
     if (nuevoExpediente) {
         codigoSubserieLocal.value = nuevoExpediente.codigo_subserie || ""
+        terminoBusqueda.value = "" // Nos aseguramos de vaciar el input
+    } else {
+        codigoSubserieLocal.value = ""
+        terminoBusqueda.value = ""
     }
 }, { immediate: true })
 
-// Computado para obtener el detalle de la subserie seleccionada
 const detalleSeleccionado = computed(() => {
     if (!codigoSubserieLocal.value) return null
     for (const serie of props.catalogoSeries) {
@@ -190,7 +193,6 @@ const ejecutarConclusion = async () => {
 
     procesando.value = true
     try {
-        // CONSTRUCCIÓN DEL SNAPSHOT HISTÓRICO JSONB
         const snapshotCadido = {
             codigo_padre: detalleSeleccionado.value.codigo_serie_padre,
             nombre_padre: detalleSeleccionado.value.nombre_serie_padre,
@@ -220,10 +222,12 @@ const ejecutarConclusion = async () => {
         toast.success(`Expediente clasificado y archivado.`)
         emit('guardado')
 
-        // La corrección clave aquí:
+        // === CORRECCIÓN 2: Limpiar después de archivar ===
+        terminoBusqueda.value = ''
+        codigoSubserieLocal.value = ''
+        
         procesando.value = false
         cerrarModal()
-        return
 
     } catch (err) {
         toast.error("Error al concluir el expediente.")
@@ -231,9 +235,8 @@ const ejecutarConclusion = async () => {
     }
 }
 
-// === LÓGICA DE TECLADO (Cerrar con ESC) ===
+// Lógica de Teclado
 const handleKeydown = (e) => {
-    // Evita cerrar si está archivando el expediente
     if (e.key === 'Escape' && props.modelValue && !procesando.value) {
         cerrarModal() 
     }
