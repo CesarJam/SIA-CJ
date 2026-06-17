@@ -23,7 +23,14 @@
                             d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                         </path>
                     </svg>
-                    Exportar CADIDO
+                    CSV
+                </button>
+                <button @click="exportarPDF"
+                    class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold text-white bg-[#AB0033] hover:bg-[#8A0029] rounded-lg shadow-sm transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                    PDF
                 </button>
             </div>
         </div>
@@ -256,6 +263,10 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/supabase'
 import { useToast } from '@/composables/useToast'
 
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
+import logoSIA from '@/assets/logo-transparente.png'
+
 const toast = useToast()
 
 // Estado Global
@@ -383,31 +394,194 @@ const guardarValoracion = async () => {
 
 // Exportación CSV especializada para CADIDO
 const exportarCSV = () => {
-    let csv = "\uFEFFCÓDIGO SERIE;SECCIÓN;CÓDIGO SUBSERIE;SUBSERIE;VALOR;AT;AC;TOTAL;DESTINO;DATOS PERSONALES;OBSERVACIONES\n"
+    // 1. Obtener la información de la sección seleccionada actualmente
+    const seccionSeleccionada = seccionesDisponibles.value.find(s => s.id === filtroSeccion.value);
+    const nombreSeccion = seccionSeleccionada ? seccionSeleccionada.seccion : "No definida";
+    const codigoSeccion = seccionSeleccionada ? seccionSeleccionada.codigo : "S/C";
 
+    // 2. Generar la fecha actual con formato en español
+    const fechaActual = new Date().toLocaleDateString('es-MX', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+    });
+
+    // 3. Construir las filas del encabezado oficial
+    const fila1 = `;"CONSEJERÍA JURÍDICA DEL PODER EJECUTIVO DEL ESTADO DE GUERRERO"`;
+    const fila2 = ``;
+    const fila3 = `;"Sección";"${nombreSeccion}"`;
+    const fila4 = `;"Código";"${codigoSeccion}"`;
+    const fila5 = `;"Fecha de exportación";"${fechaActual}"`;
+    const fila6 = ``;
+
+    // 4. Tus nuevas cabeceras modificadas
+    const cabeceras = "CÓDIGO SERIE;SERIE;CÓDIGO SUBSERIE;SUBSERIE;VALOR DOCUMENTAL;AÑOS TRÁMITE;AÑOS CONCENTRACIÓN;TOTAL;DESTINO;DATOS PERSONALES;OBSERVACIONES";
+
+    // 5. Unir los encabezados con el BOM (para los acentos en Excel)
+    let csv = `\uFEFF${fila1}\n${fila2}\n${fila3}\n${fila4}\n${fila5}\n${fila6}\n${cabeceras}\n`;
+
+    // 6. Mapear los datos de las series
     seriesFiltradas.value.forEach(serie => {
         if (serie.subseries && serie.subseries.length > 0) {
             serie.subseries.forEach(sub => {
-                const at = sub.at || 0
-                const ac = sub.ac || 0
-                const total = at + ac
-                const valor = sub.valor_documental || 'No asignado'
-                const destino = sub.tecnica_seleccion || 'No asignado'
-                const dp = sub.datos_personales || 'No'
-                const obs = sub.observaciones || ''
+                const at = sub.at || 0;
+                const ac = sub.ac || 0;
+                const total = at + ac;
+                const valor = sub.valor_documental || 'No asignado';
+                const destino = sub.tecnica_seleccion || 'No asignado';
+                const dp = sub.datos_personales || 'No';
+                
+                // Limpiamos observaciones por si el usuario escribió comillas dobles
+                const obs = sub.observaciones ? String(sub.observaciones).replace(/"/g, '""') : '';
 
-                csv += `"${serie.codigo_serie}";"${serie.cuadro_general.codigo}";"${sub.codigoSubserie}";"${sub.nombre}";"${valor}";${at};${ac};${total};"${destino}";"${dp}";"${obs}"\n`
-            })
+                csv += `"${serie.codigo_serie}";"${serie.nombre}";"${sub.codigoSubserie}";"${sub.nombre}";"${valor}";${at};${ac};${total};"${destino}";"${dp}";"${obs}"\n`;
+            });
         }
-    })
+    });
 
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement("a")
-    link.href = url
-    link.download = "CADIDO_ConsejeriaJuridica.csv"
-    link.click()
+    // 7. Generar y descargar el archivo dinámicamente con el nombre de la sección
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `CADIDO_${codigoSeccion}.csv`;
+    link.click();
+    
+    // Limpieza de memoria (buena práctica en JS)
+    setTimeout(() => URL.revokeObjectURL(url), 100);
 }
+
+// Exportación a PDF Oficial para CADIDO
+const exportarPDF = async () => {
+    try {
+        const seccionSeleccionada = seccionesDisponibles.value.find(s => s.id === filtroSeccion.value);
+        const nombreSeccion = seccionSeleccionada ? seccionSeleccionada.seccion : "No definida";
+        const codigoSeccion = seccionSeleccionada ? seccionSeleccionada.codigo : "S/C";
+
+        // --- 1. CONFIGURAR EL DOCUMENTO PDF ---
+        const doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: 'legal' // Tamaño oficio
+        });
+
+        const img = new Image();
+        img.src = logoSIA;
+        await new Promise((resolve) => {
+            img.onload = resolve;
+        });
+
+        doc.addImage(img, 'PNG', 300, 20, 24, 24);
+
+        const pageWidth = doc.internal.pageSize.getWidth();
+
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text('CATÁLOGO DE DISPOSICIÓN DOCUMENTAL (CADIDO)', pageWidth / 2, 15, { align: 'center' });
+        doc.text("CONSEJERÍA JURÍDICA DEL PODER EJECUTIVO DEL ESTADO DE GUERRERO", pageWidth / 2, 20, { align: 'center' });
+        
+        const fechaActual = new Date().toLocaleDateString('es-MX', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
+
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Fecha de exportación: ${fechaActual}`, pageWidth - 14, 47, { align: 'right' });
+
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`Sección: ${nombreSeccion}`, 14, 32);
+        doc.text(`Código: ${codigoSeccion}`, 14, 38);
+
+        // --- 2. CABECERAS DE LA TABLA (Tus 11 columnas) ---
+        const cabeceras = [
+            "Código Serie", 
+            "Serie", 
+            "Código Subserie", 
+            "Subserie", 
+            "Valor Documental", 
+            "Años Trámite", 
+            "Años Concentración", 
+            "Total", 
+            "Destino", 
+            "Datos Personales", 
+            "Observaciones"
+        ];
+        
+        // --- 3. MAPEAMOS LOS DATOS ---
+        const filas = [];
+        seriesFiltradas.value.forEach(serie => {
+            if (serie.subseries && serie.subseries.length > 0) {
+                serie.subseries.forEach(sub => {
+                    const at = sub.at || 0;
+                    const ac = sub.ac || 0;
+                    const total = at + ac;
+                    const valor = sub.valor_documental || 'No asignado';
+                    const destino = sub.tecnica_seleccion || 'No asignado';
+                    const dp = sub.datos_personales || 'No';
+                    const obs = sub.observaciones || '';
+
+                    filas.push([
+                        serie.codigo_serie,
+                        serie.nombre,
+                        sub.codigoSubserie,
+                        sub.nombre,
+                        valor,
+                        at.toString(),
+                        ac.toString(),
+                        total.toString(),
+                        destino,
+                        dp,
+                        obs
+                    ]);
+                });
+            }
+        });
+
+        if (filas.length === 0) {
+            toast.info("No hay subseries valoradas para exportar en esta sección.");
+            return;
+        }
+
+        // --- 4. DIBUJAR LA TABLA CON AUTOTABLE ---
+        autoTable(doc, {
+            startY: 50, 
+            head: [cabeceras],
+            body: filas,
+            headStyles: { 
+                fillColor: '#AB0033', // Guinda institucional
+                textColor: '#FFFFFF', // Texto Blanco
+                fontSize: 8,
+                halign: 'center'
+            },
+            styles: { 
+                fontSize: 7, 
+                cellPadding: 2,
+                overflow: 'linebreak'
+            },
+            alternateRowStyles: {
+                fillColor: '#f9fafb' 
+            },
+            columnStyles: {
+                1: { cellWidth: 40 }, // Serie
+                3: { cellWidth: 45 }, // Subserie
+                10: { cellWidth: 35 } // Observaciones
+            }
+        });
+
+        // --- 5. GUARDAR Y DESCARGAR ---
+        const nombreArchivo = `CADIDO_${codigoSeccion}.pdf`;
+        doc.save(nombreArchivo);
+        
+        toast.success("Catálogo PDF exportado correctamente.");
+
+    } catch (error) {
+        console.error("Error al exportar CADIDO a PDF:", error);
+        toast.error("Ocurrió un error al generar el documento PDF.");
+    }
+};
 
 const handleKeydown = (e) => {
     if (e.key === 'Escape' && modalAbierto.value) cerrarModal()
