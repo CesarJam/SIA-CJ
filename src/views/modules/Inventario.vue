@@ -232,6 +232,13 @@
                                                     </svg>
                                                     Asignar Trámite
                                                 </button>
+                                                <button @click="abrirModalEditar(item); cerrarMenu();"
+                                                    class="w-full text-left px-4 py-2.5 text-xs font-semibold text-amber-600 hover:bg-amber-50 dark:text-amber-500 dark:hover:bg-amber-900/30 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                    </svg>
+                                                    Editar Registro
+                                                </button>
                                                 <button @click="
                                                     abrirModalDetalles(item);
                                                 cerrarMenu();
@@ -373,8 +380,12 @@
             </div>
         </div>
 
-        <ModalRegistroDocumento v-model="modalNuevoAbierto" :origenId="seccionSeleccionada || ''"
-            @guardado="onRegistroInternoExitoso" />
+        <ModalRegistroDocumento 
+            v-model="modalNuevoAbierto" 
+            :origenId="seccionSeleccionada || ''"
+            :datosEditar="expedienteAEditar" 
+            @guardado="onRegistroInternoExitoso" 
+        />
 
         <ModalAtender v-model="modalAtenderAbierto" :expediente="expedienteAAtender"
             :usuarioActual="usuarioActual || ''" @guardado="cargarBandeja" />
@@ -422,6 +433,13 @@ import ModalExportarPDF from '@/components/ModalExportarPDF.vue';
 const toast = useToast();
 
 const modalNuevoAbierto = ref(false);
+const expedienteAEditar = ref(null);
+
+const abrirModalEditar = (item) => {
+    expedienteAEditar.value = item; // Guardamos los datos del expediente a editar
+    modalNuevoAbierto.value = true; // Abrimos el mismo modal
+};
+
 
 // === ESTADOS GLOBALES ===
 const loading = ref(true);
@@ -693,6 +711,7 @@ const abrirModalNuevoInterno = () => {
     if (!seccionSeleccionada.value) {
         return toast.error("Selecciona un área en la cabecera primero.");
     }
+    expedienteAEditar.value = null; // <-- LIMPIAMOS LA VARIABLE AQUÍ
     modalNuevoAbierto.value = true;
 };
 

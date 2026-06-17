@@ -342,7 +342,8 @@ watch(() => props.modelValue, async (nuevoValor) => {
                 areas_destino: [],
                 id_seccion_turnada: props.datosEditar.id_seccion_turnada,
                 caracter: props.datosEditar.caracter,
-                fecha_registro: props.datosEditar.fecha_registro || obtenerFechaActual()
+                fecha_registro: props.datosEditar.fecha_registro || obtenerFechaActual(),
+                tipo_registro: props.datosEditar.tipo_registro || 'Recibido'
             }
         } else {
             form.value = {
