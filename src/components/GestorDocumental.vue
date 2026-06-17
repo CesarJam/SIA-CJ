@@ -2,10 +2,24 @@
     <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
         
         <div v-if="modo !== 'lectura'" class="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-indigo-300 border-dashed rounded-lg cursor-pointer bg-indigo-50/30 dark:bg-indigo-900/10 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors">
-                <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                    <svg class="w-8 h-8 mb-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                    <p class="mb-1 text-sm text-gray-600 dark:text-gray-300"><span class="font-bold text-indigo-600 dark:text-indigo-400">Haz clic para subir</span> o arrastra tus archivos</p>
+            <label 
+                @dragover.prevent="isDragging = true"
+                @dragleave.prevent="isDragging = false"
+                @drop.prevent="manejarDrop"
+                :class="[
+                    'flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors',
+                    isDragging 
+                        ? 'border-indigo-500 bg-indigo-100 dark:bg-indigo-900/40' // Color activo al arrastrar encima
+                        : 'border-indigo-300 bg-indigo-50/30 dark:bg-indigo-900/10 hover:bg-indigo-50 dark:hover:bg-indigo-900/20' // Color normal
+                ]"
+            >
+                <div class="flex flex-col items-center justify-center pt-5 pb-6 pointer-events-none">
+                    <svg :class="['w-8 h-8 mb-3 transition-colors', isDragging ? 'text-indigo-600' : 'text-indigo-500']" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                    <p class="mb-1 text-sm text-gray-600 dark:text-gray-300">
+                        <span class="font-bold text-indigo-600 dark:text-indigo-400">
+                            {{ isDragging ? 'Suelta tus archivos aquí' : 'Haz clic para subir o arrastra tus archivos' }}
+                        </span>
+                    </p>
                     <p class="text-xs text-gray-500 dark:text-gray-400">PDF, JPG, PNG (Max. 10MB)</p>
                 </div>
                 <input type="file" class="hidden" multiple @change="manejarSubidaArchivo" :disabled="subiendo" accept=".pdf,.jpg,.jpeg,.png" />
@@ -84,7 +98,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { supabase } from '@/supabase'
 import { useToast } from '@/composables/useToast'
-import ModalVisor from '@/components/ModalVisor.vue' // Importamos el visor
+import ModalVisor from '@/components/ModalVisor.vue' 
 
 const props = defineProps({
     expedienteId: { type: String, required: true },
@@ -97,7 +111,9 @@ const archivos = ref([])
 const cargandoArchivos = ref(false)
 const subiendo = ref(false)
 
-// === ESTADOS DEL VISOR ===
+// Estado para la animación de "Arrastrar y Soltar"
+const isDragging = ref(false)
+
 const visorAbierto = ref(false)
 const archivoActualUrl = ref('')
 const archivoActualNombre = ref('')
@@ -122,8 +138,22 @@ const cargarArchivos = async () => {
     }
 }
 
-const manejarSubidaArchivo = async (event) => {
+// Nueva función exclusiva para procesar el "Drop" (Soltar)
+const manejarDrop = (event) => {
+    isDragging.value = false
+    // Extraemos los archivos del evento dataTransfer en lugar del input target
+    const files = event.dataTransfer.files
+    procesarArchivos(files)
+}
+
+// Modificamos la función del botón de buscar para que use la misma lógica central
+const manejarSubidaArchivo = (event) => {
     const files = event.target.files
+    procesarArchivos(files)
+}
+
+// Lógica central para subir archivos a Supabase (usada tanto por click como por drag & drop)
+const procesarArchivos = async (files) => {
     if (!files || files.length === 0) return
 
     subiendo.value = true
@@ -132,6 +162,14 @@ const manejarSubidaArchivo = async (event) => {
     try {
         for (let i = 0; i < files.length; i++) {
             const file = files[i]
+            
+            // Validamos que sea un tipo de archivo permitido antes de subirlo
+            const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg']
+            if (!allowedTypes.includes(file.type)) {
+                toast.error(`El archivo ${file.name} no es un formato válido.`)
+                continue
+            }
+
             const cleanFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
             const rutaStorage = `${props.expedienteId}/${Date.now()}_${cleanFileName}`
 
@@ -161,14 +199,11 @@ const manejarSubidaArchivo = async (event) => {
         toast.error(error.message || "Error al subir el archivo.")
     } finally {
         subiendo.value = false
-        event.target.value = '' 
     }
 }
 
-// === NUEVA FUNCIÓN: ABRIR VISOR ===
 const abrirVisor = async (archivo) => {
     try {
-        // Solicitamos a Supabase una URL firmada (segura) válida por 1 hora (3600 seg)
         const { data, error } = await supabase.storage
             .from('expedientes')
             .createSignedUrl(archivo.ruta_supabase, 3600)
