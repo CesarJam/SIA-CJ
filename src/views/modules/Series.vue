@@ -21,7 +21,14 @@
                             d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                         </path>
                     </svg>
-                    Exportar
+                    CSV
+                </button>
+                <button @click="exportarPDF"
+                    class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold text-white bg-[#AB0033] hover:bg-[#8A0029] rounded-lg shadow-sm transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                    PDF
                 </button>
                 <button @click="abrirModalNuevo"
                     class="flex-1 md:flex-none px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700 transition-colors">
@@ -246,6 +253,10 @@ import { ref, computed, watch, onMounted, onUnmounted, nextTick, defineAsyncComp
 import { supabase } from '@/supabase'
 import { useToast } from '@/composables/useToast'
 
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
+import logoSIA from '@/assets/logo-transparente.png'
+
 const ConfirmModal = defineAsyncComponent(() => import('@/components/ConfirmModal.vue'))
 
 const toast = useToast()
@@ -407,18 +418,179 @@ const confirmarEliminacion = async () => {
 }
 
 const exportarCSV = () => {
-    let csv = "\uFEFFCódigo;Nombre;Sección;Subseries\n"
-    seriesFiltradas.value.forEach(s => {
-        const subNombres = s.subseries.map(sub => sub.nombre).join(' | ')
-        csv += `"${s.codigo_serie}";"${s.nombre}";"${s.cuadro_general.codigo}";"${subNombres}"\n`
-    })
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement("a")
-    link.href = url
-    link.download = "SeriesDocumentales.csv"
-    link.click()
+    // 1. Obtener la información de la sección seleccionada actualmente
+    const seccionSeleccionada = seccionesDisponibles.value.find(s => s.id === filtroSeccion.value);
+    const nombreSeccion = seccionSeleccionada ? seccionSeleccionada.seccion : "No definida";
+    const codigoSeccion = seccionSeleccionada ? seccionSeleccionada.codigo : "S/C";
+
+    // 2. Generar la fecha actual con formato en español
+    const fechaActual = new Date().toLocaleDateString('es-MX', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+    });
+
+    // 3. Construir las filas del encabezado oficial
+    const fila1 = `;"CONSEJERÍA JURÍDICA DEL PODER EJECUTIVO DEL ESTADO DE GUERRERO"`;
+    const fila2 = ``;
+    const fila3 = `;"Sección";"${nombreSeccion}"`;
+    const fila4 = `;"Código";"${codigoSeccion}"`;
+    const fila5 = `;"Fecha de exportación";"${fechaActual}"`;
+    const fila6 = ``;
+
+    // 4. Nuevas cabeceras
+    const cabeceras = "CÓDIGO SERIE;SERIE;CÓDIGO SUBSERIE;SUBSERIE";
+
+    // 5. Unir los encabezados con el BOM
+    let csv = `\uFEFF${fila1}\n${fila2}\n${fila3}\n${fila4}\n${fila5}\n${fila6}\n${cabeceras}\n`;
+
+    // 6. Mapear los datos (desglosando cada subserie en una nueva fila)
+    seriesFiltradas.value.forEach(serie => {
+        // Limpiamos el nombre de la serie por si lleva comillas
+        const nombreSerie = serie.nombre ? String(serie.nombre).replace(/"/g, '""') : '';
+
+        if (serie.subseries && serie.subseries.length > 0) {
+            serie.subseries.forEach(sub => {
+                const nombreSubserie = sub.nombre ? String(sub.nombre).replace(/"/g, '""') : '';
+                csv += `"${serie.codigo_serie}";"${nombreSerie}";"${sub.codigoSubserie}";"${nombreSubserie}"\n`;
+            });
+        } else {
+            // Si la serie existe pero aún no tiene subseries registradas, mostramos la serie y dejamos los otros campos vacíos
+            csv += `"${serie.codigo_serie}";"${nombreSerie}";"";""\n`;
+        }
+    });
+
+    // 7. Generar y descargar el archivo dinámicamente con el nombre de la sección
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `Series_${codigoSeccion}.csv`;
+    link.click();
+    
+    // Limpieza de memoria
+    setTimeout(() => URL.revokeObjectURL(url), 100);
 }
+
+// Exportación a PDF Oficial para Series
+const exportarPDF = async () => {
+    try {
+        const seccionSeleccionada = seccionesDisponibles.value.find(s => s.id === filtroSeccion.value);
+        const nombreSeccion = seccionSeleccionada ? seccionSeleccionada.seccion : "No definida";
+        const codigoSeccion = seccionSeleccionada ? seccionSeleccionada.codigo : "S/C";
+
+        // --- 1. CONFIGURAR EL DOCUMENTO PDF ---
+        const doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: 'legal' // Tamaño Oficio Horizontal
+        });
+
+        const img = new Image();
+        img.src = logoSIA;
+        await new Promise((resolve) => {
+            img.onload = resolve;
+        });
+
+        doc.addImage(img, 'PNG', 300, 20, 24, 24);
+
+        const pageWidth = doc.internal.pageSize.getWidth();
+
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text('SERIES Y SUBSERIES DOCUMENTALES', pageWidth / 2, 15, { align: 'center' });
+        doc.text("CONSEJERÍA JURÍDICA DEL PODER EJECUTIVO DEL ESTADO DE GUERRERO", pageWidth / 2, 20, { align: 'center' });
+        
+        const fechaActual = new Date().toLocaleDateString('es-MX', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
+
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Fecha de exportación: ${fechaActual}`, pageWidth - 14, 47, { align: 'right' });
+
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`Sección: ${nombreSeccion}`, 14, 32);
+        doc.text(`Código: ${codigoSeccion}`, 14, 38);
+
+        // --- 2. CABECERAS DE LA TABLA ---
+        const cabeceras = [
+            "Código Serie", 
+            "Serie", 
+            "Código Subserie", 
+            "Subserie"
+        ];
+        
+        // --- 3. MAPEAMOS LOS DATOS (Igual que en el CSV) ---
+        const filas = [];
+        seriesFiltradas.value.forEach(serie => {
+            if (serie.subseries && serie.subseries.length > 0) {
+                serie.subseries.forEach(sub => {
+                    filas.push([
+                        serie.codigo_serie || "",
+                        serie.nombre || "",
+                        sub.codigoSubserie || "",
+                        sub.nombre || ""
+                    ]);
+                });
+            } else {
+                // Si no tiene subseries, la dejamos en blanco
+                filas.push([
+                    serie.codigo_serie || "",
+                    serie.nombre || "",
+                    "",
+                    ""
+                ]);
+            }
+        });
+
+        if (filas.length === 0) {
+            toast.info("No hay series registradas en esta sección para exportar.");
+            return;
+        }
+
+        // --- 4. DIBUJAR LA TABLA CON AUTOTABLE ---
+        autoTable(doc, {
+            startY: 50, 
+            head: [cabeceras],
+            body: filas,
+            headStyles: { 
+                fillColor: '#AB0033', // Guinda Institucional
+                textColor: '#FFFFFF', // Texto Blanco
+                fontSize: 9,
+                halign: 'center'
+            },
+            styles: { 
+                fontSize: 8, 
+                cellPadding: 3,
+                overflow: 'linebreak'
+            },
+            alternateRowStyles: {
+                fillColor: '#f9fafb' // Gris claro para filas pares
+            },
+            // Como son pocas columnas, podemos hacerlas más anchas para que se lea mejor
+            columnStyles: {
+                0: { cellWidth: 40 }, // Código Serie
+                1: { cellWidth: 100 }, // Nombre Serie
+                2: { cellWidth: 40 }, // Código Subserie
+                3: { cellWidth: 'auto' } // Nombre Subserie (Toma el resto del espacio)
+            }
+        });
+
+        // --- 5. GUARDAR Y DESCARGAR ---
+        const nombreArchivo = `Series_${codigoSeccion}.pdf`;
+        doc.save(nombreArchivo);
+        
+        toast.success("Catálogo de Series PDF exportado correctamente.");
+
+    } catch (error) {
+        console.error("Error al exportar Series a PDF:", error);
+        toast.error("Ocurrió un error al generar el documento PDF.");
+    }
+};
 
 const handleKeydown = (e) => {
     if (e.key === 'Escape' && modalAbierto.value && !modalEliminar.value.abierto) cerrarModal()
