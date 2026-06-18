@@ -28,13 +28,12 @@
 
                 <div class="flex-1 overflow-y-auto p-6 space-y-5">
                     <div
-                        class="bg-emerald-50 dark:bg-emerald-900/20 p-3 rounded-lg border border-emerald-100 dark:border-emerald-800/30 text-sm text-emerald-800 dark:text-emerald-300 mb-4 flex gap-3 items-center">
-                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-xl border border-emerald-100 dark:border-emerald-800/30 text-base text-emerald-800 dark:text-emerald-300 mb-5 flex gap-3 items-start shadow-sm">
+                        <svg class="w-6 h-6 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        <p>El trámite de <strong>{{ expediente?.numero_consecutivo }}</strong>, con asunto <strong>{{ expediente?.asunto }}</strong> ha finalizado. Clasifica
-                            el fondo para generar su Snapshot histórico.</p>
+                        <p class="leading-relaxed">El trámite de <strong class="text-emerald-900 dark:text-emerald-200">{{ expediente?.numero_consecutivo }}</strong>, con asunto <strong class="text-emerald-900 dark:text-emerald-200">{{ expediente?.asunto }}</strong> ha finalizado. Clasifica el fondo para generar su Snapshot histórico.</p>
                     </div>
 
                     <div class="relative">
