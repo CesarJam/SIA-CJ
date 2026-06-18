@@ -458,7 +458,8 @@ const ejecutarTurnado = async () => {
             id_seccion_turnada: idDestino,       // A quién va
             id_usuario_registro: usuarioActual.value,
             estatus: 'Recepcionado',
-            tradicion: index === 0 ? 'Original' : 'Copia',
+            tradicion: null,
+            //tradicion: index === 0 ? 'Original' : 'Copia',
             caracter: form.value.caracter,
             fecha_registro: form.value.fecha_registro
         }))
