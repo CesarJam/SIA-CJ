@@ -117,7 +117,8 @@
                                         Consecutivo</label>
                                     <input v-model="form.numero_consecutivo" type="text" placeholder="Ej: CJ-2026-001"
                                         required
-                                        class="mt-auto w-full px-3 py-2.5 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
+                                        class="mt-auto w-full px-3 py-2.5 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
+                                        >
                                 </div>
 
                                 <div class="flex flex-col">
@@ -168,8 +169,9 @@
                             class="bg-gray-50 dark:bg-gray-900/50 p-5 rounded-xl border border-gray-200 dark:border-gray-700">
                             <div
                                 class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
-                                <h3 class="text-base font-bold text-gray-700 dark:text-gray-300">2. Dependencias
-                                    Involucradas</h3>
+                                <h3 class="text-base font-bold text-gray-700 dark:text-gray-300">
+                                    2. Dependencias Involucradas
+                                </h3>
                                 <button class="text-sm text-indigo-600 font-bold hover:underline"
                                     @click="abrirModalDependencia">+ Nueva Dependencia</button>
                             </div>
@@ -210,7 +212,7 @@
                                     <div class="flex flex-col">
                                         <span class="text-base font-semibold text-gray-700 dark:text-gray-200">{{
                                             dep.nombre_oficial }}</span>
-                                        <span v-if="dep.siglas" class="text-xs font-bold text-gray-400 uppercase mt-0.5">{{
+                                        <span v-if="dep.siglas" class="text-xs font-bold text-gray-400 mt-0.5">{{
                                             dep.siglas }}</span>
                                     </div>
                                 </label>
@@ -312,11 +314,11 @@ const obtenerFechaActual = () => {
 
 // Formulario Principal
 const form = ref({
-    numero_consecutivo: '',
+    numero_consecutivo: 'CJ/DA//2026',
     fojas: 1,
     asunto: '',
     caracter: 'Ordinario',
-    tipo_registro: 'Recibido',
+    tipo_registro: 'Enviado',
     dependencias_ids: [],
     areas_destino: [],
     id_seccion_turnada: null,
@@ -344,8 +346,8 @@ watch(() => props.modelValue, async (nuevoValor) => {
             }
         } else {
             form.value = {
-                numero_consecutivo: '', fojas: 1, asunto: '', dependencias_ids: [],
-                areas_destino: [], id_seccion_turnada: null, caracter: 'Ordinario',
+                numero_consecutivo: 'CJ/DA//2026', fojas: 1, asunto: '', dependencias_ids: [],
+                areas_destino: [], id_seccion_turnada: null, caracter: 'Ordinario', tipo_registro: 'Enviado',
                 fecha_registro: obtenerFechaActual()
             }
         }
