@@ -57,11 +57,14 @@
                     <option value="Concluido">Concluido (Archivados)</option>
                     <option value="Cancelado">Cancelados</option>
                 </select>
-                
+
                 <button @click="abrirModalExportar"
                     class="w-full md:w-auto px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2">
-                    <svg class="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    <svg class="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
                     </svg>
                     CSV
                 </button>
@@ -69,7 +72,9 @@
                 <button @click="abrirModalExportarPDF"
                     class="w-full md:w-auto px-4 py-2 text-sm font-semibold text-white bg-[#AB0033] hover:bg-[#8A0029] rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z">
+                        </path>
                     </svg>
                     PDF
                 </button>
@@ -79,12 +84,12 @@
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
-                    Nuevo 
+                    Nuevo
                 </button>
 
-                
 
-                
+
+
             </div>
         </div>
 
@@ -109,7 +114,7 @@
                     }">
                     <div class="w-full md:w-1/6 flex flex-col md:block">
                         <span class="font-bold text-gray-900 dark:text-white text-sm">{{ item.numero_consecutivo
-                        }}</span>
+                            }}</span>
                         <span v-if="item.caracter === 'Urgente' || item.caracter === 'Extraordinario'"
                             :class="claseBadgeCaracter(item.caracter)">
                             {{ item.caracter }}
@@ -234,8 +239,12 @@
                                                 </button>
                                                 <button @click="abrirModalEditar(item); cerrarMenu();"
                                                     class="w-full text-left px-4 py-2.5 text-xs font-semibold text-amber-600 hover:bg-amber-50 dark:text-amber-500 dark:hover:bg-amber-900/30 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                        </path>
                                                     </svg>
                                                     Editar Registro
                                                 </button>
@@ -324,9 +333,19 @@
                                                     </svg>
                                                     Auditar Expediente
                                                 </button>
-                                                <button v-if="rolUsuario === 'admin'" @click="abrirModalEdicionAdmin(item); cerrarMenu();"
+                                                <button v-if="rolUsuario === 'admin'"
+                                                    @click="abrirModalEdicionAdmin(item); cerrarMenu();"
                                                     class="w-full text-left px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 flex items-center gap-2.5 transition-colors border-t border-gray-100 dark:border-gray-700/50">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                                        </path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+                                                        </path>
+                                                    </svg>
                                                     Corrección Administrativa
                                                 </button>
                                             </template>
@@ -385,12 +404,8 @@
             </div>
         </div>
 
-        <ModalRegistroDocumento 
-            v-model="modalNuevoAbierto" 
-            :origenId="seccionSeleccionada || ''"
-            :datosEditar="expedienteAEditar" 
-            @guardado="onRegistroInternoExitoso" 
-        />
+        <ModalRegistroDocumento v-model="modalNuevoAbierto" :origenId="seccionSeleccionada || ''"
+            :datosEditar="expedienteAEditar" @guardado="onRegistroInternoExitoso" />
 
         <ModalAtender v-model="modalAtenderAbierto" :expediente="expedienteAAtender"
             :usuarioActual="usuarioActual || ''" @guardado="cargarBandeja" />
@@ -404,30 +419,15 @@
         <ModalCancelar v-model="modalCancelarAbierto" :expediente="expedienteACancelar"
             :usuarioActual="usuarioActual || ''" @guardado="cargarBandeja" />
 
-        <ModalExportar 
-            v-model="modalExportarAbierto" 
-            :seccionId="seccionSeleccionada"
-            :miSeccion="miSeccion"
-            :opcionesAnios="opcionesAnios"
-            :anioDefecto="filtroAnio"
-        />
+        <ModalExportar v-model="modalExportarAbierto" :seccionId="seccionSeleccionada" :miSeccion="miSeccion"
+            :opcionesAnios="opcionesAnios" :anioDefecto="filtroAnio" />
 
-        <ModalExportarPDF 
-            v-model="modalExportarPDFAbierto" 
-            :seccionId="seccionSeleccionada"
-            :miSeccion="miSeccion"
-            :opcionesAnios="opcionesAnios"
-            :anioDefecto="filtroAnio"
-        />
+        <ModalExportarPDF v-model="modalExportarPDFAbierto" :seccionId="seccionSeleccionada" :miSeccion="miSeccion"
+            :opcionesAnios="opcionesAnios" :anioDefecto="filtroAnio" />
+        <ModalEdicionAdmin v-model="modalEdicionAdminAbierto" :expediente="expedienteAdmin"
+            :catalogoSeries="catalogoSeriesEstructurado" :usuarioActual="usuarioActual || ''"
+            @guardado="cargarBandeja" />
     </div>
-    
-    <ModalEdicionAdmin 
-            v-model="modalEdicionAdminAbierto" 
-            :expediente="expedienteAdmin"
-            :catalogoSeries="catalogoSeriesEstructurado" 
-            :usuarioActual="usuarioActual || ''"
-            @guardado="cargarBandeja" 
-        />
 
 </template>
 
@@ -453,7 +453,6 @@ const abrirModalEditar = (item) => {
     expedienteAEditar.value = item; // Guardamos los datos del expediente a editar
     modalNuevoAbierto.value = true; // Abrimos el mismo modal
 };
-
 
 // === ESTADOS GLOBALES ===
 const loading = ref(true);
@@ -496,7 +495,6 @@ const cerrarMenu = () => {
 const modalAtenderAbierto = ref(false);
 const expedienteAAtender = ref(null);
 
-
 // === ESTADOS MODAL 2: CONCLUIR ===
 const modalConcluirAbierto = ref(false);
 const expedienteAConcluir = ref(null);
@@ -506,9 +504,25 @@ const catalogoSeriesEstructurado = ref([]);
 const modalDetallesAbierto = ref(false);
 const expedienteDetalle = ref(null);
 
-// ==ESTADOS MODAL 4: EDICIÓN ADMIN
+// === ESTADOS MODAL 4: CANCELAR ===
+const modalCancelarAbierto = ref(false);
+const expedienteACancelar = ref(null);
+
+// == ESTADOS MODAL 5: EDICIÓN ADMIN ===
 const modalEdicionAdminAbierto = ref(false);
 const expedienteAdmin = ref(null);
+
+// === FLUJO 1: ASIGNAR / ATENDER ===
+const abrirModalAtender = (item) => {
+    expedienteAAtender.value = item;
+    modalAtenderAbierto.value = true;
+};
+
+// === FLUJO 2: CONCLUIR Y SNAPSHOT ===
+const abrirModalConcluir = (item) => {
+    expedienteAConcluir.value = item;
+    modalConcluirAbierto.value = true;
+};
 
 // === FLUJO 3: DETALLES ===
 const abrirModalDetalles = async (item) => {
@@ -516,7 +530,13 @@ const abrirModalDetalles = async (item) => {
     modalDetallesAbierto.value = true;
 };
 
-// == FLUJO4: EDICIÓN ADMIN
+// === FLUJO 4: CANCELAR ===
+const abrirModalCancelar = (item) => {
+    expedienteACancelar.value = item;
+    modalCancelarAbierto.value = true;
+};
+
+// === FLUJO 5: EDICIÓN ADMIN ===
 const abrirModalEdicionAdmin = (item) => {
     expedienteAdmin.value = item;
     modalEdicionAdminAbierto.value = true;
@@ -670,31 +690,6 @@ const cargarBandeja = async () => {
     }
 };
 
-// === FLUJO 1: ASIGNAR / ATENDER ===
-
-const abrirModalAtender = (item) => {
-    expedienteAAtender.value = item;
-    modalAtenderAbierto.value = true;
-};
-
-
-// === FLUJO 2: CONCLUIR Y SNAPSHOT ===
-const abrirModalConcluir = (item) => {
-    expedienteAConcluir.value = item;
-    modalConcluirAbierto.value = true;
-};
-
-// === ESTADOS MODAL 4: CANCELAR ===
-const modalCancelarAbierto = ref(false);
-const expedienteACancelar = ref(null);
-
-const abrirModalCancelar = (item) => {
-    expedienteACancelar.value = item;
-    modalCancelarAbierto.value = true;
-};
-
-// === ESTADOS Y LÓGICA DE CANCELACIÓN (LOCAL) ===
-
 // === UTILIDADES VISUALES ===
 const formatFecha = (fechaISO) => {
     if (!fechaISO) return "";
@@ -715,21 +710,6 @@ const formatFechaHora = (isoString) => {
     });
 };
 
-const badgeColor = (estatus) => {
-    switch (estatus) {
-        case "Recepcionado":
-            return "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400";
-        case "En trámite":
-            return "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400";
-        case "Concluido":
-            return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400";
-        case "Cancelado":
-            return "bg-red-50 text-red-600/70 border border-red-200/60 dark:bg-red-900/20 dark:text-red-400/70 dark:border-red-800/50";
-        default:
-            return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
-    }
-};
-
 const abrirModalNuevoInterno = () => {
     // Verificamos que haya un área seleccionada para usarla como origen
     if (!seccionSeleccionada.value) {
@@ -745,9 +725,10 @@ const onRegistroInternoExitoso = async () => {
     await cargarBandeja();           // Recargamos la tabla con el nuevo registro
 };
 
-// ==ESTADOS MODAL 5: MODAL EXPORTAR ===
+// ==ESTADOS MODAL 6: MODAL EXPORTAR ===
 const modalExportarAbierto = ref(false);
 
+// == FLUJO MODAL 6: MODAL EXPORTAR
 const abrirModalExportar = () => {
     if (!seccionSeleccionada.value) {
         return toast.error("Selecciona un área en la cabecera primero.");
@@ -755,9 +736,10 @@ const abrirModalExportar = () => {
     modalExportarAbierto.value = true;
 };
 
-// ==ESTADOS MODAL 6: MODAL EXPORTAR PDF ===
+// ==ESTADOS MODAL 7: MODAL EXPORTAR PDF ===
 const modalExportarPDFAbierto = ref(false);
 
+// == FLUJO MODAL 7: MODAL EXPORTAR PDF
 const abrirModalExportarPDF = () => {
     if (!seccionSeleccionada.value) return toast.error("Selecciona un área en la cabecera primero.");
     modalExportarPDFAbierto.value = true;
@@ -781,7 +763,23 @@ const claseBadgeCaracter = (caracter) => {
     return clasesBase + "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700"
 }
 
+const badgeColor = (estatus) => {
+    switch (estatus) {
+        case "Recepcionado":
+            return "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400";
+        case "En trámite":
+            return "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400";
+        case "Concluido":
+            return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400";
+        case "Cancelado":
+            return "bg-red-50 text-red-600/70 border border-red-200/60 dark:bg-red-900/20 dark:text-red-400/70 dark:border-red-800/50";
+        default:
+            return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
+    }
+};
+
 onMounted(() => {
     inicializarUsuario();
 });
+
 </script>
