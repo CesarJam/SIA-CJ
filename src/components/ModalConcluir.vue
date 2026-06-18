@@ -11,7 +11,7 @@
             enter-to-class="opacity-100 scale-100" leave-active-class="ease-in duration-200"
             leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
             <div v-if="modelValue"
-                class="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl flex flex-col border border-emerald-200 dark:border-emerald-900/50 h-[80vh]">
+                class="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl flex flex-col border border-emerald-200 dark:border-emerald-900/50 h-[95vh]">
 
                 <div
                     class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-emerald-50 dark:bg-emerald-900/20 flex justify-between items-center shrink-0">
@@ -33,7 +33,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        <p>El trámite de <strong>{{ expediente?.numero_consecutivo }}</strong> ha finalizado. Clasifica
+                        <p>El trámite de <strong>{{ expediente?.numero_consecutivo }}</strong>, con asunto <strong>{{ expediente?.asunto }}</strong> ha finalizado. Clasifica
                             el fondo para generar su Snapshot histórico.</p>
                     </div>
 
@@ -42,23 +42,23 @@
                             Documental <span class="text-red-500">*</span></label>
 
                         <input type="text" v-model="terminoBusqueda" placeholder="Escribe el nombre o código..."
-                            class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-emerald-500"
+                            class="w-full px-3 py-2.5 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-emerald-500"
                             @focus="busquedaActiva = true" @blur="setTimeout(() => busquedaActiva = false, 200)" />
 
                         <div v-if="busquedaActiva && terminoBusqueda"
-                            class="absolute z-20 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                            class="absolute z-20 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg max-h-[500px] overflow-y-auto">
                             <template v-for="serie in seriesFiltradas" :key="serie.id">
                                 <div
-                                    class="px-3 py-1.5 bg-gray-50 dark:bg-gray-900 text-[10px] font-bold text-gray-500 uppercase">
+                                    class="px-3 py-2 bg-gray-50 dark:bg-gray-900 text-xs font-bold text-gray-500 uppercase sticky top-0 z-10 shadow-sm">
                                     {{ serie.codigo_serie }} - {{ serie.nombre }}
                                 </div>
                                 <button v-for="sub in serie.subseries" :key="sub.codigoSubserie"
                                     @click="seleccionarSubserie(sub)"
-                                    class="w-full text-left px-4 py-2 text-sm hover:bg-emerald-50 dark:hover:bg-emerald-900/30 border-b border-gray-50 dark:border-gray-700/50 transition-colors">
+                                    class="w-full text-left px-4 py-3 text-base hover:bg-emerald-50 dark:hover:bg-emerald-900/30 border-b border-gray-50 dark:border-gray-700/50 transition-colors">
                                     {{ sub.codigoSubserie }} - {{ sub.nombre }}
                                 </button>
                             </template>
-                            <div v-if="seriesFiltradas.length === 0" class="px-4 py-2 text-sm text-gray-500 italic">No
+                            <div v-if="seriesFiltradas.length === 0" class="px-4 py-3 text-base text-gray-500 italic">No
                                 se encontraron resultados.
                             </div>
                         </div>

@@ -10,7 +10,7 @@
                 
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20 flex justify-between items-center">
                     <h2 class="text-lg font-bold text-blue-800 dark:text-blue-400">
-                        Asignar Trámite y Datos Físicos COMPONENTE
+                        Asignar Trámite y Datos Físicos
                     </h2>
                     <button @click="cerrarModal" class="text-gray-400 hover:text-gray-600 transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -19,6 +19,18 @@
 
                 <div class="p-6 overflow-y-auto space-y-6 max-h-[70vh]">
                     
+                    <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex items-start gap-3 shadow-sm">
+                        <div class="p-2 bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400 rounded-lg shrink-0 mt-0.5">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        </div>
+                        <div class="flex flex-col w-full">
+                            <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Folio / No. Expediente</span>
+                            <span class="text-sm font-bold text-gray-900 dark:text-white">{{ expediente?.numero_consecutivo }}</span>
+                            
+                            <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-2.5">Asunto</span>
+                            <span class="text-sm text-gray-700 dark:text-gray-300 leading-snug">{{ expediente?.asunto }}</span>
+                        </div>
+                    </div>
                     <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
                         <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 border-b border-gray-200 dark:border-gray-700 pb-2">
                             1. Control de Tareas
@@ -194,6 +206,7 @@ const ejecutarAtencion = async () => {
         procesando.value = false
     }
 }
+
 // === LÓGICA DE TECLADO (Cerrar con ESC) ===
 const handleKeydown = (e) => {
     // Solo cierra si el modal está abierto y NO está procesando/guardando
