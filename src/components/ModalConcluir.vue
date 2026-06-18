@@ -141,15 +141,23 @@ const busquedaActiva = ref(false)
 // Lógica de filtrado
 const seriesFiltradas = computed(() => {
     const term = terminoBusqueda.value.toLowerCase()
+    
     return props.catalogoSeries
-        .map(serie => ({
-            ...serie,
-            subseries: serie.subseries.filter(sub =>
-                sub.nombre.toLowerCase().includes(term) ||
-                sub.codigoSubserie.toLowerCase().includes(term)
-            )
-        }))
-        .filter(serie => serie.subseries.length > 0)
+        .map(serie => {
+            // Evaluamos si lo que el usuario escribió coincide con el código (o nombre) de la Serie Padre
+            const coincidePadre = serie.codigo_serie.toLowerCase().includes(term) || 
+                                  serie.nombre.toLowerCase().includes(term)
+            
+            return {
+                ...serie,
+                subseries: serie.subseries.filter(sub =>
+                    coincidePadre || // Si el padre coincide, mostramos TODAS sus subseries
+                    sub.nombre.toLowerCase().includes(term) ||
+                    sub.codigoSubserie.toLowerCase().includes(term)
+                )
+            }
+        })
+        .filter(serie => serie.subseries.length > 0) // Solo mostramos los padres que tengan subseries visibles
 })
 
 // Función para seleccionar
