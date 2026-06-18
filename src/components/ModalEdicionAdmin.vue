@@ -143,7 +143,10 @@
                                 :class="modificandoCadido ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'">
                                 {{ modificandoCadido ? 'Cancelar reclasificación' : 'Reclasificar Expediente' }}
                             </button>
+                            
                         </div>
+                        
+                                                
 
                         <div v-if="!modificandoCadido" class="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div class="md:col-span-2">
@@ -167,6 +170,8 @@
                                         expediente?.snapshot_cadido?.anios_concentracion }}</span>
                             </div>
                         </div>
+
+                        
 
                         <div v-else class="relative">
                             <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5">Buscar Nueva
@@ -193,12 +198,26 @@
                             <div v-if="detalleSeleccionado"
                                 class="mt-4 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg text-sm text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50">
                                 <strong>Nueva Selección:</strong> Se actualizará a "{{
-                                detalleSeleccionado.codigoSubserie }} - {{
-                                detalleSeleccionado.nombre }}".
+                                    detalleSeleccionado.codigoSubserie }} - {{
+                                    detalleSeleccionado.nombre }}".
                             </div>
                         </div>
+                        
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 border-b border-gray-200 dark:border-gray-700 pb-2 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                            4. Archivos Digitales (Anexos)
+                        </h3>
+                        <GestorDocumental 
+                            v-if="expediente" 
+                            :expedienteId="expediente.id" 
+                            :folio="expediente.numero_consecutivo" 
+                            modo="escritura"
+                        />
                     </div>
                 </div>
+                
 
                 <div
                     class="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/40 shrink-0">
@@ -221,6 +240,7 @@
 import { ref, watch, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/supabase'
 import { useToast } from '@/composables/useToast'
+import GestorDocumental from '@/components/GestorDocumental.vue'
 
 const props = defineProps({
     modelValue: { type: Boolean, required: true },
