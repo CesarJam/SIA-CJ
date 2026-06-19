@@ -37,21 +37,19 @@
                 </div>
 
                 <div class="p-6 overflow-y-auto flex-1 space-y-6">
-                    <div
-                        class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
-                        <h3
-                            class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
-                            1. Datos Generales del Documento</h3>
+                    <!-- 1. DATOS GENERALES -->
+                    <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
+                            1. Datos Generales del Documento
+                        </h3>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">No.
-                                    Consecutivo</label>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">No. Consecutivo</label>
                                 <input v-model="form.numero_consecutivo" type="text"
                                     class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Fecha de
-                                    Registro</label>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Fecha de Registro</label>
                                 <input v-model="form.fecha_registro" type="date"
                                     class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md dark:[color-scheme:dark]">
                             </div>
@@ -77,21 +75,65 @@
                         </div>
                     </div>
 
-                    <div
-                        class="bg-blue-50/30 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-800/30">
-                        <h3
-                            class="text-sm font-bold text-blue-800 dark:text-blue-300 mb-4 border-b border-blue-200 dark:border-blue-800/50 pb-2">
-                            2. Atención y Ubicación Física</h3>
+                    <!-- 2. DEPENDENCIAS INVOLUCRADAS -->
+                    <div class="bg-purple-50/30 dark:bg-purple-900/10 p-4 rounded-xl border border-purple-100 dark:border-purple-800/30">
+                        <h3 class="text-sm font-bold text-purple-800 dark:text-purple-300 mb-4 border-b border-purple-200 dark:border-purple-800/50 pb-2">
+                            2. Dependencias Involucradas
+                        </h3>
+                        
+                        <div class="flex flex-wrap gap-2 mb-3" v-if="dependenciasSeleccionadasInfo.length > 0">
+                            <span v-for="dep in dependenciasSeleccionadasInfo" :key="dep.id"
+                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300 shadow-sm border border-purple-200 dark:border-purple-800">
+                                {{ dep.siglas || dep.nombre_oficial }}
+                                <button @click.prevent="removerDependencia(dep.id)"
+                                    class="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-white transition-colors">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </span>
+                        </div>
+
+                        <div class="relative mb-2">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                            <input v-model="busquedaDependencia" type="text"
+                                placeholder="Buscar dependencia para agregar..."
+                                class="w-full pl-10 pr-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 transition-colors">
+                        </div>
+
+                        <div class="max-h-32 overflow-y-auto space-y-1 border border-gray-200 dark:border-gray-700 rounded-md p-2 bg-white dark:bg-gray-800 shadow-inner">
+                            <label v-for="dep in dependenciasFiltradas" :key="dep.id"
+                                class="flex items-start gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg cursor-pointer transition-colors">
+                                <input type="checkbox" :value="dep.id" v-model="form.dependencias_ids"
+                                    class="mt-0.5 w-4 h-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-semibold text-gray-700 dark:text-gray-200">{{ dep.nombre_oficial }}</span>
+                                    <span v-if="dep.siglas" class="text-[11px] font-bold text-gray-400 uppercase">{{ dep.siglas }}</span>
+                                </div>
+                            </label>
+                            <div v-if="dependenciasFiltradas.length === 0" class="text-center py-4 text-sm text-gray-500">
+                                No se encontraron dependencias con "{{ busquedaDependencia }}"
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. ATENCIÓN Y UBICACIÓN FÍSICA -->
+                    <div class="bg-blue-50/30 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-800/30">
+                        <h3 class="text-sm font-bold text-blue-800 dark:text-blue-300 mb-4 border-b border-blue-200 dark:border-blue-800/50 pb-2">
+                            3. Atención y Ubicación Física
+                        </h3>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
-                                <label
-                                    class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Responsable</label>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Responsable</label>
                                 <input v-model="form.responsable_tramite" type="text"
                                     class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">
                             </div>
                             <div class="md:col-span-2">
-                                <label
-                                    class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Indicaciones</label>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Indicaciones</label>
                                 <input v-model="form.indicaciones_tramite" type="text"
                                     class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">
                             </div>
@@ -114,8 +156,7 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Condición de
-                                    Acceso</label>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Condición de Acceso</label>
                                 <select v-model="form.condicion_acceso"
                                     class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">
                                     <option value="Pública">Pública</option>
@@ -124,58 +165,43 @@
                                 </select>
                             </div>
                             <div class="md:col-span-3">
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Inmueble /
-                                    Gaveta</label>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Inmueble / Gaveta</label>
                                 <input v-model="form.inmueble" type="text"
                                     class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">
                             </div>
                         </div>
                     </div>
 
-                    <div
-                        class="bg-emerald-50/30 dark:bg-emerald-900/10 p-4 rounded-xl border border-emerald-100 dark:border-emerald-800/30">
-                        <div
-                            class="flex justify-between items-center mb-4 border-b border-emerald-200 dark:border-emerald-800/50 pb-2">
-                            <h3 class="text-sm font-bold text-emerald-800 dark:text-emerald-300">3. Clasificación CADIDO
-                                (Snapshot)</h3>
+                    <!-- 4. CLASIFICACIÓN CADIDO -->
+                    <div class="bg-emerald-50/30 dark:bg-emerald-900/10 p-4 rounded-xl border border-emerald-100 dark:border-emerald-800/30">
+                        <div class="flex justify-between items-center mb-4 border-b border-emerald-200 dark:border-emerald-800/50 pb-2">
+                            <h3 class="text-sm font-bold text-emerald-800 dark:text-emerald-300">
+                                4. Clasificación CADIDO (Snapshot)
+                            </h3>
                             <button @click="modificandoCadido = !modificandoCadido"
                                 class="text-xs font-bold px-3 py-1 rounded-md transition-colors"
                                 :class="modificandoCadido ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'">
                                 {{ modificandoCadido ? 'Cancelar reclasificación' : 'Reclasificar Expediente' }}
                             </button>
-                            
                         </div>
                         
-                                                
-
                         <div v-if="!modificandoCadido" class="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div class="md:col-span-2">
-                                <span class="block text-[10px] font-bold text-emerald-600 uppercase">Subserie
-                                    Actual</span>
-                                <span class="text-sm font-bold text-gray-800 dark:text-gray-200">{{
-                                    expediente?.snapshot_cadido?.codigo_subserie }} - {{
-                                        expediente?.snapshot_cadido?.nombre_subserie }}</span>
+                                <span class="block text-[10px] font-bold text-emerald-600 uppercase">Subserie Actual</span>
+                                <span class="text-sm font-bold text-gray-800 dark:text-gray-200">{{ expediente?.snapshot_cadido?.codigo_subserie }} - {{ expediente?.snapshot_cadido?.nombre_subserie }}</span>
                             </div>
                             <div>
-                                <span class="block text-[10px] font-bold text-emerald-600 uppercase">Valor
-                                    Documental</span>
-                                <span class="text-sm text-gray-800 dark:text-gray-200">{{
-                                    expediente?.snapshot_cadido?.valor_documental }}</span>
+                                <span class="block text-[10px] font-bold text-emerald-600 uppercase">Valor Documental</span>
+                                <span class="text-sm text-gray-800 dark:text-gray-200">{{ expediente?.snapshot_cadido?.valor_documental }}</span>
                             </div>
                             <div>
-                                <span class="block text-[10px] font-bold text-emerald-600 uppercase">Vigencia
-                                    (AT/AC)</span>
-                                <span class="text-sm font-bold text-gray-800 dark:text-gray-200">{{
-                                    expediente?.snapshot_cadido?.anios_tramite }} / {{
-                                        expediente?.snapshot_cadido?.anios_concentracion }}</span>
+                                <span class="block text-[10px] font-bold text-emerald-600 uppercase">Vigencia (AT/AC)</span>
+                                <span class="text-sm font-bold text-gray-800 dark:text-gray-200">{{ expediente?.snapshot_cadido?.anios_tramite }} / {{ expediente?.snapshot_cadido?.anios_concentracion }}</span>
                             </div>
                         </div>
 
-                        
-
                         <div v-else class="relative">
-                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5">Buscar Nueva
-                                Subserie</label>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1.5">Buscar Nueva Subserie</label>
                             <input type="text" v-model="terminoBusqueda"
                                 placeholder="Escribe el nombre o código para cambiar..."
                                 class="w-full px-3 py-2.5 text-base bg-white dark:bg-gray-800 border border-emerald-300 dark:border-emerald-600 rounded-md focus:ring-2 focus:ring-emerald-500"
@@ -184,8 +210,7 @@
                             <div v-if="busquedaActiva && terminoBusqueda"
                                 class="absolute z-20 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg max-h-[300px] overflow-y-auto">
                                 <template v-for="serie in seriesFiltradas" :key="serie.id">
-                                    <div
-                                        class="px-3 py-2 bg-gray-50 dark:bg-gray-900 text-xs font-bold text-gray-500 uppercase sticky top-0 z-10 shadow-sm">
+                                    <div class="px-3 py-2 bg-gray-50 dark:bg-gray-900 text-xs font-bold text-gray-500 uppercase sticky top-0 z-10 shadow-sm">
                                         {{ serie.codigo_serie }} - {{ serie.nombre }}</div>
                                     <button v-for="sub in serie.subseries" :key="sub.codigoSubserie"
                                         @click="seleccionarSubserie(sub)"
@@ -197,17 +222,16 @@
 
                             <div v-if="detalleSeleccionado"
                                 class="mt-4 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg text-sm text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50">
-                                <strong>Nueva Selección:</strong> Se actualizará a "{{
-                                    detalleSeleccionado.codigoSubserie }} - {{
-                                    detalleSeleccionado.nombre }}".
+                                <strong>Nueva Selección:</strong> Se actualizará a "{{ detalleSeleccionado.codigoSubserie }} - {{ detalleSeleccionado.nombre }}".
                             </div>
                         </div>
-                        
                     </div>
+
+                    <!-- 5. ARCHIVOS DIGITALES -->
                     <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
                         <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 border-b border-gray-200 dark:border-gray-700 pb-2 flex items-center gap-2">
                             <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                            4. Archivos Digitales (Anexos)
+                            5. Archivos Digitales (Anexos)
                         </h3>
                         <GestorDocumental 
                             v-if="expediente" 
@@ -218,9 +242,7 @@
                     </div>
                 </div>
                 
-
-                <div
-                    class="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/40 shrink-0">
+                <div class="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/40 shrink-0">
                     <button @click="cerrarModal" :disabled="procesando"
                         class="px-5 py-2.5 text-sm text-gray-600 dark:text-gray-300 font-semibold border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                         Cancelar
@@ -253,11 +275,17 @@ const emit = defineEmits(['update:modelValue', 'guardado'])
 const toast = useToast()
 const procesando = ref(false)
 
-const form = ref({})
+const form = ref({
+    dependencias_ids: []
+})
 const modificandoCadido = ref(false)
 const terminoBusqueda = ref('')
 const busquedaActiva = ref(false)
 const codigoSubserieLocal = ref('')
+
+// Estados de dependencias
+const catalogoDependencias = ref([])
+const busquedaDependencia = ref('')
 
 // Limpieza de arreglos de PostgreSQL
 const obtenerValorArreglo = (valor) => {
@@ -267,11 +295,23 @@ const obtenerValorArreglo = (valor) => {
     return valor
 }
 
-watch(() => props.modelValue, (isOpen) => {
+// Cargar catálogo de dependencias
+const cargarDependencias = async () => {
+    if (catalogoDependencias.value.length === 0) {
+        const { data } = await supabase.from('dependencias').select('id, nombre_oficial, siglas').eq('activo', true).order('nombre_oficial')
+        catalogoDependencias.value = data || []
+    }
+}
+
+watch(() => props.modelValue, async (isOpen) => {
     if (isOpen && props.expediente) {
         modificandoCadido.value = false
         terminoBusqueda.value = ''
+        busquedaDependencia.value = ''
         codigoSubserieLocal.value = props.expediente.codigo_subserie || ''
+
+        // Cargamos las dependencias si no se han cargado
+        await cargarDependencias()
 
         form.value = {
             numero_consecutivo: props.expediente.numero_consecutivo,
@@ -279,6 +319,7 @@ watch(() => props.modelValue, (isOpen) => {
             fojas: props.expediente.fojas,
             caracter: props.expediente.caracter,
             asunto: props.expediente.asunto,
+            dependencias_ids: props.expediente.dependencias_ids || [],
             responsable_tramite: props.expediente.responsable_tramite || '',
             indicaciones_tramite: props.expediente.indicaciones_tramite || '',
             tradicion: obtenerValorArreglo(props.expediente.tradicion) || 'Original',
@@ -288,6 +329,25 @@ watch(() => props.modelValue, (isOpen) => {
         }
     }
 })
+
+// === LÓGICA DE DEPENDENCIAS ===
+const dependenciasFiltradas = computed(() => {
+    if (!busquedaDependencia.value) return catalogoDependencias.value
+    const termino = busquedaDependencia.value.toLowerCase()
+    return catalogoDependencias.value.filter(dep =>
+        dep.nombre_oficial.toLowerCase().includes(termino) ||
+        (dep.siglas && dep.siglas.toLowerCase().includes(termino))
+    )
+})
+
+const dependenciasSeleccionadasInfo = computed(() => {
+    if (!form.value.dependencias_ids) return []
+    return catalogoDependencias.value.filter(dep => form.value.dependencias_ids.includes(dep.id))
+})
+
+const removerDependencia = (id) => {
+    form.value.dependencias_ids = form.value.dependencias_ids.filter(depId => depId !== id)
+}
 
 // === LÓGICA DE BÚSQUEDA CADIDO ===
 const seriesFiltradas = computed(() => {
@@ -342,7 +402,7 @@ const ejecutarCorreccion = async () => {
                 valor_documental: detalleSeleccionado.value.valor_documental,
                 anios_tramite: detalleSeleccionado.value.at,
                 anios_concentracion: detalleSeleccionado.value.ac,
-                fecha_clasificacion: new Date().toISOString(), // Actualizamos la fecha de reclasificación
+                fecha_clasificacion: new Date().toISOString(),
             }
         }
 
@@ -354,7 +414,7 @@ const ejecutarCorreccion = async () => {
             id_expediente: props.expediente.id,
             id_usuario: props.usuarioActual,
             accion: "Corrección Administrativa",
-            detalles: { mensaje: "Un administrador modificó los datos del expediente concluido." }
+            detalles: { mensaje: "Un administrador modificó los datos del expediente concluido, incluyendo sus dependencias vinculadas." }
         }])
 
         toast.success(`Corrección administrativa aplicada.`)
