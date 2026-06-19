@@ -4,7 +4,7 @@
       <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Gestión de Usuarios</h1>
       <button 
         @click="abrirPanelNuevo"
-        class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold transition shadow-md"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition shadow-md"
       >
         + Nuevo Usuario
       </button>
@@ -50,7 +50,7 @@
         <div class="flex items-center gap-2 mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-t-0 border-gray-100 dark:border-gray-700 w-full md:w-auto justify-end shrink-0">
           <button 
             @click="abrirPanelEdicion(user)" 
-            class="flex items-center gap-1.5 text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-semibold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+            class="flex items-center gap-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-semibold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
             Editar
@@ -112,18 +112,18 @@
                     v-model="form.email" 
                     type="email" 
                     placeholder="Correo de Google" 
-                    class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors disabled:opacity-60 disabled:bg-gray-100 dark:disabled:bg-gray-900 disabled:cursor-not-allowed" 
+                    class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:opacity-60 disabled:bg-gray-100 dark:disabled:bg-gray-900 disabled:cursor-not-allowed" 
                     :disabled="editandoId"
                   >
                   <input 
                     v-model="form.nombre" 
                     type="text" 
                     placeholder="Nombre completo" 
-                    class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   >
                   <select 
                     v-model="form.rol" 
-                    class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   >
                     <option value="cliente">Cliente</option>
                     <option value="admin">Administrador</option>
@@ -134,8 +134,8 @@
               <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase mb-4">Secciones Permitidas (Lista Blanca)</label>
                 <div class="grid grid-cols-1 gap-2">
-                  <label v-for="sec in todasLasSecciones" :key="sec.codigo" class="flex items-center gap-3 p-3 rounded-lg border border-gray-100 dark:border-gray-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer transition-colors duration-200">
-                    <input type="checkbox" :value="sec.codigo" v-model="form.secciones_permitidas" class="rounded text-indigo-600 focus:ring-indigo-500 h-5 w-5 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600">
+                  <label v-for="sec in todasLasSecciones" :key="sec.codigo" class="flex items-center gap-3 p-3 rounded-lg border border-gray-100 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer transition-colors duration-200">
+                    <input type="checkbox" :value="sec.codigo" v-model="form.secciones_permitidas" class="rounded text-blue-600 focus:ring-blue-500 h-5 w-5 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600">
                     <div class="flex flex-col">
                       <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ sec.codigo }}</span>
                       <span class="text-xs text-gray-500 dark:text-gray-400">{{ sec.seccion }}</span>
@@ -147,7 +147,7 @@
 
             <div class="p-6 border-t border-gray-200 dark:border-gray-700 flex gap-3 bg-gray-50 dark:bg-gray-900/40">
               <button @click="cerrarPanel" class="flex-1 py-2 text-gray-600 dark:text-gray-300 font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors">Cancelar</button>
-              <button @click="guardarUsuario" class="flex-1 py-2 bg-indigo-600 text-white rounded-lg font-bold shadow-md hover:bg-indigo-700 hover:shadow-lg transform transition-all active:scale-95">
+              <button @click="guardarUsuario" class="flex-1 py-2 bg-blue-600 text-white rounded-lg font-bold shadow-md hover:bg-blue-700 hover:shadow-lg transform transition-all active:scale-95">
                 {{ editandoId ? 'Actualizar' : 'Guardar' }}
               </button>
             </div>

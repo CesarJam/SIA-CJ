@@ -8,7 +8,7 @@
                     autorizada.</p>
             </div>
             <select v-model="filtroSeccion"
-                class="w-full md:w-64 px-4 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 text-gray-700 dark:text-gray-200">
+                class="w-full md:w-64 px-4 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 text-gray-700 dark:text-gray-200">
                 <option v-for="sec in seccionesDisponibles" :key="sec.id" :value="sec.id">
                     {{ sec.codigo }} - {{ sec.seccion }}
                 </option>
@@ -31,7 +31,7 @@
                     PDF
                 </button>
                 <button @click="abrirModalNuevo"
-                    class="flex-1 md:flex-none px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700 transition-colors">
+                    class="flex-1 md:flex-none px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition-colors">
                     + Registrar Serie
                 </button>
             </div>
@@ -66,7 +66,7 @@
 
                         <div class="w-full md:w-1/5 flex items-center justify-between md:justify-start">
                             <span class="md:hidden text-xs font-bold text-gray-400 uppercase">Sección:</span>
-                            <span class="text-sm text-indigo-600 dark:text-indigo-400 font-medium">{{
+                            <span class="text-sm text-blue-600 dark:text-blue-400 font-medium">{{
                                 item.cuadro_general?.codigo }} - {{ item.cuadro_general?.seccion }}</span>
                         </div>
 
@@ -75,10 +75,10 @@
 
                             <button @click="toggleExpandir(item.id)"
                                 class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-colors"
-                                :class="{ 'ring-2 ring-indigo-500/50': filasExpandidas.includes(item.id) }">
+                                :class="{ 'ring-2 ring-blue-500/50': filasExpandidas.includes(item.id) }">
                                 <span class="text-xs font-bold">{{ item.subseries?.length || 0 }} elementos</span>
                                 <svg class="w-4 h-4 transition-transform duration-300"
-                                    :class="{ 'rotate-180 text-indigo-600 dark:text-indigo-400': filasExpandidas.includes(item.id) }"
+                                    :class="{ 'rotate-180 text-blue-600 dark:text-blue-400': filasExpandidas.includes(item.id) }"
                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 9l-7 7-7-7"></path>
@@ -89,7 +89,7 @@
                         <div
                             class="w-full md:w-1/5 flex items-center justify-end md:justify-center gap-4 mt-3 md:mt-0 pt-3 md:pt-0 border-t md:border-t-0 border-gray-100 dark:border-gray-700">
                             <button @click="abrirModalEdicion(item)"
-                                class="flex items-center gap-1.5 text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-semibold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20">
+                                class="flex items-center gap-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-semibold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
@@ -115,9 +115,9 @@
 
                             <ul v-if="item.subseries && item.subseries.length > 0" class="flex flex-col gap-2">
                                 <li v-for="(sub, index) in item.subseries" :key="index"
-                                    class="flex items-start md:items-center gap-4 px-3 py-5 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 shadow-sm hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-md transition-all">
+                                    class="flex items-start md:items-center gap-4 px-3 py-5 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 shadow-sm hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md transition-all">
                                     <span
-                                        class="text-indigo-600 dark:text-indigo-400 font-black w-16 md:w-35 shrink-0 break-words">
+                                        class="text-blue-600 dark:text-blue-400 font-black w-16 md:w-35 shrink-0 break-words">
                                         {{ sub.codigoSubserie }}
                                     </span>
                                     <span class="font-medium flex-1 break-words">
@@ -136,7 +136,7 @@
             </div>
             
             <div v-if="loading" class="text-center py-12 text-gray-500 flex flex-col items-center">
-                <svg class="animate-spin h-8 w-8 text-indigo-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
+                <svg class="animate-spin h-8 w-8 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
                     viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor"
@@ -180,7 +180,7 @@
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Sección
                                     Responsable</label>
                                 <select v-model="form.id_seccion"
-                                    class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
+                                    class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
                                     <option v-for="sec in seccionesDisponibles" :key="sec.id" :value="sec.id">{{
                                         sec.codigo }} - {{ sec.seccion }}</option>
                                 </select>
@@ -189,14 +189,14 @@
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Código de
                                     Serie</label>
                                 <input v-model="form.codigo_serie" type="text" placeholder="Ej: 1S.1"
-                                    class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
+                                    class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
                             </div>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Nombre de la
                                 Serie</label>
                             <input v-model="form.nombre" type="text" placeholder="Ej: Correspondencia"
-                                class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
+                                class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
                         </div>
 
                         <div class="pt-4 border-t border-gray-100 dark:border-gray-700">
@@ -204,7 +204,7 @@
                                 <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Subseries (1 a
                                     N)</label>
                                 <button @click="agregarSubserie"
-                                    class="text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-3 py-1 rounded-full font-bold hover:bg-indigo-100 transition-colors">+
+                                    class="text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-full font-bold hover:bg-blue-100 transition-colors">+
                                     Añadir</button>
                             </div>
                             <div class="space-y-3">
@@ -236,7 +236,7 @@
                         <button @click="cerrarModal"
                             class="flex-1 py-2.5 text-gray-600 dark:text-gray-300 font-semibold border border-gray-300 dark:border-gray-600 rounded-lg">Cancelar</button>
                         <button @click="guardarSerie"
-                            class="flex-1 py-2.5 bg-indigo-600 text-white rounded-lg font-bold shadow-md hover:bg-indigo-700 transform active:scale-95 transition-all">Guardar</button>
+                            class="flex-1 py-2.5 bg-blue-600 text-white rounded-lg font-bold shadow-md hover:bg-blue-700 transform active:scale-95 transition-all">Guardar</button>
                     </div>
                 </div>
             </transition>

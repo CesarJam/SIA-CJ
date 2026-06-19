@@ -8,12 +8,12 @@
                 </h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-4">
                     Bandeja de entrada y gestor de tareas del área:
-                    <strong class="text-indigo-600 dark:text-indigo-400">{{ miSeccion?.codigo }}</strong>
+                    <strong class="text-blue-600 dark:text-blue-400">{{ miSeccion?.codigo }}</strong>
                 </p>
                 <div
                     class="flex bg-gray-100 dark:bg-gray-900 p-1 rounded-lg w-fit border border-gray-200 dark:border-gray-700 shadow-inner">
                     <button @click="cambiarVista('entrada')"
-                        :class="vistaActual === 'entrada' ? 'bg-white dark:bg-gray-800 shadow-sm text-indigo-700 dark:text-indigo-400 font-bold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                        :class="vistaActual === 'entrada' ? 'bg-white dark:bg-gray-800 shadow-sm text-blue-700 dark:text-blue-400 font-bold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
                         class="px-4 py-1.5 text-sm rounded-md transition-all flex items-center gap-1.5">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -23,7 +23,7 @@
                         Bandeja de Entrada
                     </button>
                     <button @click="cambiarVista('enviados')"
-                        :class="vistaActual === 'enviados' ? 'bg-white dark:bg-gray-800 shadow-sm text-indigo-700 dark:text-indigo-400 font-bold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                        :class="vistaActual === 'enviados' ? 'bg-white dark:bg-gray-800 shadow-sm text-blue-700 dark:text-blue-400 font-bold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
                         class="px-4 py-1.5 text-sm rounded-md transition-all flex items-center gap-1.5">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -36,21 +36,21 @@
 
             <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
                 <select v-model="seccionSeleccionada" @change="cargarBandeja"
-                    class="w-full md:w-auto truncate max-w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 shadow-sm cursor-pointer">
+                    class="w-full md:w-auto truncate max-w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer">
                     <option v-for="area in areasUsuario" :key="area.id" :value="area.id">
                         {{ area.codigo }} - {{ area.seccion }}
                     </option>
                 </select>
 
                 <select v-model="filtroAnio" @change="cargarBandeja"
-                    class="w-full md:w-auto px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 shadow-sm cursor-pointer font-bold">
+                    class="w-full md:w-auto px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer font-bold">
                     <option v-for="anio in opcionesAnios" :key="anio" :value="anio">
                         Año {{ anio }}
                     </option>
                 </select>
 
                 <select v-model="filtroEstatus"
-                    class="w-full md:w-auto px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 shadow-sm cursor-pointer">
+                    class="w-full md:w-auto px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer">
                     <option value="Todos">Todos los estatus</option>
                     <option value="Recepcionado">Recepcionado (Nuevos)</option>
                     <option value="En trámite">En trámite</option>
@@ -80,7 +80,7 @@
                 </button>
 
                 <button @click="abrirModalNuevoInterno"
-                    class="w-full md:w-auto px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
+                    class="w-full md:w-auto px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
@@ -128,17 +128,17 @@
                             item.asunto }}</span>
 
                         <div v-if="item.responsable_tramite"
-                            class="mt-2 flex items-start gap-1.5 p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-md border border-indigo-100 dark:border-indigo-800/50">
-                            <svg class="w-4 h-4 text-indigo-500 shrink-0 mt-0.5" fill="none" stroke="currentColor"
+                            class="mt-2 flex items-start gap-1.5 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-100 dark:border-blue-800/50">
+                            <svg class="w-4 h-4 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                             </svg>
                             <div class="flex flex-col">
-                                <span class="text-xs font-semibold text-indigo-700 dark:text-indigo-300">Responsable: {{
+                                <span class="text-xs font-semibold text-blue-700 dark:text-blue-300">Responsable: {{
                                     item.responsable_tramite }}</span>
                                 <span v-if="item.indicaciones_tramite"
-                                    class="text-[10px] text-indigo-600/80 dark:text-indigo-400/80 italic mt-0.5 line-clamp-1"
+                                    class="text-[10px] text-blue-600/80 dark:text-blue-400/80 italic mt-0.5 line-clamp-1"
                                     :title="item.indicaciones_tramite">"{{ item.indicaciones_tramite }}"</span>
                             </div>
                         </div>
@@ -150,10 +150,10 @@
                         </span>
 
                         <span v-if="vistaActual === 'entrada'"
-                            class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            class="text-sm text-white-700 dark:text-white-300">
                             {{ item.area_origen?.codigo || "Externo" }} - {{ item.area_origen?.seccion || "No definido" }}
                         </span>
-                        <span v-else class="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                        <span v-else class="text-sm text-white-700 dark:text-white-100">
                             {{ item.area_destino?.codigo }} - {{ item.area_destino?.seccion }}
                         </span>
 
@@ -332,7 +332,7 @@
 
                                             <template v-if="item.estatus === 'Concluido'">
                                                 <button @click="abrirModalDetalles(item); cerrarMenu();"
-                                                    class="w-full text-left px-4 py-2.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-900/30 flex items-center gap-2.5 transition-colors">
+                                                    class="w-full text-left px-4 py-2.5 text-xs font-semibold text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 flex items-center gap-2.5 transition-colors">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -402,7 +402,7 @@
             </div>
 
             <div v-if="loading" class="text-center py-12 text-gray-500 flex flex-col items-center">
-                <svg class="animate-spin h-8 w-8 text-indigo-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
+                <svg class="animate-spin h-8 w-8 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
                     viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor"

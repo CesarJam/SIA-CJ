@@ -9,7 +9,7 @@
             </div>
 
             <select v-model="filtroSeccion"
-                class="w-full md:w-64 px-4 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 text-gray-700 dark:text-gray-200">
+                class="w-full md:w-64 px-4 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 text-gray-700 dark:text-gray-200">
                 <option v-for="sec in seccionesDisponibles" :key="sec.id" :value="sec.id">
                     {{ sec.codigo }} - {{ sec.seccion }}
                 </option>
@@ -60,14 +60,14 @@
                         </div>
                         <div class="w-full md:w-1/4 flex items-center justify-between md:justify-start">
                             <span class="md:hidden text-xs font-bold text-gray-400 uppercase">Sección:</span>
-                            <span class="text-sm text-indigo-600 dark:text-indigo-400 font-medium">{{
+                            <span class="text-sm text-blue-600 dark:text-blue-400 font-medium">{{
                                 item.cuadro_general?.codigo }}</span>
                         </div>
                         <div class="w-full md:w-1/6 flex items-center justify-between md:justify-center mt-1 md:mt-0">
                             <span class="md:hidden text-xs font-bold text-gray-400 uppercase">Subseries:</span>
                             <button @click="toggleExpandir(item.id)"
-                                class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50 transition-colors"
-                                :class="{ 'ring-2 ring-indigo-500/50': filasExpandidas.includes(item.id) }">
+                                class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 transition-colors"
+                                :class="{ 'ring-2 ring-blue-500/50': filasExpandidas.includes(item.id) }">
                                 <span class="text-xs font-bold">{{ item.subseries?.length || 0 }} subseries</span>
                                 <svg class="w-4 h-4 transition-transform duration-300"
                                     :class="{ 'rotate-180': filasExpandidas.includes(item.id) }" fill="none"
@@ -87,11 +87,11 @@
 
                             <ul v-if="item.subseries && item.subseries.length > 0" class="flex flex-col gap-2">
                                 <li v-for="(sub, index) in item.subseries" :key="index"
-                                    class="flex flex-col md:flex-row md:items-center justify-between gap-4 px-4 py-3 rounded-lg text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 shadow-sm hover:border-indigo-300 transition-colors">
+                                    class="flex flex-col md:flex-row md:items-center justify-between gap-4 px-4 py-3 rounded-lg text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 shadow-sm hover:border-blue-300 transition-colors">
 
                                     <div class="flex items-center gap-4 flex-1 min-w-0">
                                         <span
-                                            class="text-indigo-600 dark:text-indigo-400 font-black w-40 shrink-0 break-words">{{
+                                            class="text-blue-600 dark:text-blue-400 font-black w-40 shrink-0 break-words">{{
                                             sub.codigoSubserie }}</span>
                                         <span class="font-medium text-gray-800 dark:text-gray-200 truncate">{{
                                             sub.nombre }}</span>
@@ -113,7 +113,7 @@
                                         </span>
 
                                         <button @click="abrirModalValoracion(item, sub, index)"
-                                            class="ml-2 flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors shadow-sm">
+                                            class="ml-2 flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -135,7 +135,7 @@
             </div>
 
             <div v-if="loading" class="text-center py-12 text-gray-500 flex flex-col items-center">
-                <svg class="animate-spin h-8 w-8 text-indigo-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
+                <svg class="animate-spin h-8 w-8 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
                     viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor"
@@ -169,7 +169,7 @@
                         <div class="flex items-center gap-3">
                             <h2 class="text-lg font-bold text-gray-800 dark:text-white">Valoración Documental</h2>
                             <span
-                                class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">
+                                class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
                                 Plazo Total: {{ plazoTotal }} años
                             </span>
                         </div>
@@ -198,7 +198,7 @@
                             <div>
                                 <label class="block text-sm font-semibold text-white mb-1.5">Valor Documental</label>
                                 <select v-model="form.valor_documental"
-                                    class="w-full px-3 py-2 text-sm bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-indigo-500">
+                                    class="w-full px-3 py-2 text-sm bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-blue-500">
                                     <option value="Administrativo">Administrativo</option>
                                     <option value="Legal">Legal</option>
                                     <option value="Contable">Contable</option>
@@ -209,20 +209,20 @@
                                     <label class="block text-sm font-semibold text-white mb-1.5">Años Trámite
                                         (AT)</label>
                                     <input v-model.number="form.at" type="number" min="0"
-                                        class="w-full px-3 py-2 text-sm bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-indigo-500">
+                                        class="w-full px-3 py-2 text-sm bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-blue-500">
                                 </div>
                                 <div class="flex-1">
                                     <label class="block text-sm font-semibold text-white mb-1.5">Años Concentración
                                         (AC)</label>
                                     <input v-model.number="form.ac" type="number" min="0"
-                                        class="w-full px-3 py-2 text-sm bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-indigo-500">
+                                        class="w-full px-3 py-2 text-sm bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-blue-500">
                                 </div>
                             </div>
 
                             <div>
                                 <label class="block text-sm font-semibold text-white mb-1.5">Téc. Selección</label>
                                 <select v-model="form.tecnica_seleccion"
-                                    class="w-full px-3 py-2 text-sm bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-indigo-500">
+                                    class="w-full px-3 py-2 text-sm bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-blue-500">
                                     <option value="Baja">Baja</option>
                                     <option value="Archivo Histórico">Archivo Histórico</option>
                                 </select>
@@ -230,7 +230,7 @@
                             <div>
                                 <label class="block text-sm font-semibold text-white mb-1.5">Datos Personales</label>
                                 <select v-model="form.datos_personales"
-                                    class="w-full px-3 py-2 text-sm bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-indigo-500">
+                                    class="w-full px-3 py-2 text-sm bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-blue-500">
                                     <option value="Sí">Sí</option>
                                     <option value="No">No</option>
                                 </select>
@@ -240,7 +240,7 @@
                         <div class="mt-4">
                             <label class="block text-sm font-semibold text-white mb-1.5">Observaciones</label>
                             <input v-model="form.observaciones" type="text" placeholder="Sin observaciones"
-                                class="w-full px-3 py-2 text-sm bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-indigo-500">
+                                class="w-full px-3 py-2 text-sm bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-blue-500">
                         </div>
                     </div>
 
@@ -249,7 +249,7 @@
                         <button @click="cerrarModal"
                             class="flex-1 py-2.5 text-gray-600 dark:text-gray-300 font-semibold border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Cancelar</button>
                         <button @click="guardarValoracion"
-                            class="flex-1 py-2.5 bg-indigo-600 text-white rounded-lg font-bold shadow-md hover:bg-indigo-700 transform active:scale-95 transition-all">Guardar
+                            class="flex-1 py-2.5 bg-blue-600 text-white rounded-lg font-bold shadow-md hover:bg-blue-700 transform active:scale-95 transition-all">Guardar
                             Dictamen</button>
                     </div>
                 </div>

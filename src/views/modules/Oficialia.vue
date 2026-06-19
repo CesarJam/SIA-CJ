@@ -11,14 +11,14 @@
 
             <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
                 <select v-model="filtroAnio" @change="cargarDatos"
-                    class="w-full md:w-auto px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 shadow-sm cursor-pointer font-bold">
+                    class="w-full md:w-auto px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer font-bold">
                     <option v-for="anio in opcionesAnios" :key="anio" :value="anio">
                         Año {{ anio }}
                     </option>
                 </select>
 
                 <select v-model="filtroEstatus" @change="cargarDatos"
-                    class="w-full md:w-auto px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 shadow-sm cursor-pointer">
+                    class="w-full md:w-auto px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer">
                     <option value="Todos">Todos los estatus</option>
                     <option value="Recepcionado">Recepcionado</option>
                     <option value="En trámite">En trámite</option>
@@ -27,7 +27,7 @@
                 </select>
 
                 <button @click="abrirModalNuevo"
-                    class="flex-1 md:flex-none px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700 transition-colors">
+                    class="flex-1 md:flex-none px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition-colors">
                     + Nuevo Registro
                 </button>
             </div>
@@ -65,7 +65,7 @@
 
                     <div class="w-full md:w-1/4 flex flex-col md:block mt-1 md:mt-0">
                         <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">Destino:</span>
-                        <span class="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                        <span class="text-sm font-medium text-blue-600 dark:text-blue-400">
                             {{ item.area_destino?.codigo }} - {{ item.area_destino?.seccion }}
                         </span>
                         <div class="mt-1.5">
@@ -89,7 +89,7 @@
                             <div v-if="item.estatus === 'Recepcionado'"
                                 class="flex items-center gap-1 border-l border-gray-200 dark:border-gray-700 pl-2 ml-1">
                                 <button @click="abrirModalEditar(item)" title="Editar registro"
-                                    class="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-md transition-colors">
+                                    class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
@@ -113,7 +113,7 @@
             </div>
 
             <div v-if="loading" class="text-center py-12 text-gray-500 flex flex-col items-center">
-                <svg class="animate-spin h-8 w-8 text-indigo-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
+                <svg class="animate-spin h-8 w-8 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
                     viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor"

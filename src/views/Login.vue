@@ -4,7 +4,7 @@
     <div class="w-full max-w-md mx-auto p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700 text-center relative z-10">
       
       <div class="flex justify-center mb-6">
-        <div class="bg-indigo-100 dark:bg-indigo-900/30 p-4 rounded-full">
+        <div class="bg-blue-100 dark:bg-blue-900/30 p-4 rounded-full">
           <img src="@/assets/logo-transparente.png" class="h-16 w-auto" alt="Logo">
         </div>
       </div>
@@ -24,7 +24,7 @@
             type="email" 
             required
             @input="errorMessage = ''"
-            class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+            class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
             placeholder="usuario@ejemplo.com"
           >
         </div>
@@ -37,7 +37,7 @@
             type="password" 
             required
             @input="errorMessage = ''"
-            class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+            class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
             placeholder="••••••••"
           >
         </div>
@@ -52,7 +52,7 @@
         <button 
           type="submit" 
           :disabled="cargando"
-          class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-semibold py-3.5 px-4 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all transform hover:-translate-y-0.5 duration-300 flex items-center justify-center"
+          class="w-full mt-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3.5 px-4 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all transform hover:-translate-y-0.5 duration-300 flex items-center justify-center"
         >
           <span v-if="cargando" class="flex items-center gap-2">
             <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

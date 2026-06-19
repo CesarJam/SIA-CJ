@@ -28,7 +28,7 @@
                 </button>
 
                 <button v-if="userRole === 'admin'" @click="abrirModalNuevo"
-                    class="flex-1 md:flex-none px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700 transition-colors">
+                    class="flex-1 md:flex-none px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition-colors">
                     + Registrar
                 </button>
             </div>
@@ -67,7 +67,7 @@
                     <div v-if="userRole === 'admin'"
                         class="flex items-center gap-2 mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-t-0 border-gray-100 dark:border-gray-700 w-full md:w-auto justify-end shrink-0">
                         <button @click="abrirModalEdicion(item)"
-                            class="flex items-center gap-1.5 text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-semibold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20">
+                            class="flex items-center gap-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-semibold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
@@ -91,7 +91,7 @@
 
             <!--Estado de Carga y Estado Vacío -->
             <div v-if="loading" class="text-center py-12 text-gray-500 flex flex-col items-center">
-                <svg class="animate-spin h-8 w-8 text-indigo-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
+                <svg class="animate-spin h-8 w-8 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
                     viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor"
@@ -141,7 +141,7 @@
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Código de
                                 Sección</label>
                             <input v-model="form.codigo" type="text" placeholder="Ej: CJ.1"
-                                class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors disabled:opacity-60 disabled:bg-gray-100 dark:disabled:bg-gray-900 disabled:cursor-not-allowed"
+                                class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:opacity-60 disabled:bg-gray-100 dark:disabled:bg-gray-900 disabled:cursor-not-allowed"
                                 :disabled="editandoId">
                             <p v-if="editandoId" class="text-xs text-orange-500 mt-1">El código no puede modificarse al
                                 editar.</p>
@@ -150,13 +150,13 @@
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nombre de
                                 la Sección</label>
                             <input v-model="form.seccion" type="text" placeholder="Ej: PRUEBA LOCAL"
-                                class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors">
+                                class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
                         </div>
                         <div>
                             <label
                                 class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Función</label>
                             <select v-model="form.funcion"
-                                class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors">
+                                class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
                                 <option value="Sustantivas">Sustantivas</option>
                                 <option value="Comunes">Comunes</option>
                             </select>
@@ -168,7 +168,7 @@
                         <button @click="cerrarModal"
                             class="flex-1 py-2.5 text-gray-600 dark:text-gray-300 font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg transition-colors">Cancelar</button>
                         <button @click="guardarRegistro"
-                            class="flex-1 py-2.5 bg-indigo-600 text-white rounded-lg font-bold shadow-md hover:bg-indigo-700 hover:shadow-lg transform transition-all active:scale-95">
+                            class="flex-1 py-2.5 bg-blue-600 text-white rounded-lg font-bold shadow-md hover:bg-blue-700 hover:shadow-lg transform transition-all active:scale-95">
                             {{ editandoId ? 'Modificar' : 'Guardar' }}
                         </button>
                     </div>
