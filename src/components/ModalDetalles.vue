@@ -88,6 +88,27 @@
                     </div>
 
                     <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <h3 class="text-sm font-bold text-purple-700 dark:text-purple-400 mb-4 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                            Dependencias Involucradas
+                        </h3>
+                        
+                        <div v-if="loadingDependencias" class="flex items-center gap-2 text-sm text-purple-600 dark:text-purple-400">
+                            <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            <span>Cargando dependencias...</span>
+                        </div>
+                        <div v-else-if="dependenciasVinculadas.length === 0" class="text-sm text-gray-500 dark:text-gray-400 italic bg-gray-50 dark:bg-gray-900/50 p-3 rounded border border-gray-100 dark:border-gray-700/50">
+                            No hay dependencias vinculadas a este expediente.
+                        </div>
+                        <div v-else class="flex flex-wrap gap-2">
+                            <span v-for="dep in dependenciasVinculadas" :key="dep.id"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800/50 shadow-sm">
+                                <svg class="w-3.5 h-3.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                {{ dep.siglas ? `${dep.siglas} - ${dep.nombre_oficial}` : dep.nombre_oficial }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
                         <h3 class="text-sm font-bold text-emerald-700 dark:text-emerald-400 mb-4 flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
                             Datos de Archivo (CADIDO)
@@ -140,7 +161,7 @@
 
                         <div class="mt-5 pt-4 border-t border-gray-100 dark:border-gray-700">
                             <h4 class="text-xs font-bold text-gray-500 uppercase mb-3 flex items-center gap-2">
-                                <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3-3m3-3v12"></path></svg>
                                 Documentos Digitales Anexos
                             </h4>
                             
@@ -200,7 +221,7 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import { supabase } from '@/supabase'
 import GestorDocumental from '@/components/GestorDocumental.vue'
 
@@ -214,14 +235,48 @@ const emit = defineEmits(['update:modelValue'])
 const historialBitacora = ref([])
 const loadingBitacora = ref(false)
 
-// Cargar bitácora cuando se abre el modal
+const dependenciasVinculadas = ref([])
+const loadingDependencias = ref(false)
+
+const detallesContenedor = ref(null)
+
+// Cargar información cuando se abre el modal
 watch(() => props.modelValue, async (isOpen) => {
     if (isOpen && props.expediente) {
         await cargarBitacora(props.expediente.id)
+        await cargarDependencias(props.expediente.dependencias_ids)
+        await nextTick()
+        if (detallesContenedor.value) {
+            detallesContenedor.value.focus()
+        }
     } else {
         historialBitacora.value = [] // Limpiar al cerrar
+        dependenciasVinculadas.value = []
     }
 })
+
+// Extrae las dependencias vinculadas
+const cargarDependencias = async (ids) => {
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        dependenciasVinculadas.value = []
+        return
+    }
+    loadingDependencias.value = true
+    try {
+        const { data, error } = await supabase
+            .from('dependencias')
+            .select('id, nombre_oficial, siglas')
+            .in('id', ids)
+            .order('nombre_oficial')
+            
+        if (error) throw error
+        dependenciasVinculadas.value = data || []
+    } catch (error) {
+        console.error("Error al cargar dependencias:", error)
+    } finally {
+        loadingDependencias.value = false
+    }
+}
 
 const cargarBitacora = async (idExpediente) => {
     loadingBitacora.value = true
@@ -273,7 +328,6 @@ const badgeColor = (estatus) => {
     }
 }
 
-// Agrega esta función debajo de badgeColor
 const badgePrioridad = (prioridad) => {
     const p = (prioridad || '').toLowerCase()
     
@@ -286,23 +340,5 @@ const badgePrioridad = (prioridad) => {
     // Ordinario / Normal / Baja
     return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 px-2 py-0.5 rounded text-xs font-bold border border-gray-200 dark:border-gray-700"
 }
-
-// Añade la referencia al contenedor
-const detallesContenedor = ref(null)
-
-// Modifica el watch existente de modelValue
-watch(() => props.modelValue, async (isOpen) => {
-    if (isOpen && props.expediente) {
-        await cargarBitacora(props.expediente.id)
-        // Agrega esto para el foco
-        await nextTick()
-        if (detallesContenedor.value) {
-            detallesContenedor.value.focus()
-        }
-    } else {
-        historialBitacora.value = []
-    }
-})
-
 
 </script>
