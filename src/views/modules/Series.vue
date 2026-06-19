@@ -61,12 +61,12 @@
 
                         <div class="w-full md:w-1/5 flex flex-col md:block mt-1 md:mt-0">
                             <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">Nombre:</span>
-                            <span class="text-sm text-gray-800 dark:text-gray-200">{{ item.nombre }}</span>
+                            <span class="text-gray-800 dark:text-gray-200">{{ item.nombre }}</span>
                         </div>
 
                         <div class="w-full md:w-1/5 flex items-center justify-between md:justify-start">
                             <span class="md:hidden text-xs font-bold text-gray-400 uppercase">Sección:</span>
-                            <span class="text-sm text-blue-600 dark:text-blue-400 font-medium">{{
+                            <span class="text-blue-600 dark:text-blue-400 font-medium">{{
                                 item.cuadro_general?.codigo }} - {{ item.cuadro_general?.seccion }}</span>
                         </div>
 
@@ -76,7 +76,7 @@
                             <button @click="toggleExpandir(item.id)"
                                 class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-colors"
                                 :class="{ 'ring-2 ring-blue-500/50': filasExpandidas.includes(item.id) }">
-                                <span class="text-xs font-bold">{{ item.subseries?.length || 0 }} elementos</span>
+                                <span class="font-bold">{{ item.subseries?.length || 0 }} elementos</span>
                                 <svg class="w-4 h-4 transition-transform duration-300"
                                     :class="{ 'rotate-180 text-blue-600 dark:text-blue-400': filasExpandidas.includes(item.id) }"
                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">

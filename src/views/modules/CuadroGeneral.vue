@@ -56,12 +56,12 @@
 
                     <div class="ww-full md:w-1/5 flex items-center justify-between md:justify-start">
                         <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">Sección:</span>
-                        <span class="font-bold text-gray-800 dark:text-gray-200">{{ item.seccion }}</span>
+                        <span class="text-gray-800 dark:text-gray-200">{{ item.seccion }}</span>
                     </div>
 
                     <div class="w-full md:w-1/4 flex items-center justify-between md:justify-start mt-1 md:mt-0">
                         <span class="md:hidden text-xs font-bold text-gray-400 uppercase">Función:</span>
-                        <span class="font-bold text-gray-800 dark:text-gray-200">{{ item.funcion }}</span>
+                        <span class="text-gray-800 dark:text-gray-200">{{ item.funcion }}</span>
                     </div>
 
                     <div v-if="userRole === 'admin'"

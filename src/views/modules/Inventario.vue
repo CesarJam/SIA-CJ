@@ -105,8 +105,7 @@
                 <div v-for="(item, index) in expedientesFiltrados" :key="item.id"
                     class="p-4 md:px-6 md:py-4 flex flex-col md:flex-row md:items-start gap-2 md:gap-4 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/20 last:rounded-b-xl"
                     :class="{
-                        'opacity-75 bg-gray-50/50 dark:bg-gray-900/20':
-                            item.estatus === 'Concluido',
+                        'bg-gray-50/50 dark:bg-gray-900/40': item.estatus === 'Concluido',
                         'relative z-20': menuActivoId === item.id,
                         'relative z-0': menuActivoId !== item.id,
                     }">
@@ -124,21 +123,22 @@
 
                     <div class="w-full md:w-[25%] flex flex-col md:block mt-1 md:mt-0">
                         <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">Asunto:</span>
-                        <span class="text-m text-gray-800 dark:text-gray-200 line-clamp-2" :title="item.asunto">{{
-                            item.asunto }}</span>
+                        <span class="text-sm text-gray-800 dark:text-white line-clamp-2" :title="item.asunto">
+                            {{ item.asunto }}
+                        </span>
 
                         <div v-if="item.responsable_tramite"
-                            class="mt-2 flex items-start gap-1.5 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-100 dark:border-blue-800/50">
-                            <svg class="w-4 h-4 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor"
+                            class="mt-2 flex items-start gap-1.5 p-2 bg-blue-50 dark:bg-blue-900/40 rounded-md border border-blue-100 dark:border-blue-800/50">
+                            <svg class="w-4 h-4 text-blue-500 dark:text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                             </svg>
                             <div class="flex flex-col">
-                                <span class="text-xs font-semibold text-blue-700 dark:text-blue-300">Responsable: {{
+                                <span class="text-xs font-semibold text-blue-700 dark:text-blue-200">Responsable: {{
                                     item.responsable_tramite }}</span>
                                 <span v-if="item.indicaciones_tramite"
-                                    class="text-[10px] text-blue-600/80 dark:text-blue-400/80 italic mt-0.5 line-clamp-1"
+                                    class="text-[10px] text-blue-600/80 dark:text-blue-300 italic mt-0.5 line-clamp-1"
                                     :title="item.indicaciones_tramite">"{{ item.indicaciones_tramite }}"</span>
                             </div>
                         </div>
@@ -150,10 +150,10 @@
                         </span>
 
                         <span v-if="vistaActual === 'entrada'"
-                            class="text-sm text-white-700 dark:text-white-300">
+                            class="text-sm font-medium text-gray-700 dark:text-gray-300">
                             {{ item.area_origen?.codigo || "Externo" }} - {{ item.area_origen?.seccion || "No definido" }}
                         </span>
-                        <span v-else class="text-sm text-white-700 dark:text-white-100">
+                        <span v-else class="text-sm font-medium text-indigo-600 dark:text-indigo-400">
                             {{ item.area_destino?.codigo }} - {{ item.area_destino?.seccion }}
                         </span>
 
@@ -165,13 +165,12 @@
                         </div>
                     </div>
 
-                    <!-- COLUMNA 4 (NUEVA): DEPENDENCIAS INVOLUCRADAS -->
                     <div class="w-full md:w-[20%] flex flex-col md:block mt-2 md:mt-0">
                         <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-1">Dependencias:</span>
                         <div class="flex flex-wrap gap-1">
                             <template v-if="obtenerNombresDependencias(item.dependencias_ids).length > 0">
                                 <span v-for="dep in obtenerNombresDependencias(item.dependencias_ids)" :key="dep.id"
-                                    class="inline-block px-2 py-1 rounded text-sm bg-white-50 text-white-700 dark:bg-white-900/30 dark:text-white-300 dark:border-white-800/50 max-w-full whitespace-normal break-words leading-tight"
+                                    class="inline-block px-2 py-1 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800/50 max-w-full whitespace-normal break-words leading-tight"
                                     :title="dep.nombre_oficial">
                                     {{ dep.siglas ? `${dep.siglas} - ${dep.nombre_oficial}` : dep.nombre_oficial }}
                                 </span>
@@ -184,7 +183,7 @@
                         <span class="md:hidden text-xs font-bold text-gray-400 uppercase">Estatus:</span>
 
                         <div class="flex flex-col items-center gap-2 w-full">
-                            <span class="px-2.5 py-1 text-xs font-bold rounded-full w-full text-center"
+                            <span class="px-2.5 py-1 text-xs font-bold rounded-md w-full text-center"
                                 :class="badgeColor(item.estatus)">
                                 {{ item.estatus }}
                             </span>
@@ -209,17 +208,13 @@
                                     leave-to-class="transform opacity-0 scale-95">
                                     <div v-if="menuActivoId === item.id"
                                         class="absolute right-0 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-100 dark:border-gray-700 z-30 overflow-hidden flex flex-col"
-                                        :class="expedientesFiltrados.length > 3 &&
-                                            index >= expedientesFiltrados.length - 2
+                                        :class="expedientesFiltrados.length > 3 && index >= expedientesFiltrados.length - 2
                                             ? 'bottom-full mb-1 origin-bottom-right'
                                             : 'top-full mt-1 origin-top-right'
                                             ">
                                         <template
                                             v-if="vistaActual === 'enviados' && item.id_seccion_turnada !== seccionSeleccionada">
-                                            <button @click="
-                                                abrirModalDetalles(item);
-                                            cerrarMenu();
-                                            "
+                                            <button @click="abrirModalDetalles(item); cerrarMenu();"
                                                 class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
@@ -234,13 +229,9 @@
                                             </button>
                                         </template>
 
-
                                         <template v-else>
                                             <template v-if="item.estatus === 'Recepcionado'">
-                                                <button @click="
-                                                    abrirModalAtender(item);
-                                                cerrarMenu();
-                                                "
+                                                <button @click="abrirModalAtender(item); cerrarMenu();"
                                                     class="w-full text-left px-4 py-2.5 text-xs font-semibold text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
@@ -260,10 +251,7 @@
                                                     </svg>
                                                     Editar Registro
                                                 </button>
-                                                <button @click="
-                                                    abrirModalDetalles(item);
-                                                cerrarMenu();
-                                                "
+                                                <button @click="abrirModalDetalles(item); cerrarMenu();"
                                                     class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
@@ -277,15 +265,10 @@
                                                     </svg>
                                                     Ver Detalles
                                                 </button>
-
                                             </template>
 
                                             <template v-if="item.estatus === 'En trámite'">
-
-                                                <button @click="
-                                                    abrirModalConcluir(item);
-                                                cerrarMenu();
-                                                "
+                                                <button @click="abrirModalConcluir(item); cerrarMenu();"
                                                     class="w-full text-left px-4 py-2.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/30 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
@@ -294,10 +277,7 @@
                                                     </svg>
                                                     Clasificar y Concluir
                                                 </button>
-                                                <button @click="
-                                                    abrirModalAtender(item);
-                                                cerrarMenu();
-                                                "
+                                                <button @click="abrirModalAtender(item); cerrarMenu();"
                                                     class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
@@ -308,11 +288,7 @@
                                                     </svg>
                                                     Editar Asignación
                                                 </button>
-
-                                                <button @click="
-                                                    abrirModalDetalles(item);
-                                                cerrarMenu();
-                                                "
+                                                <button @click="abrirModalDetalles(item); cerrarMenu();"
                                                     class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
@@ -326,8 +302,6 @@
                                                     </svg>
                                                     Ver Detalles
                                                 </button>
-
-
                                             </template>
 
                                             <template v-if="item.estatus === 'Concluido'">
@@ -391,7 +365,6 @@
                                                 </svg>
                                                 Cancelar Trámite
                                             </button>
-
                                         </template>
                                     </div>
                                 </transition>
@@ -801,15 +774,15 @@ const claseBadgeCaracter = (caracter) => {
 const badgeColor = (estatus) => {
     switch (estatus) {
         case "Recepcionado":
-            return "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400";
+            return "bg-blue-100 text-blue-800 dark:bg-blue-900/80 dark:text-blue-300 border border-blue-300 dark:border-blue-600";
         case "En trámite":
-            return "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400";
+            return "bg-amber-100 text-amber-800 dark:bg-amber-900/80 dark:text-amber-300 border border-amber-300 dark:border-amber-600";
         case "Concluido":
-            return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400";
+            return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/80 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-600";
         case "Cancelado":
-            return "bg-red-50 text-red-600/70 border border-red-200/60 dark:bg-red-900/20 dark:text-red-400/70 dark:border-red-800/50";
+            return "bg-red-100 text-red-800 dark:bg-red-900/80 dark:text-red-300 border border-red-300 dark:border-red-600";
         default:
-            return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
+            return "bg-gray-100 text-gray-800 dark:bg-gray-900/80 dark:text-gray-300 border border-gray-300 dark:border-gray-600";
     }
 };
 

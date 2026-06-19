@@ -52,15 +52,15 @@
                     <div class="p-4 md:px-6 md:py-3.5 flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
                         <div class="w-full md:w-1/4 flex items-center justify-between md:justify-start">
                             <span class="md:hidden text-xs font-bold text-gray-400 uppercase">Código:</span>
-                            <span class="font-bold text-gray-900 dark:text-white text-sm">{{ item.codigo_serie }}</span>
+                            <span class="font-bold text-gray-900 dark:text-white">{{ item.codigo_serie }}</span>
                         </div>
                         <div class="w-full md:w-1/4 flex items-center justify-between md:justify-start">
                             <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">Nombre:</span>
-                            <span class="font-bold text-gray-900 dark:text-white text-sm">{{ item.nombre }}</span>
+                            <span class="text-gray-900 dark:text-white">{{ item.nombre }}</span>
                         </div>
                         <div class="w-full md:w-1/4 flex items-center justify-between md:justify-start">
                             <span class="md:hidden text-xs font-bold text-gray-400 uppercase">Sección:</span>
-                            <span class="text-sm text-blue-600 dark:text-blue-400 font-medium">{{
+                            <span class="text-blue-600 dark:text-blue-400 font-medium">{{
                                 item.cuadro_general?.codigo }}</span>
                         </div>
                         <div class="w-full md:w-1/6 flex items-center justify-between md:justify-center mt-1 md:mt-0">
@@ -68,7 +68,7 @@
                             <button @click="toggleExpandir(item.id)"
                                 class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 transition-colors"
                                 :class="{ 'ring-2 ring-blue-500/50': filasExpandidas.includes(item.id) }">
-                                <span class="text-xs font-bold">{{ item.subseries?.length || 0 }} subseries</span>
+                                <span class="font-bold">{{ item.subseries?.length || 0 }} subseries</span>
                                 <svg class="w-4 h-4 transition-transform duration-300"
                                     :class="{ 'rotate-180': filasExpandidas.includes(item.id) }" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
@@ -82,7 +82,7 @@
                     <div v-show="filasExpandidas.includes(item.id)" class="px-4 pb-4 md:px-6 md:pb-4 w-full">
                         <div
                             class="bg-gray-50/80 dark:bg-gray-900/40 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-inner">
-                            <h4 class="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3">Dictamen de
+                            <h4 class="font-bold text-gray-500 uppercase tracking-wider mb-3">Dictamen de
                                 Subseries</h4>
 
                             <ul v-if="item.subseries && item.subseries.length > 0" class="flex flex-col gap-2">
