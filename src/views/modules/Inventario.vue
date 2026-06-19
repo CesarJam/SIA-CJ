@@ -87,19 +87,17 @@
                     Nuevo
                 </button>
 
-
-
-
             </div>
         </div>
 
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
             <div
                 class="hidden md:flex items-center gap-4 px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-900/50 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                <div class="w-1/6">Folio / Fecha</div>
-                <div class="w-1/3">Asunto y Seguimiento</div>
-                <div class="w-1/4">{{ vistaActual === 'entrada' ? 'Origen (Remitente)' : 'Destino (Turnado a)' }}</div>
-                <div class="w-1/6 text-center">Estatus / Acción</div>
+                <div class="w-[15%]">Folio / Fecha</div>
+                <div class="w-[25%]">Asunto y Seguimiento</div>
+                <div class="w-[20%]">{{ vistaActual === 'entrada' ? 'Origen (Remitente)' : 'Destino (Turnado a)' }}</div>
+                <div class="w-[20%]">Dependencias</div>
+                <div class="w-[20%] text-center">Estatus / Acción</div>
             </div>
 
             <div class="divide-y divide-gray-100 dark:divide-gray-700/50">
@@ -112,9 +110,9 @@
                         'relative z-20': menuActivoId === item.id,
                         'relative z-0': menuActivoId !== item.id,
                     }">
-                    <div class="w-full md:w-1/6 flex flex-col md:block">
-                        <span class="font-bold text-gray-900 dark:text-white text-sm">{{ item.numero_consecutivo
-                            }}</span>
+                    
+                    <div class="w-full md:w-[15%] flex flex-col md:block">
+                        <span class="font-bold text-gray-900 dark:text-white text-sm">{{ item.numero_consecutivo }}</span>
                         <span v-if="item.caracter === 'Urgente' || item.caracter === 'Extraordinario'"
                             :class="claseBadgeCaracter(item.caracter)">
                             {{ item.caracter }}
@@ -124,9 +122,9 @@
                         </div>
                     </div>
 
-                    <div class="w-full md:w-1/3 flex flex-col md:block mt-1 md:mt-0">
+                    <div class="w-full md:w-[25%] flex flex-col md:block mt-1 md:mt-0">
                         <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">Asunto:</span>
-                        <span class="text-sm text-gray-800 dark:text-gray-200 line-clamp-2" :title="item.asunto">{{
+                        <span class="text-m text-gray-800 dark:text-gray-200 line-clamp-2" :title="item.asunto">{{
                             item.asunto }}</span>
 
                         <div v-if="item.responsable_tramite"
@@ -146,15 +144,14 @@
                         </div>
                     </div>
 
-                    <div class="w-full md:w-1/4 flex flex-col md:block mt-1 md:mt-0">
+                    <div class="w-full md:w-[20%] flex flex-col md:block mt-1 md:mt-0">
                         <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">
                             {{ vistaActual === 'entrada' ? 'Origen:' : 'Destino:' }}
                         </span>
 
                         <span v-if="vistaActual === 'entrada'"
                             class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ item.area_origen?.codigo || "Externo" }} - {{ item.area_origen?.seccion || "No definido"
-                            }}
+                            {{ item.area_origen?.codigo || "Externo" }} - {{ item.area_origen?.seccion || "No definido" }}
                         </span>
                         <span v-else class="text-sm font-medium text-indigo-600 dark:text-indigo-400">
                             {{ item.area_destino?.codigo }} - {{ item.area_destino?.seccion }}
@@ -168,7 +165,22 @@
                         </div>
                     </div>
 
-                    <div class="w-full md:w-1/6 flex justify-between items-center md:justify-center mt-3 md:mt-0 gap-3">
+                    <!-- COLUMNA 4 (NUEVA): DEPENDENCIAS INVOLUCRADAS -->
+                    <div class="w-full md:w-[20%] flex flex-col md:block mt-2 md:mt-0">
+                        <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-1">Dependencias:</span>
+                        <div class="flex flex-wrap gap-1">
+                            <template v-if="obtenerNombresDependencias(item.dependencias_ids).length > 0">
+                                <span v-for="dep in obtenerNombresDependencias(item.dependencias_ids)" :key="dep.id"
+                                    class="inline-block px-2 py-1 rounded text-sm bg-white-50 text-white-700 dark:bg-white-900/30 dark:text-white-300 dark:border-white-800/50 max-w-full whitespace-normal break-words leading-tight"
+                                    :title="dep.nombre_oficial">
+                                    {{ dep.siglas ? `${dep.siglas} - ${dep.nombre_oficial}` : dep.nombre_oficial }}
+                                </span>
+                            </template>
+                            <span v-else class="text-[11px] text-gray-400 dark:text-gray-500 italic bg-gray-50 dark:bg-gray-800 px-2 py-0.5 rounded border border-gray-100 dark:border-gray-700">Ninguna</span>
+                        </div>
+                    </div>
+
+                    <div class="w-full md:w-[20%] flex justify-between items-center md:justify-center mt-3 md:mt-0 gap-3">
                         <span class="md:hidden text-xs font-bold text-gray-400 uppercase">Estatus:</span>
 
                         <div class="flex flex-col items-center gap-2 w-full">
@@ -424,6 +436,7 @@
 
         <ModalExportarPDF v-model="modalExportarPDFAbierto" :seccionId="seccionSeleccionada" :miSeccion="miSeccion"
             :opcionesAnios="opcionesAnios" :anioDefecto="filtroAnio" />
+            
         <ModalEdicionAdmin v-model="modalEdicionAdminAbierto" :expediente="expedienteAdmin"
             :catalogoSeries="catalogoSeriesEstructurado" :usuarioActual="usuarioActual || ''"
             @guardado="cargarBandeja" />
@@ -471,6 +484,25 @@ const anioActual = new Date().getFullYear();
 // Crea un arreglo de 8 elementos (El año actual + 7 hacia atrás)
 const opcionesAnios = ref(Array.from({ length: 8 }, (_, i) => anioActual - i));
 const filtroAnio = ref(anioActual);
+
+// === CATÁLOGO GLOBAL DE DEPENDENCIAS ===
+const catalogoDependencias = ref([]);
+
+const cargarCatalogoDependenciasGlobal = async () => {
+    try {
+        const { data, error } = await supabase.from('dependencias').select('id, nombre_oficial, siglas');
+        if (!error && data) {
+            catalogoDependencias.value = data;
+        }
+    } catch (err) {
+        console.error("Error al cargar dependencias globales:", err);
+    }
+};
+
+const obtenerNombresDependencias = (ids) => {
+    if (!ids || !Array.isArray(ids) || ids.length === 0) return [];
+    return catalogoDependencias.value.filter(dep => ids.includes(dep.id));
+};
 
 const cambiarVista = async (nuevaVista) => {
     if (vistaActual.value === nuevaVista) return;
@@ -589,6 +621,9 @@ const inicializarUsuario = async () => {
 
         usuarioActual.value = userData.id;
         rolUsuario.value = userData.rol;
+
+        // CARGAMOS EL CATÁLOGO DE DEPENDENCIAS DE FORMA GLOBAL
+        await cargarCatalogoDependenciasGlobal();
 
         // Construimos la consulta base de áreas
         let querySec = supabase.from("cuadro_general").select("id, codigo, seccion").order("codigo");
