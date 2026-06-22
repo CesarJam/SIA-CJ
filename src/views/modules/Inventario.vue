@@ -93,8 +93,8 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
             <div
                 class="hidden md:flex items-center gap-4 px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-900/50 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                <div class="w-[15%]">Folio / Fecha</div>
-                <div class="w-[25%]">Asunto y Seguimiento</div>
+                <div class="w-[10%]">Folio / Fecha</div>
+                <div class="w-[30%]">Asunto y Seguimiento</div>
                 <div class="w-[20%]">{{ vistaActual === 'entrada' ? 'Origen (Remitente)' : 'Destino (Turnado a)' }}</div>
                 <div class="w-[20%]">Dependencias</div>
                 <div class="w-[20%] text-center">Estatus / Acción</div>
@@ -110,7 +110,7 @@
                         'relative z-0': menuActivoId !== item.id,
                     }">
                     
-                    <div class="w-full md:w-[15%] flex flex-col md:block">
+                    <div class="w-full md:w-[10%] flex flex-col md:block">
                         <span class="font-bold text-gray-900 dark:text-white text-sm">{{ item.numero_consecutivo }}</span>
                         <span v-if="item.caracter === 'Urgente' || item.caracter === 'Extraordinario'"
                             :class="claseBadgeCaracter(item.caracter)">
@@ -121,7 +121,7 @@
                         </div>
                     </div>
 
-                    <div class="w-full md:w-[25%] flex flex-col md:block mt-1 md:mt-0">
+                    <div class="w-full md:w-[30%] flex flex-col md:block mt-1 md:mt-0">
                         <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">Asunto:</span>
                         <span class="text-sm text-gray-800 dark:text-white line-clamp-2" :title="item.asunto">
                             {{ item.asunto }}
