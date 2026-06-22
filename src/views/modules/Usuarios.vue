@@ -121,6 +121,12 @@
                     placeholder="Nombre completo" 
                     class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   >
+                  <input 
+                    v-model="form.nomenclaturaExpedienteArea" 
+                    type="text" 
+                    placeholder="Nomenclatura (Ej: CJ/DA//2026)" 
+                    class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  >
                   <select 
                     v-model="form.rol" 
                     class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
@@ -183,7 +189,8 @@ const form = ref({
   email: '',
   nombre: '',
   rol: 'cliente',
-  secciones_permitidas: []
+  secciones_permitidas: [],
+  nomenclaturaExpedienteArea: ''
 })
 
 // Cargar Datos
@@ -201,7 +208,7 @@ onMounted(cargarDatos)
 
 const abrirPanelNuevo = () => {
   editandoId.value = null
-  form.value = { email: '', nombre: '', rol: 'cliente', secciones_permitidas: [] }
+  form.value = { email: '', nombre: '', rol: 'cliente', secciones_permitidas: [], nomenclaturaExpedienteArea: '' }
   panelAbierto.value = true
 }
 
@@ -234,7 +241,8 @@ const guardarUsuario = async () => {
   const payload = {
     ...form.value,
     email: form.value.email.trim(),
-    nombre: form.value.nombre.trim()
+    nombre: form.value.nombre.trim(),
+    nomenclaturaExpedienteArea: form.value.nomenclaturaExpedienteArea ? form.value.nomenclaturaExpedienteArea.trim() : null
   }
 
   // 3. Persistencia en Base de Datos

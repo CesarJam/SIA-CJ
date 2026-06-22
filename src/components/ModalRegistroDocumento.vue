@@ -115,7 +115,7 @@
                                 <div class="flex flex-col">
                                     <label class="block text-sm font-bold text-gray-500 uppercase mb-2">No.
                                         Consecutivo</label>
-                                    <input v-model="form.numero_consecutivo" type="text" placeholder="Ej: CJ-2026-001"
+                                    <input v-model="form.numero_consecutivo" type="text" placeholder="Ej: CJ/DA/001/2026"
                                         required
                                         class="mt-auto w-full px-3 py-2.5 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
                                         >
@@ -312,9 +312,11 @@ const obtenerFechaActual = () => {
     return `${year}-${month}-${day}` // Formato YYYY-MM-DD que requiere el input date
 }
 
+const nomenclaturaUsuario = ref('')
+
 // Formulario Principal
 const form = ref({
-    numero_consecutivo: 'CJ/DA//2026',
+    numero_consecutivo: '',
     fojas: 1,
     asunto: '',
     caracter: 'Ordinario',
@@ -346,8 +348,14 @@ watch(() => props.modelValue, async (nuevoValor) => {
             }
         } else {
             form.value = {
-                numero_consecutivo: 'CJ/DA//2026', fojas: 1, asunto: '', dependencias_ids: [],
-                areas_destino: [], id_seccion_turnada: null, caracter: 'Ordinario', tipo_registro: 'Enviado',
+                numero_consecutivo: nomenclaturaUsuario.value, 
+                fojas: 1, 
+                asunto: '', 
+                dependencias_ids: [],
+                areas_destino: [], 
+                id_seccion_turnada: null, 
+                caracter: 'Ordinario', 
+                tipo_registro: 'Enviado',
                 fecha_registro: obtenerFechaActual()
             }
         }
@@ -397,8 +405,9 @@ const guardarDependencia = async () => {
 // === LÓGICA DE CATÁLOGOS ===
 const cargarCatalogos = async () => {
     const { data: { user } } = await supabase.auth.getUser()
-    const { data: userData } = await supabase.from('usuarios').select('id').eq('email', user.email).single()
+    const { data: userData } = await supabase.from('usuarios').select('id, nomenclaturaExpedienteArea').eq('email', user.email).single()
     usuarioActual.value = userData.id
+    nomenclaturaUsuario.value = userData.nomenclaturaExpedienteArea || ''
 
     if (catalogoDependencias.value.length === 0) {
         const { data: dependencias } = await supabase.from('dependencias').select('id, nombre_oficial, siglas').eq('activo', true).order('nombre_oficial')
