@@ -654,7 +654,11 @@ const cargarBandeja = async () => {
         // Lógica dinámica del filtro
         if (vistaActual.value === "entrada") {
             // BANDEJA DE ENTRADA: 
-            query = query.eq("id_seccion_turnada", seccionSeleccionada.value);            
+            // 1. Debe estar turnado a mi área
+            // 2. Y (O fue creado por otra área, O es un documento externo "Recibido")
+            query = query
+                .eq("id_seccion_turnada", seccionSeleccionada.value)
+                .or(`id_seccion_registro.neq.${seccionSeleccionada.value},tipo_registro.eq.Recibido`);           
         } else {
             // MIS ENVIADOS: 
             query = query
