@@ -94,10 +94,10 @@
             <div
                 class="hidden md:flex items-center gap-4 px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-900/50 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 <div class="w-[10%]">Folio / Fecha</div>
-                <div class="w-[30%]">Asunto y Seguimiento</div>
-                <div class="w-[20%]">{{ vistaActual === 'entrada' ? 'Origen (Remitente)' : 'Destino (Turnado a)' }}</div>
-                <div class="w-[20%]">Dependencias</div>
-                <div class="w-[20%] text-center">Estatus / Acción</div>
+                <div class="w-[50%]">Asunto y Seguimiento</div>
+                <div class="w-[15%]">{{ vistaActual === 'entrada' ? 'Origen (Remitente)' : 'Destino (Turnado a)' }}</div>
+                <div class="w-[15%]">Dependencias</div>
+                <div class="w-[10%] text-center">Estatus / Acción</div>
             </div>
 
             <div class="divide-y divide-gray-100 dark:divide-gray-700/50">
@@ -121,9 +121,9 @@
                         </div>
                     </div>
 
-                    <div class="w-full md:w-[30%] flex flex-col md:block mt-1 md:mt-0">
+                    <div class="w-full md:w-[50%] flex flex-col md:block mt-1 md:mt-0">
                         <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">Asunto:</span>
-                        <span class="text-sm text-gray-800 dark:text-white line-clamp-2" :title="item.asunto">
+                        <span class="text-lg text-gray-800 dark:text-white line-clamp-2" :title="item.asunto">
                             {{ item.asunto }}
                         </span>
 
@@ -132,19 +132,23 @@
                             <svg class="w-4 h-4 text-blue-500 dark:text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                                </path>
                             </svg>
                             <div class="flex flex-col">
-                                <span class="text-xs font-semibold text-blue-700 dark:text-blue-200">Responsable: {{
-                                    item.responsable_tramite }}</span>
+                                <span class="text-[10px] font-semibold text-blue-700 dark:text-blue-200">
+                                    Responsable: {{
+                                    item.responsable_tramite }}
+                                </span>
                                 <span v-if="item.indicaciones_tramite"
                                     class="text-[10px] text-blue-600/80 dark:text-blue-300 italic mt-0.5 line-clamp-1"
-                                    :title="item.indicaciones_tramite">"{{ item.indicaciones_tramite }}"</span>
+                                    :title="item.indicaciones_tramite">"{{ item.indicaciones_tramite }}"
+                                </span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="w-full md:w-[20%] flex flex-col md:block mt-1 md:mt-0">
+                    <div class="w-full md:w-[15%] flex flex-col md:block mt-1 md:mt-0">
                         <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">
                             {{ vistaActual === 'entrada' ? 'Origen:' : 'Destino:' }}
                         </span>
@@ -153,7 +157,7 @@
                             class="text-sm font-medium text-gray-700 dark:text-gray-300">
                             {{ item.area_origen?.codigo || "Externo" }} - {{ item.area_origen?.seccion || "No definido" }}
                         </span>
-                        <span v-else class="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                        <span v-else class="text-sm font-medium text-white-600 dark:text-white-400">
                             {{ item.area_destino?.codigo }} - {{ item.area_destino?.seccion }}
                         </span>
 
@@ -165,12 +169,12 @@
                         </div>
                     </div>
 
-                    <div class="w-full md:w-[20%] flex flex-col md:block mt-2 md:mt-0">
+                    <div class="w-full md:w-[15%] flex flex-col md:block mt-2 md:mt-0">
                         <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-1">Dependencias:</span>
                         <div class="flex flex-wrap gap-1">
                             <template v-if="obtenerNombresDependencias(item.dependencias_ids).length > 0">
                                 <span v-for="dep in obtenerNombresDependencias(item.dependencias_ids)" :key="dep.id"
-                                    class="inline-block px-2 py-1 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800/50 max-w-full whitespace-normal break-words leading-tight"
+                                    class="inline-block px-2 py-1 rounded text-[10px] font-bold bg-sky-500/75 text-sky-700 border border-sky-200 dark:bg-sky-900/30 dark:text-sky-300 dark:border-sky-800/50 max-w-full whitespace-normal break-words leading-tight"
                                     :title="dep.nombre_oficial">
                                     {{ dep.siglas ? `${dep.siglas} - ${dep.nombre_oficial}` : dep.nombre_oficial }}
                                 </span>
@@ -179,7 +183,7 @@
                         </div>
                     </div>
 
-                    <div class="w-full md:w-[20%] flex justify-between items-center md:justify-center mt-3 md:mt-0 gap-3">
+                    <div class="w-full md:w-[10%] flex justify-between items-center md:justify-center mt-3 md:mt-0 gap-3">
                         <span class="md:hidden text-xs font-bold text-gray-400 uppercase">Estatus:</span>
 
                         <div class="flex flex-col items-center gap-2 w-full">
