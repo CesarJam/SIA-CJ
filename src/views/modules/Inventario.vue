@@ -654,9 +654,7 @@ const cargarBandeja = async () => {
         // Lógica dinámica del filtro
         if (vistaActual.value === "entrada") {
             // BANDEJA DE ENTRADA: 
-            query = query
-                .eq("id_seccion_turnada", seccionSeleccionada.value)
-                .neq("tipo_registro", "Enviado");
+            query = query.eq("id_seccion_turnada", seccionSeleccionada.value);            
         } else {
             // MIS ENVIADOS: 
             query = query
