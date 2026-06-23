@@ -102,7 +102,7 @@
 
             <div class="divide-y divide-gray-100 dark:divide-gray-700/50">
                 <div v-if="menuActivoId" @click="cerrarMenu" class="fixed inset-0 z-10"></div>
-                <div v-for="(item, index) in expedientesFiltrados" :key="item.id"
+                <div v-for="(item, index) in expedientesPaginados" :key="item.id"
                     class="p-4 md:px-6 md:py-4 flex flex-col md:flex-row md:items-start gap-2 md:gap-4 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/20 last:rounded-b-xl"
                     :class="{
                         'bg-gray-50/50 dark:bg-gray-900/40': item.estatus === 'Concluido',
@@ -376,6 +376,7 @@
                         </div>
                     </div>
                 </div>
+                
             </div>
 
             <div v-if="loading" class="text-center py-12 text-gray-500 flex flex-col items-center">
@@ -388,8 +389,31 @@
                 </svg>
                 Cargando inventario...
             </div>
-            <div v-else-if="expedientesFiltrados.length === 0" class="text-center py-12 text-gray-500">
+            <div v-else-if="expedientesPaginados.length === 0" class="text-center py-12 text-gray-500">
                 No se encontraron expedientes en esta bandeja.
+            </div>
+            <div v-if="totalPaginas > 1" class="flex flex-col sm:flex-row justify-between items-center px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 gap-4">
+                <span class="text-sm text-gray-500 dark:text-gray-400">
+                    Mostrando <span class="font-bold text-gray-900 dark:text-white">{{ ((paginaActual - 1) * registrosPorPagina) + 1 }}</span> a 
+                    <span class="font-bold text-gray-900 dark:text-white">{{ Math.min(paginaActual * registrosPorPagina, expedientesFiltrados.length) }}</span> de 
+                    <span class="font-bold text-gray-900 dark:text-white">{{ expedientesFiltrados.length }}</span> registros
+                </span>
+                
+                <div class="flex items-center gap-1">
+                    <button @click="irAPagina(paginaActual - 1)" :disabled="paginaActual === 1"
+                        class="px-3 py-1.5 text-sm font-medium rounded-md text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors shadow-sm">
+                        Anterior
+                    </button>
+                    
+                    <span class="px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Página {{ paginaActual }} de {{ totalPaginas }}
+                    </span>
+                    
+                    <button @click="irAPagina(paginaActual + 1)" :disabled="paginaActual === totalPaginas"
+                        class="px-3 py-1.5 text-sm font-medium rounded-md text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors shadow-sm">
+                        Siguiente
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -422,7 +446,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { supabase } from "@/supabase";
 import { useToast } from "@/composables/useToast";
 import ModalRegistroDocumento from '@/components/ModalRegistroDocumento.vue';
@@ -499,6 +523,34 @@ const toggleMenu = (id) => {
 const cerrarMenu = () => {
     menuActivoId.value = null;
 };
+
+// === ESTADOS DE PAGINACIÓN ===
+const paginaActual = ref(1);
+const registrosPorPagina = 100;
+
+// Reiniciar la página a 1 si el usuario cambia algún filtro
+watch([filtroEstatus, filtroAnio, seccionSeleccionada, vistaActual], () => {
+    paginaActual.value = 1;
+});
+
+const totalPaginas = computed(() => {
+    return Math.ceil(expedientesFiltrados.value.length / registrosPorPagina) || 1;
+});
+
+// Este es el arreglo que se dibujará en la tabla
+const expedientesPaginados = computed(() => {
+    const inicio = (paginaActual.value - 1) * registrosPorPagina;
+    const fin = inicio + registrosPorPagina;
+    return expedientesFiltrados.value.slice(inicio, fin);
+});
+
+const irAPagina = (pag) => {
+    if (pag >= 1 && pag <= totalPaginas.value) {
+        paginaActual.value = pag;
+        window.scrollTo({ top: 0, behavior: 'smooth' }); // Sube la pantalla suavemente
+    }
+};
+
 
 // === ESTADOS MODAL 1: ATENDER ===
 const modalAtenderAbierto = ref(false);
