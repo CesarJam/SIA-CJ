@@ -289,7 +289,8 @@ const props = defineProps({
     modelValue: { type: Boolean, required: true }, // v-model para abrir/cerrar
     origenId: { type: String, required: true }, // El ID de la sección que está creando el oficio
     titulo: { type: String, default: 'Registrar Documento' },
-    datosEditar: { type: Object, default: null } // Si viene lleno, es modo edición
+    datosEditar: { type: Object, default: null }, // Si viene lleno, es modo edición
+    esOficialia: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['update:modelValue', 'guardado'])
@@ -476,7 +477,7 @@ const ejecutarTurnado = async () => {
                 id_seccion_registro: props.origenId, // Creado por mi área
                 id_seccion_turnada: props.origenId,  // Turnado a mi área (Para que se quede en mi historial)
                 id_usuario_registro: usuarioActual.value,
-                estatus: 'Recepcionado',
+                estatus: props.esOficialia ? 'Concluido' : 'Recepcionado',
                 tradicion: ['Copia'], // Es mi acuse
                 caracter: form.value.caracter,
                 fecha_registro: form.value.fecha_registro

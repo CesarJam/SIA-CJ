@@ -3,10 +3,34 @@
 
         <div
             class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+
             <div>
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Oficialía de Partes</h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Recepción, captura y turnado de
                     correspondencia.</p>
+
+                <div
+                    class="flex bg-gray-100 dark:bg-gray-900 p-1 rounded-lg w-fit border border-gray-200 dark:border-gray-700 shadow-inner mt-4">
+                    <button @click="cambiarVista('entrada')"
+                        :class="vistaActual === 'entrada' ? 'bg-white dark:bg-gray-800 shadow-sm text-blue-700 dark:text-blue-400 font-bold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                        class="px-4 py-1.5 text-sm rounded-md transition-all flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
+                            </path>
+                        </svg>
+                        Bandeja de Entrada
+                    </button>
+                    <button @click="cambiarVista('enviados')"
+                        :class="vistaActual === 'enviados' ? 'bg-white dark:bg-gray-800 shadow-sm text-blue-700 dark:text-blue-400 font-bold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                        class="px-4 py-1.5 text-sm rounded-md transition-all flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                        </svg>
+                        Mis Enviados
+                    </button>
+                </div>
             </div>
 
             <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
@@ -34,7 +58,7 @@
         </div>
 
         <ModalRegistroDocumento v-model="modalRegistroAbierto" :origenId="idSeccionOficialia || ''"
-            :datosEditar="expedienteAEditar" @guardado="cargarDatos" />
+            :datosEditar="expedienteAEditar" :esOficialia="true" @guardado="cargarDatos" />
 
         <div
             class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -42,12 +66,15 @@
                 class="hidden md:flex items-center gap-4 px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-900/50 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 <div class="w-1/6">Folio / Fecha</div>
                 <div class="w-1/3">Asunto</div>
-                <div class="w-1/4">Área Turnada (Destino)</div>
+                <div class="w-1/4">{{ vistaActual === 'entrada' ? 'Área Origen (Remitente)' : 'Área Turnada (Destino)'
+                }}</div>
                 <div class="w-1/6 text-center">Estatus</div>
             </div>
 
             <div class="divide-y divide-gray-100 dark:divide-gray-700/50">
-                <div v-for="item in listaExpedientes" :key="item.id"
+                <div v-if="menuActivoId" @click="cerrarMenu" class="fixed inset-0 z-50"></div>
+
+                <div v-for="(item, index) in expedientesPaginados" :key="item.id"
                     class="p-4 md:px-6 md:py-3.5 flex flex-col md:flex-row md:items-center gap-2 md:gap-4 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/20">
 
                     <div class="w-full md:w-1/6 flex flex-col md:block">
@@ -61,54 +88,119 @@
                         <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">Asunto:</span>
                         <span class="text-sm text-gray-800 dark:text-gray-200 line-clamp-2" :title="item.asunto">{{
                             item.asunto }}</span>
-                    </div>
 
-                    <div class="w-full md:w-1/4 flex flex-col md:block mt-1 md:mt-0">
-                        <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">Destino:</span>
-                        <span class="text-sm font-medium text-blue-600 dark:text-blue-400">
-                            {{ item.area_destino?.codigo }} - {{ item.area_destino?.seccion }}
-                        </span>
                         <div class="mt-1.5">
                             <span class="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded-md"
                                 :class="obtenerValorArreglo(item.tradicion) === 'Original' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'">
                                 {{ obtenerValorArreglo(item.tradicion) }}
                             </span>
                         </div>
+                    </div>
 
+                    <div class="w-full md:w-1/4 flex flex-col md:block mt-1 md:mt-0">
+                        <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">
+                            {{ vistaActual === 'entrada' ? 'Origen:' : 'Destino:' }}
+                        </span>
+
+                        <span v-if="vistaActual === 'entrada'"
+                            class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {{ item.area_origen?.codigo }} - {{ item.area_origen?.seccion }}
+                        </span>
+                        <span v-else class="text-sm font-medium text-blue-600 dark:text-blue-400">
+                            {{ item.area_destino?.codigo }} - {{ item.area_destino?.seccion }}
+                        </span>
 
                     </div>
 
 
-                    <div class="w-full md:w-1/6 flex justify-between items-center md:justify-center mt-2 md:mt-0 gap-3">
+
+                    <div class="w-full md:w-1/6 flex justify-between items-center md:justify-center mt-3 md:mt-0 gap-3">
                         <span class="md:hidden text-xs font-bold text-gray-400 uppercase">Estatus:</span>
-                        <div class="flex items-center gap-2">
-                            <span class="px-2.5 py-1 text-xs font-bold rounded-full" :class="badgeColor(item.estatus)">
+                        <div class="flex flex-col items-center gap-2 w-full">
+                            <span class="px-2.5 py-1 text-xs font-bold rounded-md w-full text-center"
+                                :class="badgeColor(item.estatus)">
                                 {{ item.estatus }}
                             </span>
 
-                            <div v-if="item.estatus === 'Recepcionado'"
-                                class="flex items-center gap-1 border-l border-gray-200 dark:border-gray-700 pl-2 ml-1">
-                                <button @click="abrirModalEditar(item)" title="Editar registro"
-                                    class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="relative w-full mt-2">
+                                <button @click.stop="toggleMenu(item.id)"
+                                    class="w-full px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 rounded-md transition-colors flex items-center justify-center gap-2 shadow-sm relative z-20">
+                                    <span>Acciones</span>
+                                    <svg class="w-3.5 h-3.5 transition-transform duration-200"
+                                        :class="{ 'rotate-180': menuActivoId === item.id }" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
-                                        </path>
+                                            d="M19 9l-7 7-7-7"></path>
                                     </svg>
                                 </button>
 
-                                <button @click="abrirModalCancelar(item)" title="Cancelar registro"
-                                    class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                        </path>
-                                    </svg>
-                                </button>
+                                <div v-if="menuActivoId === item.id"
+                                    class="absolute right-0 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-100 dark:border-gray-700 z-50 overflow-hidden flex flex-col"
+                                    :class="index >= expedientesPaginados.length - 2
+                                        ? 'bottom-full mb-2 origin-bottom-right'
+                                        : 'top-full mt-2 origin-top-right'">
+
+                                    <button @click="abrirModalDetalles(item); cerrarMenu();"
+                                        class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors">
+
+                                        Ver detalles
+
+                                    </button>
+
+                                    <template v-if="item.estatus === 'Recepcionado' || item.estatus === 'En trámite'">
+                                        <button @click="abrirModalAtender(item); cerrarMenu();"
+                                            class="w-full text-left px-4 py-2.5 text-xs font-semibold text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 flex items-center gap-2.5 transition-colors border-t border-gray-50 dark:border-gray-700">
+                                            {{ item.estatus === 'Recepcionado' ? 'Asignar Trámite' : 'Editar Asignación'
+                                            }}
+                                        </button>
+                                    </template>
+
+                                    <button v-if="item.estatus === 'En trámite'"
+                                        @click="abrirModalConfirmar(item); cerrarMenu();"
+                                        class="w-full text-left px-4 py-2.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/30 flex items-center gap-2.5 transition-colors border-t border-gray-50 dark:border-gray-700">
+                                        Concluir Trámite
+                                    </button>
+
+                                    <button v-if="item.estatus === 'Recepcionado'"
+                                        @click="abrirModalEditar(item); cerrarMenu();"
+                                        class="w-full text-left px-4 py-2.5 text-xs font-semibold text-amber-600 hover:bg-amber-50 dark:text-amber-500 dark:hover:bg-amber-900/30 flex items-center gap-2.5 transition-colors border-t border-gray-50 dark:border-gray-700">
+                                        Editar Registro
+                                    </button>
+
+                                    <button v-if="item.estatus === 'Recepcionado'"
+                                        @click="abrirModalCancelar(item); cerrarMenu();"
+                                        class="w-full text-left px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 flex items-center gap-2.5 transition-colors border-t border-gray-50 dark:border-gray-700">
+                                        Cancelar Trámite
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
+
+                </div>
+
+            </div>
+            <div v-if="totalPaginas > 1"
+                class="flex flex-col sm:flex-row justify-between items-center px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 gap-4">
+                <span class="text-sm text-gray-500 dark:text-gray-400">
+                    Mostrando <span class="font-bold text-gray-900 dark:text-white">{{ ((paginaActual - 1) *
+                        registrosPorPagina) + 1
+                    }}</span> a
+                    <span class="font-bold text-gray-900 dark:text-white">{{ Math.min(paginaActual * registrosPorPagina,
+                        expedientesFiltrados.length) }}</span> de
+                    <span class="font-bold text-gray-900 dark:text-white">{{ expedientesFiltrados.length }}</span>
+                    registros
+                </span>
+
+                <div class="flex items-center gap-1">
+                    <button @click="irAPagina(paginaActual - 1)" :disabled="paginaActual === 1"
+                        class="px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 hover:bg-gray-50 disabled:opacity-50">Anterior</button>
+                    <span class="px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">Página {{
+                        paginaActual }} de {{
+                            totalPaginas }}</span>
+                    <button @click="irAPagina(paginaActual + 1)" :disabled="paginaActual === totalPaginas"
+                        class="px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 hover:bg-gray-50 disabled:opacity-50">Siguiente</button>
                 </div>
             </div>
 
@@ -183,15 +275,67 @@
             </transition>
         </div>
 
+        <ModalAtender v-model="modalAtenderAbierto" :expediente="expedienteAAtender"
+            :usuarioActual="usuarioActual || ''" @guardado="cargarDatos" />
+        <ModalDetalles v-model="modalDetallesAbierto" :expediente="expedienteDetalle" />
+
+        <div
+            :class="['fixed inset-0 z-[80] flex items-center justify-center p-4', modalConfirmarAbierto ? 'pointer-events-auto' : 'pointer-events-none']">
+            <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0"
+                enter-to-class="opacity-100" leave-active-class="ease-in duration-200" leave-from-class="opacity-100"
+                leave-to-class="opacity-0">
+                <div v-if="modalConfirmarAbierto" class="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                    @click="cerrarModalConfirmar"></div>
+            </transition>
+
+            <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0 scale-95"
+                enter-to-class="opacity-100 scale-100" leave-active-class="ease-in duration-200"
+                leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
+                <div v-if="modalConfirmarAbierto"
+                    class="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-sm overflow-hidden border border-gray-200 dark:border-gray-700">
+                    <div class="p-6 text-center">
+                        <div
+                            class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-emerald-100 dark:bg-emerald-900/30 mb-4">
+                            <svg class="h-6 w-6 text-emerald-600 dark:text-emerald-400" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">¿Concluir Expediente?</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                            Estás por concluir el folio <strong class="text-gray-900 dark:text-white">{{
+                                expedienteAConcluir?.numero_consecutivo }}</strong>. Esta acción marcará el registro
+                            como
+                            concluido permanentemente.
+                        </p>
+                    </div>
+                    <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900/40 flex justify-end gap-3">
+                        <button @click="cerrarModalConfirmar"
+                            class="px-4 py-2 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors">Cancelar</button>
+                        <button @click="ejecutarConcluir" :disabled="procesando"
+                            class="px-4 py-2 text-sm font-bold bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 shadow-md transition-colors disabled:opacity-50">
+                            {{ procesando ? 'Procesando...' : 'Confirmar Conclusión' }}
+                        </button>
+                    </div>
+                </div>
+            </transition>
+        </div>
+
+
+
     </div>
+
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { supabase } from '@/supabase'
 import { useToast } from '@/composables/useToast'
 
 import ModalRegistroDocumento from '@/components/ModalRegistroDocumento.vue'
+import ModalAtender from '@/components/ModalAtender.vue'
+import ModalDetalles from '@/components/ModalDetalles.vue'
 
 const toast = useToast()
 
@@ -200,6 +344,30 @@ const loading = ref(true)
 const listaExpedientes = ref([])
 const idSeccionOficialia = ref(null)
 const usuarioActual = ref(null)
+const vistaActual = ref("enviados"); // Oficialía es más de envío
+const cambiarVista = async (nuevaVista) => {
+    if (vistaActual.value === nuevaVista) return;
+    vistaActual.value = nuevaVista;
+    filtroEstatus.value = "Todos";
+    paginaActual.value = 1;
+    await cargarDatos();
+};
+
+// === ESTADOS DEL MENÚ DESPLEGABLE (ACCIONES) ===
+const menuActivoId = ref(null);
+
+const toggleMenu = (id) => {
+    menuActivoId.value = menuActivoId.value === id ? null : id;
+};
+
+const cerrarMenu = () => {
+    menuActivoId.value = null;
+};
+
+// === ESTADOS DE PAGINACIÓN ===
+const paginaActual = ref(1);
+const registrosPorPagina = 100;
+
 
 // === FILTROS ===
 const anioActual = new Date().getFullYear()
@@ -210,6 +378,53 @@ const filtroEstatus = ref("Todos")
 // === ESTADOS MODAL REGISTRO ===
 const modalRegistroAbierto = ref(false)
 const expedienteAEditar = ref(null)
+
+// === ESTADOS MODAL DETALLES ===
+const modalDetallesAbierto = ref(false)
+const expedienteDetalle = ref(null)
+const abrirModalDetalles = (item) => {
+    expedienteDetalle.value = item
+    modalDetallesAbierto.value = true
+}
+
+// === ESTADOS PARA MODAL DE CONFIRMACIÓN ===
+const modalConfirmarAbierto = ref(false);
+const expedienteAConcluir = ref(null);
+const procesando = ref(false);
+
+const abrirModalConfirmar = (item) => {
+    expedienteAConcluir.value = item;
+    modalConfirmarAbierto.value = true;
+};
+
+const cerrarModalConfirmar = () => {
+    if (!procesando.value) modalConfirmarAbierto.value = false;
+};
+
+const ejecutarConcluir = async () => {
+    procesando.value = true;
+    try {
+        const { error } = await supabase
+            .from('expedientes')
+            .update({
+                estatus: 'Concluido',
+                id_usuario_actualizacion: usuarioActual.value
+            })
+            .eq('id', expedienteAConcluir.value.id);
+
+        if (error) throw error;
+
+        toast.success("Expediente concluido correctamente.");
+        await cargarDatos();
+        cerrarModalConfirmar();
+    } catch (err) {
+        toast.error("Error al concluir el expediente.");
+    } finally {
+        procesando.value = false;
+    }
+};
+
+
 
 // === ESTADOS Y LÓGICA DE CANCELACIÓN (Soft Delete) ===
 const modalCancelarAbierto = ref(false)
@@ -254,7 +469,6 @@ const cerrarModalDependencia = () => {
 
 
 // === CARGA INICIAL Y FILTRADA ===
-// === CARGA INICIAL Y FILTRADA ===
 const cargarDatos = async () => {
     loading.value = true
 
@@ -275,19 +489,30 @@ const cargarDatos = async () => {
         }
 
         if (idSeccionOficialia.value) {
-            // CONSTRUCCIÓN DINÁMICA DE LA CONSULTA
             let query = supabase
                 .from('expedientes')
-                .select(`*, area_destino:id_seccion_turnada (codigo, seccion)`)
-                .eq('id_seccion_registro', idSeccionOficialia.value)
+                // AHORA TRAEMOS ORIGEN Y DESTINO
+                .select(`*, area_destino:id_seccion_turnada (codigo, seccion), area_origen:id_seccion_registro (codigo, seccion)`)
                 .gte("fecha_registro", `${filtroAnio.value}-01-01`)
                 .lte("fecha_registro", `${filtroAnio.value}-12-31`)
                 .order('fecha_registro', { ascending: false })
                 .order('hora_registro', { ascending: false })
 
-            // APLICAR FILTRO DE ESTATUS SI NO ES "Todos"
-            if (filtroEstatus.value !== "Todos") {
-                query = query.eq('estatus', filtroEstatus.value)
+            // LÓGICA DE BANDEJAS PARA OFICIALÍA
+            if (vistaActual.value === "entrada") {
+                // BANDEJA DE ENTRADA: 
+                // 1. Debe estar turnado a Oficialía
+                // 2. Y (O fue creado por otra área, O es un documento marcado explícitamente como "Recibido")
+                query = query
+                    .eq('id_seccion_turnada', idSeccionOficialia.value)
+                    .or(`id_seccion_registro.neq.${idSeccionOficialia.value},tipo_registro.eq.Recibido`);
+            } else {
+                // MIS ENVIADOS:
+                // 1. Creado por Oficialía
+                // 2. Y (O se turnó a otra área diferente, O es un trámite explícitamente "Enviado")
+                query = query
+                    .eq('id_seccion_registro', idSeccionOficialia.value)
+                    .or(`id_seccion_turnada.neq.${idSeccionOficialia.value},tipo_registro.eq.Enviado`);
             }
 
             const { data: expedientes, error } = await query
@@ -354,6 +579,60 @@ const ejecutarCancelacion = async () => {
     }
 }
 
+watch([filtroEstatus, filtroAnio, vistaActual], () => {
+    paginaActual.value = 1;
+});
+
+const expedientesFiltrados = computed(() => {
+    if (filtroEstatus.value === "Todos") return listaExpedientes.value;
+    return listaExpedientes.value.filter(exp => exp.estatus === filtroEstatus.value);
+});
+
+const totalPaginas = computed(() => {
+    return Math.ceil(expedientesFiltrados.value.length / registrosPorPagina) || 1;
+});
+
+const expedientesPaginados = computed(() => {
+    const inicio = (paginaActual.value - 1) * registrosPorPagina;
+    const fin = inicio + registrosPorPagina;
+    return expedientesFiltrados.value.slice(inicio, fin);
+});
+
+const irAPagina = (pag) => {
+    if (pag >= 1 && pag <= totalPaginas.value) {
+        paginaActual.value = pag;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
+
+// === ESTADOS MODAL ATENDER ===
+const modalAtenderAbierto = ref(false)
+const expedienteAAtender = ref(null)
+
+const abrirModalAtender = (item) => {
+    expedienteAAtender.value = item
+    modalAtenderAbierto.value = true
+}
+
+const concluirExpediente = async (item) => {
+    if (!confirm(`¿Estás seguro de concluir el folio ${item.numero_consecutivo}?`)) return;
+
+    try {
+        const { error } = await supabase
+            .from('expedientes')
+            .update({
+                estatus: 'Concluido',
+                id_usuario_actualizacion: usuarioActual.value
+            })
+            .eq('id', item.id);
+
+        if (error) throw error;
+        toast.success("Expediente concluido correctamente.");
+        await cargarDatos();
+    } catch (err) {
+        toast.error("Error al concluir el expediente.");
+    }
+};
 // === UTILIDADES VISUALES ===
 
 // UTILIDAD PARA ARREGLOS DE BD (Soporte, Tradición, Condición)
@@ -390,13 +669,20 @@ const badgeColor = (estatus) => {
 }
 
 // Event Listeners (Accesibilidad)
+
 // === ACCESIBILIDAD (TECLADO) ===
 const handleKeydown = (e) => {
-    // Solo manejamos el modal local de cancelación (El de registro se maneja a sí mismo)
-    if (e.key === 'Escape' && modalCancelarAbierto.value && !procesandoCancelacion.value) {
-        cerrarModalCancelar()
+    if (e.key === 'Escape') {
+        // Si el modal de cancelación está abierto, lo cierra
+        if (modalCancelarAbierto.value && !procesandoCancelacion.value) {
+            cerrarModalCancelar();
+        }
+        // NUEVO: Si el modal de confirmación de concluir está abierto, lo cierra
+        else if (modalConfirmarAbierto.value && !procesando.value) {
+            cerrarModalConfirmar();
+        }
     }
-}
+};
 
 
 onMounted(() => {
