@@ -92,6 +92,7 @@
                         <GestorDocumental 
                             v-if="expediente" 
                             :expedienteId="expediente.id" 
+                            :grupoId="expediente.grupo_id"  
                             :folio="expediente.numero_consecutivo" 
                             modo="escritura"
                         />

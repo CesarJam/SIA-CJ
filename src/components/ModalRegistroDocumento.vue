@@ -454,36 +454,65 @@ const ejecutarTurnado = async () => {
 
     procesando.value = true
     try {
-        // REGLA 2: Si no seleccionó destinos, el destino es él mismo (Trámite Local)
         const destinosFinales = form.value.areas_destino.length > 0
             ? form.value.areas_destino
             : [props.origenId]
 
-        const batchInsertData = destinosFinales.map((idDestino, index) => ({
-            numero_consecutivo: form.value.numero_consecutivo,
-            asunto: form.value.asunto.trim(),
-            fojas: form.value.fojas,
-            tipo_registro: form.value.tipo_registro,
-            dependencias_ids: form.value.dependencias_ids,
-            id_seccion_registro: props.origenId, // Quién lo crea
-            id_seccion_turnada: idDestino,       // A quién va
-            id_usuario_registro: usuarioActual.value,
-            estatus: 'Recepcionado',
-            tradicion: null,
-            //tradicion: index === 0 ? 'Original' : 'Copia',
-            caracter: form.value.caracter,
-            fecha_registro: form.value.fecha_registro
-        }))
+        // 1. Generamos el Identificador de Grupo Compartido (Nativo de JavaScript)
+        const grupoId = crypto.randomUUID();
+        const batchInsertData = [];
 
+        // 2. REGLA DE NEGOCIO: Si se turna a OTRAS áreas, generamos el "Acuse" automático para el área que lo envía
+        const esTurnadoExterno = form.value.areas_destino.length > 0;
+        
+        if (esTurnadoExterno) {
+            batchInsertData.push({
+                grupo_id: grupoId,
+                numero_consecutivo: form.value.numero_consecutivo,
+                asunto: form.value.asunto.trim(),
+                fojas: form.value.fojas,
+                tipo_registro: form.value.tipo_registro,
+                dependencias_ids: form.value.dependencias_ids,
+                id_seccion_registro: props.origenId, // Creado por mi área
+                id_seccion_turnada: props.origenId,  // Turnado a mi área (Para que se quede en mi historial)
+                id_usuario_registro: usuarioActual.value,
+                estatus: 'Recepcionado',
+                tradicion: ['Copia'], // Es mi acuse
+                caracter: form.value.caracter,
+                fecha_registro: form.value.fecha_registro
+            });
+        }
+
+        // 3. Generamos los registros "Clones" para las áreas que van a RECIBIR el documento
+        destinosFinales.forEach((idDestino) => {
+            batchInsertData.push({
+                grupo_id: grupoId,
+                numero_consecutivo: form.value.numero_consecutivo,
+                asunto: form.value.asunto.trim(),
+                fojas: form.value.fojas,
+                tipo_registro: form.value.tipo_registro, // Mantenemos el tipo que seleccionó el usuario
+                dependencias_ids: form.value.dependencias_ids,
+                id_seccion_registro: props.origenId, // Creado por mi
+                id_seccion_turnada: idDestino,       // Turnado al área destino
+                id_usuario_registro: usuarioActual.value,
+                estatus: 'Recepcionado', // Entra como "NUEVO" en la bandeja del destino
+                // Si es un trámite puramente local mío, es el original. Si se envió afuera, el destino tiene el original.
+                tradicion: !esTurnadoExterno ? ['Original'] : ['Original'], 
+                caracter: form.value.caracter,
+                fecha_registro: form.value.fecha_registro
+            });
+        });
+
+        // 4. Insertamos todo de golpe en la base de datos
         const { error } = await supabase.from('expedientes').insert(batchInsertData)
         if (error) {
             if (error.code === '23505') throw new Error(`El folio ${form.value.numero_consecutivo} ya fue registrado.`)
             throw error
         }
 
-        const msj = form.value.areas_destino.length > 0
-            ? `Folio turnado con éxito a ${form.value.areas_destino.length} área(s)`
-            : `Folio registrado localmente con éxito.`
+        const msj = esTurnadoExterno
+            ? `Oficio enviado a ${form.value.areas_destino.length} área(s). Acuse generado en su inventario.`
+            : `Trámite local registrado con éxito.`;
 
         toast.success(msj)
         emit('guardado')

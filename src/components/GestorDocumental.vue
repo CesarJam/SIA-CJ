@@ -102,6 +102,7 @@ import ModalVisor from '@/components/ModalVisor.vue'
 
 const props = defineProps({
     expedienteId: { type: String, required: true },
+    grupoId: { type: String, required: true },
     folio: { type: String, required: true },
     modo: { type: String, default: 'escritura' } 
 })
@@ -120,13 +121,15 @@ const archivoActualNombre = ref('')
 const archivoActualTipo = ref('')
 
 const cargarArchivos = async () => {
-    if (!props.expedienteId) return
+    // Si por alguna extraña razón el componente se abre sin grupoId, detenemos la búsqueda
+    if (!props.grupoId) return; 
+
     cargandoArchivos.value = true
     try {
         const { data, error } = await supabase
             .from('archivos_anexos')
             .select('*')
-            .eq('id_expediente', props.expedienteId)
+            .eq('id_grupo', props.grupoId)
             .order('created_at', { ascending: false })
 
         if (error) throw error
@@ -171,7 +174,8 @@ const procesarArchivos = async (files) => {
             }
 
             const cleanFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
-            const rutaStorage = `${props.expedienteId}/${Date.now()}_${cleanFileName}`
+            const folderName = props.grupoId;
+            const rutaStorage = `${folderName}/${Date.now()}_${cleanFileName}`
 
             const { error: uploadError } = await supabase.storage
                 .from('expedientes')
@@ -179,10 +183,12 @@ const procesarArchivos = async (files) => {
 
             if (uploadError) throw uploadError
 
+
             const { error: dbError } = await supabase
                 .from('archivos_anexos')
                 .insert([{
                     id_expediente: props.expedienteId,
+                    id_grupo: props.grupoId,
                     nombre_archivo: file.name,
                     tipo_mime: file.type,
                     tamano_bytes: file.size,
