@@ -365,17 +365,25 @@ watch(() => props.modelValue, async (nuevoValor) => {
 
 // === NUEVO: LÓGICA DE VISIBILIDAD DE ÁREA DESTINO ===
 const mostrarAreaDestino = computed(() => {
-    // Si estamos en Oficialía Y es un documento de salida (Enviado), NO mostramos el destino interno
+    // REGLA 1: Si estamos en Oficialía y es un envío (Salida externa), se oculta destino interno
     if (props.esOficialia && form.value.tipo_registro === 'Enviado') {
         return false
     }
-    // Para todos los demás casos (Módulos normales o Oficialía recibiendo), SÍ se muestra
+    // REGLA 2: Si estamos en Inventario (!esOficialia) y es recibido, se oculta destino (es para ellos mismos)
+    if (!props.esOficialia && form.value.tipo_registro === 'Recibido') {
+        return false
+    }
+    // Para todos los demás casos, SÍ se muestra
     return true
 })
 
-// Limpieza de seguridad: Si el usuario selecciona "Enviado" en Oficialía, limpiamos el destino
+// Limpieza de seguridad: Si el usuario cambia de opción y se oculta el destino, limpiamos la selección
 watch(() => form.value.tipo_registro, (nuevoTipo) => {
     if (props.esOficialia && nuevoTipo === 'Enviado') {
+        form.value.areas_destino = []
+        form.value.id_seccion_turnada = null
+    } 
+    else if (!props.esOficialia && nuevoTipo === 'Recibido') {
         form.value.areas_destino = []
         form.value.id_seccion_turnada = null
     }
