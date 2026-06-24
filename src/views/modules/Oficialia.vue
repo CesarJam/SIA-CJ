@@ -198,7 +198,8 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                                 </svg>
-                                                {{ item.estatus === 'Recepcionado' ? 'Asignar / Subir Archivo' : 'Editar Asignación' }}
+                                                {{ item.estatus === 'Recepcionado' ?
+                                                    'Asignar / Subir Archivo' : 'Editar Asignación' }}
                                             </button>
                                         </template>
 
@@ -223,6 +224,21 @@
                                                 </path>
                                             </svg>
                                             Editar Registro
+                                        </button>
+
+                                        <!-- Correccio Administrativa -->
+                                        <button
+                                            v-if="rolUsuario === 'admin' && (item.estatus === 'Concluido' || item.estatus === 'Cancelado')"
+                                            @click="abrirModalEdicionAdmin(item); cerrarMenu();"
+                                            class="w-full text-left px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 flex items-center gap-2.5 transition-colors border-t border-gray-100 dark:border-gray-700/50">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                                </path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            </svg>
+                                            Corrección Administrativa
                                         </button>
 
                                         <!-- Cancelar Trámite (Solo Recepcionado) -->
@@ -341,6 +357,8 @@
         <ModalAtender v-model="modalAtenderAbierto" :expediente="expedienteAAtender"
             :usuarioActual="usuarioActual || ''" @guardado="cargarDatos" />
         <ModalDetalles v-model="modalDetallesAbierto" :expediente="expedienteDetalle" />
+        <ModalEdicionAdmin v-model="modalEdicionAdminAbierto" :expediente="expedienteAdmin"
+            :catalogoSeries="catalogoSeriesEstructurado" :usuarioActual="usuarioActual || ''" @guardado="cargarDatos" />
 
         <div
             :class="['fixed inset-0 z-[80] flex items-center justify-center p-4', modalConfirmarAbierto ? 'pointer-events-auto' : 'pointer-events-none']">
@@ -399,6 +417,7 @@ import { useToast } from '@/composables/useToast'
 import ModalRegistroDocumento from '@/components/ModalRegistroDocumento.vue'
 import ModalAtender from '@/components/ModalAtender.vue'
 import ModalDetalles from '@/components/ModalDetalles.vue'
+import ModalEdicionAdmin from '@/components/ModalEdicionAdmin.vue'
 
 const toast = useToast()
 
@@ -541,6 +560,7 @@ const cargarDatos = async () => {
         const { data: { user } } = await supabase.auth.getUser()
         const { data: userData } = await supabase.from('usuarios').select('id, rol, secciones_permitidas').eq('email', user.email).single()
         usuarioActual.value = userData.id
+        rolUsuario.value = userData.rol // <--- AHORA GUARDAMOS EL ROL
 
         const codigoOficialia = 'OFP'
 
@@ -554,27 +574,48 @@ const cargarDatos = async () => {
         }
 
         if (idSeccionOficialia.value) {
+            // === CARGAR SERIES PARA EL MODAL ADMIN ===
+            const { data: seriesDB } = await supabase
+                .from("series")
+                .select("id, codigo_serie, nombre, subseries")
+                .eq("id_seccion", idSeccionOficialia.value)
+                .order("codigo_serie");
+
+            let structuredData = [];
+            if (seriesDB) {
+                seriesDB.forEach((seriePadre) => {
+                    if (seriePadre.subseries && Array.isArray(seriePadre.subseries)) {
+                        let subseriesWithParentInfo = seriePadre.subseries.map((sub) => ({
+                            ...sub,
+                            id_serie_padre: seriePadre.id,
+                            codigo_serie_padre: seriePadre.codigo_serie,
+                            nombre_serie_padre: seriePadre.nombre,
+                        }));
+                        structuredData.push({
+                            id: seriePadre.id,
+                            codigo_serie: seriePadre.codigo_serie,
+                            nombre: seriePadre.nombre,
+                            subseries: subseriesWithParentInfo,
+                        });
+                    }
+                });
+            }
+            catalogoSeriesEstructurado.value = structuredData;
+
+            // === CARGAR EXPEDIENTES ===
             let query = supabase
                 .from('expedientes')
-                // AHORA TRAEMOS ORIGEN Y DESTINO
                 .select(`*, area_destino:id_seccion_turnada (codigo, seccion), area_origen:id_seccion_registro (codigo, seccion)`)
                 .gte("fecha_registro", `${filtroAnio.value}-01-01`)
                 .lte("fecha_registro", `${filtroAnio.value}-12-31`)
                 .order('fecha_registro', { ascending: false })
                 .order('hora_registro', { ascending: false })
 
-            // LÓGICA DE BANDEJAS PARA OFICIALÍA
             if (vistaActual.value === "entrada") {
-                // BANDEJA DE ENTRADA: 
-                // 1. Debe estar turnado a Oficialía
-                // 2. Y (O fue creado por otra área, O es un documento marcado explícitamente como "Recibido")
                 query = query
                     .eq('id_seccion_turnada', idSeccionOficialia.value)
                     .or(`id_seccion_registro.neq.${idSeccionOficialia.value},tipo_registro.eq.Recibido`);
             } else {
-                // MIS ENVIADOS:
-                // 1. Creado por Oficialía
-                // 2. Y (O se turnó a otra área diferente, O es un trámite explícitamente "Enviado")
                 query = query
                     .eq('id_seccion_registro', idSeccionOficialia.value)
                     .or(`id_seccion_turnada.neq.${idSeccionOficialia.value},tipo_registro.eq.Enviado`);
@@ -716,6 +757,18 @@ const cargarCatalogoDependenciasGlobal = async () => {
 const obtenerNombresDependencias = (ids) => {
     if (!ids || !Array.isArray(ids) || ids.length === 0) return [];
     return catalogoDependenciasGlobal.value.filter(dep => ids.includes(dep.id));
+};
+
+const rolUsuario = ref(null); // Para saber si es admin
+const catalogoSeriesEstructurado = ref([]); // Requerido por el modal admin
+
+// === ESTADOS MODAL EDICIÓN ADMIN ===
+const modalEdicionAdminAbierto = ref(false);
+const expedienteAdmin = ref(null);
+
+const abrirModalEdicionAdmin = (item) => {
+    expedienteAdmin.value = item;
+    modalEdicionAdminAbierto.value = true;
 };
 
 // === UTILIDADES VISUALES ===
