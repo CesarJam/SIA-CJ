@@ -66,7 +66,7 @@
                         <button @click="cerrarModalDependencia" :disabled="procesandoDependencia"
                             class="px-5 py-2.5 text-base text-gray-600 dark:text-gray-300 font-semibold border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Cancelar</button>
                         <button @click="guardarDependencia" :disabled="procesandoDependencia"
-                            class="px-5 py-2.5 text-base bg-indigo-600 text-white rounded-lg font-bold shadow-md hover:bg-indigo-700 flex items-center gap-2">
+                            class="px-5 py-2.5 text-base bg-blue-600 text-white rounded-lg font-bold shadow-md hover:bg-blue-700 flex items-center gap-2">
                             <span v-if="procesandoDependencia" class="animate-pulse">Guardando...</span>
                             <span v-else>Guardar</span>
                         </button>
@@ -115,10 +115,9 @@
                                 <div class="flex flex-col">
                                     <label class="block text-sm font-bold text-gray-500 uppercase mb-2">No.
                                         Consecutivo</label>
-                                    <input v-model="form.numero_consecutivo" type="text" placeholder="Ej: CJ/DA/001/2026"
-                                        required
-                                        class="mt-auto w-full px-3 py-2.5 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
-                                        >
+                                    <input v-model="form.numero_consecutivo" type="text"
+                                        placeholder="Ej: CJ/DA/001/2026" required
+                                        class="mt-auto w-full px-3 py-2.5 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
                                 </div>
 
                                 <div class="flex flex-col">
@@ -223,7 +222,7 @@
                             </div>
                         </div>
 
-                        <div
+                        <div v-if="mostrarAreaDestino"
                             class="bg-indigo-50/50 dark:bg-indigo-900/10 p-5 rounded-xl border border-indigo-100 dark:border-indigo-800/30">
                             <div
                                 class="flex justify-between items-center mb-4 border-b border-indigo-200 dark:border-indigo-800/50 pb-2">
@@ -269,7 +268,7 @@
                         <button @click="cerrarModal" :disabled="procesando"
                             class="px-5 py-2.5 text-base text-gray-600 dark:text-gray-300 font-semibold border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50">Cancelar</button>
                         <button @click="isEditing ? ejecutarEdicion() : ejecutarTurnado()" :disabled="procesando"
-                            class="px-6 py-2.5 text-base bg-indigo-600 text-white rounded-lg font-bold shadow-md hover:bg-indigo-700 transform transition-all active:scale-95 disabled:opacity-70 flex items-center gap-2">
+                            class="px-6 py-2.5 text-base bg-blue-600 text-white rounded-lg font-bold shadow-md hover:bg-blue-700 transform transition-all active:scale-95 disabled:opacity-70 flex items-center gap-2">
                             <span v-if="procesando">Procesando...</span>
                             <span v-else>Registrar y Turnar</span>
                         </button>
@@ -349,17 +348,36 @@ watch(() => props.modelValue, async (nuevoValor) => {
             }
         } else {
             form.value = {
-                numero_consecutivo: nomenclaturaUsuario.value, 
-                fojas: 1, 
-                asunto: '', 
+                numero_consecutivo: nomenclaturaUsuario.value,
+                fojas: 1,
+                asunto: '',
                 dependencias_ids: [],
-                areas_destino: [], 
-                id_seccion_turnada: null, 
-                caracter: 'Ordinario', 
+                areas_destino: [],
+                id_seccion_turnada: null,
+                caracter: 'Ordinario',
                 tipo_registro: 'Enviado',
                 fecha_registro: obtenerFechaActual()
             }
         }
+    }
+})
+
+
+// === NUEVO: LÓGICA DE VISIBILIDAD DE ÁREA DESTINO ===
+const mostrarAreaDestino = computed(() => {
+    // Si estamos en Oficialía Y es un documento de salida (Enviado), NO mostramos el destino interno
+    if (props.esOficialia && form.value.tipo_registro === 'Enviado') {
+        return false
+    }
+    // Para todos los demás casos (Módulos normales o Oficialía recibiendo), SÍ se muestra
+    return true
+})
+
+// Limpieza de seguridad: Si el usuario selecciona "Enviado" en Oficialía, limpiamos el destino
+watch(() => form.value.tipo_registro, (nuevoTipo) => {
+    if (props.esOficialia && nuevoTipo === 'Enviado') {
+        form.value.areas_destino = []
+        form.value.id_seccion_turnada = null
     }
 })
 
@@ -465,7 +483,7 @@ const ejecutarTurnado = async () => {
 
         // 2. REGLA DE NEGOCIO: Si se turna a OTRAS áreas, generamos el "Acuse" automático para el área que lo envía
         const esTurnadoExterno = form.value.areas_destino.length > 0;
-        
+
         if (esTurnadoExterno) {
             batchInsertData.push({
                 grupo_id: grupoId,
@@ -498,7 +516,7 @@ const ejecutarTurnado = async () => {
                 id_usuario_registro: usuarioActual.value,
                 estatus: 'Recepcionado', // Entra como "NUEVO" en la bandeja del destino
                 // Si es un trámite puramente local mío, es el original. Si se envió afuera, el destino tiene el original.
-                tradicion: !esTurnadoExterno ? ['Original'] : ['Original'], 
+                tradicion: !esTurnadoExterno ? ['Original'] : ['Original'],
                 caracter: form.value.caracter,
                 fecha_registro: form.value.fecha_registro
             });
@@ -522,7 +540,7 @@ const ejecutarTurnado = async () => {
     } catch (err) {
         toast.error(err.message || "Error al intentar registrar el documento.")
         procesando.value = false
-    } 
+    }
 }
 
 const ejecutarEdicion = async () => {
@@ -566,7 +584,7 @@ const handleKeydown = (e) => {
         // Primero verificamos si el modal secundario está abierto
         if (modalDependenciaAbierto.value) {
             cerrarModalDependencia()
-        } 
+        }
         // Si no, cerramos el modal principal
         else if (props.modelValue) {
             cerrarModal()
