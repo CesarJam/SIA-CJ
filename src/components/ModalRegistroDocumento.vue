@@ -474,7 +474,17 @@ const catalogoSeccionesAFiltrar = computed(() => {
 const cerrarModal = () => {
     if (!procesando.value) emit('update:modelValue', false)
 }
+const generarUUID = () => {
+    if (crypto.randomUUID) {
+        return crypto.randomUUID();
+    }
 
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+};
 const ejecutarTurnado = async () => {
     form.value.numero_consecutivo = form.value.numero_consecutivo.trim()
     if (!form.value.numero_consecutivo || !form.value.asunto) return toast.error("El Folio y Asunto son obligatorios.")
@@ -486,7 +496,8 @@ const ejecutarTurnado = async () => {
             : [props.origenId]
 
         // 1. Generamos el Identificador de Grupo Compartido (Nativo de JavaScript)
-        const grupoId = crypto.randomUUID();
+        //const grupoId = crypto.randomUUID();
+        const grupoId = generarUUID();
         const batchInsertData = [];
 
         // 2. REGLA DE NEGOCIO: Si se turna a OTRAS áreas, generamos el "Acuse" automático para el área que lo envía
@@ -503,7 +514,7 @@ const ejecutarTurnado = async () => {
                 id_seccion_registro: props.origenId, // Creado por mi área
                 id_seccion_turnada: props.origenId,  // Turnado a mi área (Para que se quede en mi historial)
                 id_usuario_registro: usuarioActual.value,
-                estatus: 'Recepcionado',
+                estatus: props.esOficialia ? 'Concluido' : 'Recepcionado',
                 tradicion: ['Copia'], // Es mi acuse
                 caracter: form.value.caracter,
                 fecha_registro: form.value.fecha_registro
