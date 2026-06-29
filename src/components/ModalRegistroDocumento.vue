@@ -514,7 +514,7 @@ const ejecutarTurnado = async () => {
                 id_seccion_registro: props.origenId, // Creado por mi área
                 id_seccion_turnada: props.origenId,  // Turnado a mi área (Para que se quede en mi historial)
                 id_usuario_registro: usuarioActual.value,
-                estatus: props.esOficialia ? 'Concluido' : 'Recepcionado',
+                estatus: 'Recepcionado',
                 tradicion: ['Copia'], // Es mi acuse
                 caracter: form.value.caracter,
                 fecha_registro: form.value.fecha_registro
