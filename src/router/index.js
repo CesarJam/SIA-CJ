@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { authService } from '../services/authService'
 import Registro from '@/views/Registro.vue'
 import RecuperarPassword from '@/views/RecuperarPassword.vue'
+import ActualizarPassword from '@/views/ActualizarPassword.vue'
 
 const Login = () => import('../views/Login.vue')
 const Denegado = () => import('../views/Denegado.vue')
@@ -37,6 +38,12 @@ const routes = [
     name: 'RecuperarPassword',
     component: RecuperarPassword,
     meta: { requiresAuth: false } 
+    },
+    {
+    path: '/actualizar-password',
+    name: 'ActualizarPassword',
+    component: ActualizarPassword,
+    meta: { requiresAuth: false }
     },
     {
         path: '/',
