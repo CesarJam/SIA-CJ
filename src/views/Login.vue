@@ -41,6 +41,11 @@
             placeholder="••••••••"
           >
         </div>
+        <div class="flex justify-end mt-1">
+          <router-link to="/recuperar-password" class="text-sm font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+            ¿Olvidaste tu contraseña?
+          </router-link>
+        </div>
 
         <div v-if="errorMessage" class="p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg flex items-center gap-2 text-red-600 dark:text-red-400 text-sm transition-all">
           <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

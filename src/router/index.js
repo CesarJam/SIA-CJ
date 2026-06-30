@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { authService } from '../services/authService'
+import Registro from '@/views/Registro.vue'
+import RecuperarPassword from '@/views/RecuperarPassword.vue'
 
 const Login = () => import('../views/Login.vue')
 const Denegado = () => import('../views/Denegado.vue')
 const Dashboard = () => import('../views/Dashboard.vue')
-import Registro from '@/views/Registro.vue'
+
 
 // Vistas "Hijas" del Dashboard
 const Home = () => import('../views/modules/Home.vue')
@@ -29,6 +31,12 @@ const routes = [
         path: '/denegado',
         name: 'Denegado',
         component: Denegado
+    },
+    {
+    path: '/recuperar-password',
+    name: 'RecuperarPassword',
+    component: RecuperarPassword,
+    meta: { requiresAuth: false } 
     },
     {
         path: '/',
