@@ -2,12 +2,6 @@
   <div class="fade-in relative min-h-screen">
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Gestión de Usuarios</h1>
-      <button 
-        @click="abrirPanelNuevo"
-        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition shadow-md"
-      >
-        + Nuevo Usuario
-      </button>
     </div>
 
     <div class="space-y-4">
@@ -245,14 +239,19 @@ const guardarUsuario = async () => {
     nomenclaturaExpedienteArea: form.value.nomenclaturaExpedienteArea ? form.value.nomenclaturaExpedienteArea.trim() : null
   }
 
-  // 3. Persistencia en Base de Datos
-  if (editandoId.value) {
-    const { error } = await supabase.from('usuarios').update(payload).eq('id', editandoId.value)
-    dbError = error
-  } else {
-    const { error } = await supabase.from('usuarios').insert([payload])
-    dbError = error
-  }
+// 3. Persistencia en Base de Datos
+if (editandoId.value) {
+  const { error } = await supabase
+    .from('usuarios')
+    .update(payload)
+    .eq('id', editandoId.value);
+    
+  dbError = error;
+} else {
+  // Ya no permitimos crear desde aquí. 
+  console.error("Operación no permitida: Solo se pueden editar usuarios existentes.");
+  return; 
+}
 
   // 4. Manejo de Errores y Éxito
   if (dbError) {
@@ -263,7 +262,7 @@ const guardarUsuario = async () => {
     return toast.error(dbError.message || 'Error al guardar el usuario')
   }
 
-  toast.success(editandoId.value ? 'Usuario actualizado correctamente' : 'Usuario registrado con éxito')
+  toast.success('Usuario actualizado correctamente')
   await cargarDatos()
   cerrarPanel()
 }
