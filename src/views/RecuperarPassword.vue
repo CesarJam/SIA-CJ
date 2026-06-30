@@ -75,7 +75,7 @@ const solicitarRecuperacion = async () => {
 
     // NOTA IMPORTANTE: Reemplaza esta IP y puerto por los que estés usando 
     // en tu entorno de desarrollo Vue actualmente (ej. localhost:5173 o tu IP)
-    const urlRedireccion = 'http://192.168.86.60:5173/actualizar-password'
+    const urlRedireccion = `${window.location.origin}/actualizar-password`
 
     const { error } = await supabase.auth.resetPasswordForEmail(email.value, {
       redirectTo: urlRedireccion,
