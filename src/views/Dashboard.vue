@@ -226,7 +226,7 @@ onMounted(async () => {
     const session = await authService.getSession()
     if (session?.user) {
       const metadata = session.user.user_metadata
-      userProfile.value.name = metadata.full_name || metadata.name || session.user.email
+      userProfile.value.name = metadata.display_name || metadata.full_name || metadata.name || session.user.email
       userProfile.value.avatar = metadata.avatar_url || metadata.picture || `https://ui-avatars.com/api/?name=${userProfile.value.name}&background=random`
     }
   } catch (error) {

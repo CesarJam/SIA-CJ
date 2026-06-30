@@ -126,7 +126,7 @@ const formulario = ref({
   nombre: '',
   email: '',
   password: '',
-  confirmarPassword: '' // Nuevo campo agregado
+  confirmarPassword: '' 
 })
 
 // Variables para controlar la visibilidad de las contraseñas
@@ -156,7 +156,7 @@ const registrarUsuario = async () => {
       password: formulario.value.password,
       options: {
         data: {
-          nombre: formulario.value.nombre
+          display_name: formulario.value.nombre
         }
       }
     })
