@@ -4,6 +4,7 @@ import { authService } from '../services/authService'
 const Login = () => import('../views/Login.vue')
 const Denegado = () => import('../views/Denegado.vue')
 const Dashboard = () => import('../views/Dashboard.vue')
+import Registro from '@/views/Registro.vue'
 
 // Vistas "Hijas" del Dashboard
 const Home = () => import('../views/modules/Home.vue')
@@ -16,6 +17,13 @@ const routes = [
         name: 'Login',
         component: Login,
         meta: { requiresGuest: true }
+    },
+    {
+    path: '/registro',
+    name: 'Registro',
+    component: Registro,
+    // Si usas guards (meta: { requiresAuth: false }), agrégalos aquí
+    meta: { requiresAuth: false } 
     },
     {
         path: '/denegado',

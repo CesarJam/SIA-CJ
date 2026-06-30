@@ -541,6 +541,9 @@ const ejecutarTurnado = async () => {
             });
         });
 
+        console.log("Datos a insertar:", JSON.stringify(batchInsertData, null, 2));
+        console.log("UID de sesión actual:", (await supabase.auth.getUser()).data.user.id);
+
         // 4. Insertamos todo de golpe en la base de datos
         const { error } = await supabase.from('expedientes').insert(batchInsertData)
         if (error) {
