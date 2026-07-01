@@ -385,7 +385,7 @@ watch(() => form.value.tipo_registro, (nuevoTipo) => {
     } 
     else if (!props.esOficialia && nuevoTipo === 'Recibido') {
         form.value.areas_destino = []
-        form.value.id_seccion_turnada = null
+        form.value.id_seccion_turnada = props.origenId
     }
 })
 
