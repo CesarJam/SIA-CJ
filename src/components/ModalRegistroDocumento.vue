@@ -289,7 +289,8 @@ const props = defineProps({
     origenId: { type: String, required: true }, // El ID de la sección que está creando el oficio
     titulo: { type: String, default: 'Registrar Documento' },
     datosEditar: { type: Object, default: null }, // Si viene lleno, es modo edición
-    esOficialia: { type: Boolean, default: false }
+    esOficialia: { type: Boolean, default: false },
+    tipoRegistroDefecto: { type: String, default: 'Enviado' }
 })
 
 const emit = defineEmits(['update:modelValue', 'guardado'])
@@ -355,7 +356,7 @@ watch(() => props.modelValue, async (nuevoValor) => {
                 areas_destino: [],
                 id_seccion_turnada: null,
                 caracter: 'Ordinario',
-                tipo_registro: 'Enviado',
+                tipo_registro: props.tipoRegistroDefecto,
                 fecha_registro: obtenerFechaActual()
             }
         }

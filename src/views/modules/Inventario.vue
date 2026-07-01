@@ -417,8 +417,11 @@
             </div>
         </div>
 
-        <ModalRegistroDocumento v-model="modalNuevoAbierto" :origenId="seccionSeleccionada || ''"
-            :datosEditar="expedienteAEditar" @guardado="onRegistroInternoExitoso" />
+        <ModalRegistroDocumento v-model="modalNuevoAbierto" 
+            :origenId="seccionSeleccionada || ''"
+            :datosEditar="expedienteAEditar"
+            :tipoRegistroDefecto="vistaActual === 'entrada' ? 'Recibido' : 'Enviado'"
+             @guardado="onRegistroInternoExitoso" />
 
         <ModalAtender v-model="modalAtenderAbierto" :expediente="expedienteAAtender"
             :usuarioActual="usuarioActual || ''" @guardado="cargarBandeja" />
