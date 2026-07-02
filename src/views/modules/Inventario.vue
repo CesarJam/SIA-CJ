@@ -392,27 +392,45 @@
             <div v-else-if="expedientesPaginados.length === 0" class="text-center py-12 text-gray-500">
                 No se encontraron expedientes en esta bandeja.
             </div>
-            <div v-if="totalPaginas > 1" class="flex flex-col sm:flex-row justify-between items-center px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 gap-4">
+            <div v-if="expedientesFiltrados.length > 100" class="flex flex-col sm:flex-row justify-between items-center px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 gap-4">
+                
                 <span class="text-sm text-gray-500 dark:text-gray-400">
-                    Mostrando <span class="font-bold text-gray-900 dark:text-white">{{ ((paginaActual - 1) * registrosPorPagina) + 1 }}</span> a 
-                    <span class="font-bold text-gray-900 dark:text-white">{{ Math.min(paginaActual * registrosPorPagina, expedientesFiltrados.length) }}</span> de 
-                    <span class="font-bold text-gray-900 dark:text-white">{{ expedientesFiltrados.length }}</span> registros
+                    <template v-if="registrosPorPagina === 0">
+                        Mostrando todos los <span class="font-bold text-gray-900 dark:text-white">{{ expedientesFiltrados.length }}</span> registros
+                    </template>
+                    <template v-else>
+                        Mostrando <span class="font-bold text-gray-900 dark:text-white">{{ ((paginaActual - 1) * registrosPorPagina) + 1 }}</span> a 
+                        <span class="font-bold text-gray-900 dark:text-white">{{ Math.min(paginaActual * registrosPorPagina, expedientesFiltrados.length) }}</span> de 
+                        <span class="font-bold text-gray-900 dark:text-white">{{ expedientesFiltrados.length }}</span> registros
+                    </template>
                 </span>
                 
-                <div class="flex items-center gap-1">
-                    <button @click="irAPagina(paginaActual - 1)" :disabled="paginaActual === 1"
-                        class="px-3 py-1.5 text-sm font-medium rounded-md text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors shadow-sm">
-                        Anterior
+                <div class="flex items-center gap-2">
+                    <!-- Botón Ver Todos -->
+                    <button @click="toggleVerTodos"
+                        class="px-3 py-1.5 text-sm font-bold rounded-md transition-colors shadow-sm"
+                        :class="registrosPorPagina === 0 
+                            ? 'bg-blue-100 text-blue-700 border border-blue-300 hover:bg-blue-200 dark:bg-blue-900/40 dark:text-blue-400 dark:border-blue-800'
+                            : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700'">
+                        {{ registrosPorPagina === 0 ? 'Paginar vista' : 'Ver todos' }}
                     </button>
-                    
-                    <span class="px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Página {{ paginaActual }} de {{ totalPaginas }}
-                    </span>
-                    
-                    <button @click="irAPagina(paginaActual + 1)" :disabled="paginaActual === totalPaginas"
-                        class="px-3 py-1.5 text-sm font-medium rounded-md text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors shadow-sm">
-                        Siguiente
-                    </button>
+
+                    <!-- Controles de Paginación (Se ocultan si está en Ver Todos) -->
+                    <div v-show="registrosPorPagina > 0" class="flex items-center gap-1 border-l border-gray-300 dark:border-gray-600 pl-2">
+                        <button @click="irAPagina(paginaActual - 1)" :disabled="paginaActual === 1"
+                            class="px-3 py-1.5 text-sm font-medium rounded-md text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors shadow-sm">
+                            Anterior
+                        </button>
+                        
+                        <span class="px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Página {{ paginaActual }} de {{ totalPaginas }}
+                        </span>
+                        
+                        <button @click="irAPagina(paginaActual + 1)" :disabled="paginaActual === totalPaginas"
+                            class="px-3 py-1.5 text-sm font-medium rounded-md text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors shadow-sm">
+                            Siguiente
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -529,7 +547,7 @@ const cerrarMenu = () => {
 
 // === ESTADOS DE PAGINACIÓN ===
 const paginaActual = ref(1);
-const registrosPorPagina = 100;
+const registrosPorPagina = ref(100);
 
 // Reiniciar la página a 1 si el usuario cambia algún filtro
 watch([filtroEstatus, filtroAnio, seccionSeleccionada, vistaActual], () => {
@@ -537,13 +555,16 @@ watch([filtroEstatus, filtroAnio, seccionSeleccionada, vistaActual], () => {
 });
 
 const totalPaginas = computed(() => {
-    return Math.ceil(expedientesFiltrados.value.length / registrosPorPagina) || 1;
+    if (registrosPorPagina.value === 0) return 1;
+    return Math.ceil(expedientesFiltrados.value.length / registrosPorPagina.value) || 1;
 });
 
 // Este es el arreglo que se dibujará en la tabla
 const expedientesPaginados = computed(() => {
-    const inicio = (paginaActual.value - 1) * registrosPorPagina;
-    const fin = inicio + registrosPorPagina;
+    if (registrosPorPagina.value === 0) return expedientesFiltrados.value;
+
+    const inicio = (paginaActual.value - 1) * registrosPorPagina.value;
+    const fin = inicio + registrosPorPagina.value;
     return expedientesFiltrados.value.slice(inicio, fin);
 });
 
@@ -553,7 +574,17 @@ const irAPagina = (pag) => {
         window.scrollTo({ top: 0, behavior: 'smooth' }); // Sube la pantalla suavemente
     }
 };
-
+const toggleVerTodos = () => {
+    if (registrosPorPagina.value === 0) {
+        // Si ya estaba viendo todos, regresa a la vista de 100
+        registrosPorPagina.value = 100;
+        paginaActual.value = 1;
+    } else {
+        // Cambia al modo "Ver todos"
+        registrosPorPagina.value = 0;
+        paginaActual.value = 1;
+    }
+};
 
 // === ESTADOS MODAL 1: ATENDER ===
 const modalAtenderAbierto = ref(false);
