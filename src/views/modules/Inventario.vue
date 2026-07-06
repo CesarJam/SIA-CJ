@@ -467,7 +467,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from "vue";
+import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import { supabase } from "@/supabase";
 import { useToast } from "@/composables/useToast";
 import ModalRegistroDocumento from '@/components/ModalRegistroDocumento.vue';
@@ -877,9 +877,25 @@ const badgeColor = (estatus) => {
             return "bg-gray-100 text-gray-800 dark:bg-gray-900/80 dark:text-gray-300 border border-gray-300 dark:border-gray-600";
     }
 };
-
+// === ATAJOS DE TECLADO ===
+const handleAtajosTeclado = (e) => {
+    // Si presiona Ctrl + Barra espaciadora (e.code === 'Space' o e.key === ' ')
+    if (e.ctrlKey && (e.code === 'Space' || e.key === ' ')) {
+        e.preventDefault(); // Evita que la página haga scroll hacia abajo (comportamiento por defecto del espacio)
+        
+        // Solo abrimos el modal si no está abierto ya
+        if (!modalNuevoAbierto.value) {
+            abrirModalNuevoInterno();
+        }
+    }
+};
 onMounted(() => {
     inicializarUsuario();
+    window.addEventListener('keydown', handleAtajosTeclado);
+});
+
+onUnmounted(() => {
+    window.removeEventListener('keydown', handleAtajosTeclado);
 });
 
 </script>
