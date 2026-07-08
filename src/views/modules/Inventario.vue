@@ -96,7 +96,7 @@
                 <div class="w-[10%]">Folio / Fecha</div>
                 <div class="w-[50%]">Asunto y Seguimiento</div>
                 <div class="w-[15%]">{{ vistaActual === 'entrada' ? 'Origen (Remitente)' : 'Destino (Turnado a)' }}</div>
-                <div class="w-[15%]">Dependencias</div>
+                <div class="w-[15%]">Dependencias/Código</div>
                 <div class="w-[10%] text-center">Estatus / Acción</div>
             </div>
 
@@ -176,6 +176,7 @@
 
                     <div class="w-full md:w-[15%] flex flex-col md:block mt-2 md:mt-0">
                         <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-1">Dependencias:</span>
+                        
                         <div class="flex flex-wrap gap-1">
                             <template v-if="obtenerNombresDependencias(item.dependencias_ids).length > 0">
                                 <span v-for="dep in obtenerNombresDependencias(item.dependencias_ids)" :key="dep.id"
@@ -185,6 +186,19 @@
                                 </span>
                             </template>
                             <span v-else class="text-[11px] text-gray-400 dark:text-gray-500 italic bg-gray-50 dark:bg-gray-800 px-2 py-0.5 rounded border border-gray-100 dark:border-gray-700">Ninguna</span>
+                        </div>
+
+                        <div v-if="item.snapshot_cadido && item.snapshot_cadido.codigo_padre" class="mt-3 pt-2.5 border-t border-gray-200 dark:border-gray-700/60">
+                            <div class="flex flex-col gap-1.5">
+                                <div class="text-[10px] text-gray-600 dark:text-gray-300 leading-tight">
+                                    <span class="font-bold text-white-700 dark:text-white-400">{{ item.snapshot_cadido.codigo_padre }}</span>
+                                    <span class="block line-clamp-2" :title="item.snapshot_cadido.nombre_padre">{{ item.snapshot_cadido.nombre_padre }}</span>
+                                </div>
+                                <div class="text-[10px] text-gray-600 dark:text-gray-300 leading-tight">
+                                    <span class="font-bold text-white-700 dark:text-white-400">{{ item.snapshot_cadido.codigo_subserie }}</span>
+                                    <span class="block line-clamp-2" :title="item.snapshot_cadido.nombre_subserie">{{ item.snapshot_cadido.nombre_subserie }}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
