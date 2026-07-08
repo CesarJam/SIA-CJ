@@ -546,7 +546,7 @@ const ejecutarTurnado = async () => {
         console.log("UID de sesión actual:", (await supabase.auth.getUser()).data.user.id);
 
         // 4. Insertamos todo de golpe en la base de datos
-        const { error } = await supabase.from('expedientes').insert(batchInsertData)
+        const { data, error } = await supabase.from('expedientes').insert(batchInsertData).select()
         if (error) {
             if (error.code === '23505') throw new Error(`El folio ${form.value.numero_consecutivo} ya fue registrado.`)
             throw error
@@ -556,8 +556,11 @@ const ejecutarTurnado = async () => {
             ? `Oficio enviado a ${form.value.areas_destino.length} área(s). Acuse generado en su inventario.`
             : `Trámite local registrado con éxito.`;
 
+        // Extraemos los IDs insertados para enviarlos a la vista principal
+        const idsInsertados = data ? data.map(d => d.id) : [];
+
         toast.success(msj)
-        emit('guardado')
+        emit('guardado', idsInsertados)
         procesando.value = false
         cerrarModal()
     } catch (err) {
@@ -582,7 +585,7 @@ const ejecutarEdicion = async () => {
             id_usuario_actualizacion: usuarioActual.value,
             caracter: form.value.caracter,
             fecha_registro: form.value.fecha_registro
-        }).eq('id', props.datosEditar.id)
+        }).eq('id', props.datosEditar.id).select()
 
         if (error) {
             if (error.code === '23505') throw new Error("Ese folio ya existe en el área destino seleccionada.")
@@ -590,7 +593,7 @@ const ejecutarEdicion = async () => {
         }
 
         toast.success("Registro actualizado correctamente")
-        emit('guardado')
+        emit('guardado',[props.datosEditar.id])
         procesando.value = false
         cerrarModal()
     } catch (err) {

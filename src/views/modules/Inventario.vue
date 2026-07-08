@@ -103,11 +103,16 @@
             <div class="divide-y divide-gray-100 dark:divide-gray-700/50">
                 <div v-if="menuActivoId" @click="cerrarMenu" class="fixed inset-0 z-10"></div>
                 <div v-for="(item, index) in expedientesPaginados" :key="item.id"
-                    class="p-4 md:px-6 md:py-4 flex flex-col md:flex-row md:items-start gap-2 md:gap-4 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/20 last:rounded-b-xl"
+                    :id="`expediente-${item.id}`"
+                    class="p-4 md:px-6 md:py-4 flex flex-col md:flex-row md:items-start gap-2 md:gap-4 transition-all duration-1000 ease-out last:rounded-b-xl"
                     :class="{
-                        'bg-gray-50/50 dark:bg-gray-900/40': item.estatus === 'Concluido',
+                        'bg-gray-50/50 dark:bg-gray-900/40': item.estatus === 'Concluido' && registroResaltado !== item.id,
+                        'hover:bg-gray-50 dark:hover:bg-gray-700/20': registroResaltado !== item.id,
                         'relative z-20': menuActivoId === item.id,
-                        'relative z-0': menuActivoId !== item.id,
+                        'relative z-10': registroResaltado === item.id,
+                        'relative z-0': menuActivoId !== item.id && registroResaltado !== item.id,
+                        //Configuración del colore resaltado, otras variantes 'bg-emerald-100/80 dark:bg-emerald-900/50 ring-2 ring-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.4)] scale-[1.01]': registroResaltado === item.id
+                        'bg-blue-100/80 dark:bg-blue-900/50 ring-2 ring-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.4)] scale-[1.01]': registroResaltado === item.id
                     }">
                     
                     <div class="w-full md:w-[10%] flex flex-col md:block">
@@ -467,7 +472,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch, onUnmounted } from "vue";
+import { ref, onMounted, computed, watch, onUnmounted, nextTick } from "vue";
 import { supabase } from "@/supabase";
 import { useToast } from "@/composables/useToast";
 import ModalRegistroDocumento from '@/components/ModalRegistroDocumento.vue';
@@ -501,6 +506,7 @@ const seccionSeleccionada = ref(null);
 const miSeccion = ref(null);
 const filtroEstatus = ref("Todos");
 const vistaActual = ref("entrada"); // 'entrada' | 'enviados'
+const registroResaltado = ref(null);
 
 const anioActual = new Date().getFullYear();
 // Crea un arreglo de 8 elementos (El año actual + 7 hacia atrás)
@@ -819,10 +825,39 @@ const abrirModalNuevoInterno = () => {
     modalNuevoAbierto.value = true;
 };
 
-// Intercepta el éxito, cierra el modal y recarga
-const onRegistroInternoExitoso = async () => {
-    modalNuevoAbierto.value = false; // Cerramos el modal inmediatamente
-    await cargarBandeja();           // Recargamos la tabla con el nuevo registro
+// Intercepta el éxito, cierra el modal, recarga y hace scroll
+const onRegistroInternoExitoso = async (idsInsertados) => {
+    modalNuevoAbierto.value = false;
+    await cargarBandeja();           
+
+    // Si recibimos IDs, buscamos cuál mostrar
+    if (idsInsertados && Array.isArray(idsInsertados) && idsInsertados.length > 0) {
+        
+        // Verificamos si alguno de los IDs insertados existe en la vista actual (Paginada o Ver Todos)
+        const idVisible = idsInsertados.find(id => 
+            expedientesPaginados.value.some(exp => exp.id === id)
+        );
+
+        if (idVisible) {
+            registroResaltado.value = idVisible;
+            
+            // Esperamos a que el DOM se actualice con los nuevos datos
+            await nextTick();
+            
+            // Buscamos el elemento y hacemos scroll suave
+            const elemento = document.getElementById(`expediente-${idVisible}`);
+            if (elemento) {
+                elemento.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            // Quitamos el resplandor después de 3 segundos
+            setTimeout(() => {
+                if (registroResaltado.value === idVisible) {
+                    registroResaltado.value = null;
+                }
+            }, 3000);
+        }
+    }
 };
 
 // ==ESTADOS MODAL 6: MODAL EXPORTAR ===
