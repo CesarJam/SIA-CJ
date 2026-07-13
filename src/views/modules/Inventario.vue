@@ -6,7 +6,7 @@
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-white">
                     Inventario Documental
                 </h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-4 inline-block min-w-[80px]">
                     Bandeja de entrada y gestor de tareas del área:
                     <strong class="text-blue-600 dark:text-blue-400">{{ miSeccion?.codigo }}</strong>
                 </p>
@@ -36,7 +36,7 @@
 
             <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
                 <select v-model="seccionSeleccionada" @change="cargarBandeja"
-                    class="w-full md:w-auto truncate max-w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer">
+                    class="w-full md:w-72 truncate max-w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer">
                     <option v-for="area in areasUsuario" :key="area.id" :value="area.id">
                         {{ area.codigo }} - {{ area.seccion }}
                     </option>
@@ -91,7 +91,7 @@
             </div>
         </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 min-h-[700px]">
             <div
                 class="hidden md:flex items-center gap-4 px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-900/50 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 <div class="w-[10%]">Folio / Fecha</div>
@@ -103,314 +103,350 @@
 
             <div class="divide-y divide-gray-100 dark:divide-gray-700/50">
                 <div v-if="menuActivoId" @click="cerrarMenu" class="fixed inset-0 z-10"></div>
-                <div v-for="(item, index) in expedientesPaginados" :key="item.id"
-                    :id="`expediente-${item.id}`"
-                    class="p-4 md:px-6 md:py-4 flex flex-col md:flex-row md:items-start gap-2 md:gap-4 transition-all duration-1000 ease-out last:rounded-b-xl"
-                    :class="{
-                        'bg-gray-50/50 dark:bg-gray-900/40': item.estatus === 'Concluido' && registroResaltado !== item.id,
-                        'hover:bg-gray-50 dark:hover:bg-gray-700/20': registroResaltado !== item.id,
-                        'relative z-20': menuActivoId === item.id,
-                        'relative z-10': registroResaltado === item.id,
-                        'relative z-0': menuActivoId !== item.id && registroResaltado !== item.id,
-                        //Configuración del colore resaltado, otras variantes 'bg-emerald-100/80 dark:bg-emerald-900/50 ring-2 ring-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.4)] scale-[1.01]': registroResaltado === item.id
-                        'bg-blue-100/80 dark:bg-blue-900/50 ring-2 ring-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.4)] scale-[1.01]': registroResaltado === item.id
-                    }">
-                    
-                    <div class="w-full md:w-[10%] flex flex-col md:block">
-                        <span class="font-bold text-gray-900 dark:text-white text-sm">{{ item.numero_consecutivo }}</span>
-                        <span v-if="item.caracter === 'Urgente' || item.caracter === 'Extraordinario'"
-                            :class="claseBadgeCaracter(item.caracter)">
-                            {{ item.caracter }}
-                        </span>
-                        <div class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                            {{ formatFecha(item.fecha_registro) }}
-                        </div>
-                    </div>
 
-                    <div class="w-full md:w-[50%] flex flex-col md:block mt-1 md:mt-0">
-                        <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">Asunto:</span>
-                        <span class="text-lg text-gray-800 dark:text-white line-clamp-2" :title="item.asunto">
-                            {{ item.asunto }}
-                        </span>
-
-                        <div v-if="item.responsable_tramite"
-                            class="mt-2 flex items-start gap-1.5 p-2 bg-blue-50 dark:bg-blue-900/40 rounded-md border border-blue-100 dark:border-blue-800/50">
-                            <svg class="w-4 h-4 text-blue-500 dark:text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
-                                </path>
-                            </svg>
-                            <div class="flex flex-col">
-                                <span class="text-[10px] font-semibold text-blue-700 dark:text-blue-200">
-                                    Responsable: {{
-                                    item.responsable_tramite }}
-                                </span>
-                                <span v-if="item.indicaciones_tramite"
-                                    class="text-[10px] text-blue-600/80 dark:text-blue-300 italic mt-0.5 line-clamp-1"
-                                    :title="item.indicaciones_tramite">"{{ item.indicaciones_tramite }}"
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="w-full md:w-[15%] flex flex-col md:block mt-1 md:mt-0">
-                        <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">
-                            {{ vistaActual === 'entrada' ? 'Origen:' : 'Destino:' }}
-                        </span>
-
-                        <span v-if="vistaActual === 'entrada'"
-                            class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ item.area_origen?.codigo || "Externo" }} - {{ item.area_origen?.seccion || "No definido" }}
-                        </span>
-                        <span v-else class="text-sm font-medium text-white-600 dark:text-white-400">
-                            {{ item.area_destino?.codigo }} - {{ item.area_destino?.seccion }}
-                        </span>
-
-                        <div class="mt-1.5">
-                            <span class="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded-md"
-                                :class="obtenerValorArreglo(item.tradicion) === 'Original' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'">
-                                {{ obtenerValorArreglo(item.tradicion) }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="w-full md:w-[15%] flex flex-col md:block mt-2 md:mt-0">
-                        <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-1">Dependencias:</span>
+                <!-- 1. SKELETONS (Se muestran mientras Supabase carga) -->
+                <template v-if="loading">
+                    <!-- Dibujamos 6 filas falsas simulando las proporciones reales -->
+                    <div v-for="i in 6" :key="'skel-' + i" class="p-4 md:px-6 md:py-4 flex flex-col md:flex-row md:items-start gap-2 md:gap-4 animate-pulse bg-white dark:bg-gray-800">
                         
-                        <div class="flex flex-wrap gap-1">
-                            <template v-if="obtenerNombresDependencias(item.dependencias_ids).length > 0">
-                                <span v-for="dep in obtenerNombresDependencias(item.dependencias_ids)" :key="dep.id"
-                                    class="inline-block px-2 py-1 rounded text-[10px] font-bold bg-sky-500/75 text-sky-700 border border-sky-200 dark:bg-sky-900/30 dark:text-sky-300 dark:border-sky-800/50 max-w-full whitespace-normal break-words leading-tight"
-                                    :title="dep.nombre_oficial">
-                                    {{ dep.siglas ? `${dep.siglas} - ${dep.nombre_oficial}` : dep.nombre_oficial }}
-                                </span>
-                            </template>
-                            <span v-else class="text-[11px] text-gray-400 dark:text-gray-500 italic bg-gray-50 dark:bg-gray-800 px-2 py-0.5 rounded border border-gray-100 dark:border-gray-700">Ninguna</span>
+                        <!-- Columna 1: Folio / Fecha (10%) -->
+                        <div class="w-full md:w-[10%] flex flex-col gap-2 mt-1">
+                            <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+                            <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
                         </div>
 
-                        <div v-if="item.snapshot_cadido && item.snapshot_cadido.codigo_padre" class="mt-3 pt-2.5 border-t border-gray-200 dark:border-gray-700/60">
-                            <div class="flex flex-col gap-1.5">
-                                <div class="text-[10px] text-gray-600 dark:text-gray-300 leading-tight">
-                                    <span class="font-bold text-white-700 dark:text-white-400">{{ item.snapshot_cadido.codigo_padre }}</span>
-                                    <span class="block line-clamp-2" :title="item.snapshot_cadido.nombre_padre">{{ item.snapshot_cadido.nombre_padre }}</span>
-                                </div>
-                                <div class="text-[10px] text-gray-600 dark:text-gray-300 leading-tight">
-                                    <span class="font-bold text-white-700 dark:text-white-400">{{ item.snapshot_cadido.codigo_subserie }}</span>
-                                    <span class="block line-clamp-2" :title="item.snapshot_cadido.nombre_subserie">{{ item.snapshot_cadido.nombre_subserie }}</span>
-                                </div>
-                            </div>
+                        <!-- Columna 2: Asunto (50%) -->
+                        <div class="w-full md:w-[50%] mt-1 md:mt-0 flex flex-col gap-2">
+                            <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                            <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded w-4/5"></div>
+                            <div class="mt-2 h-12 bg-gray-100 dark:bg-gray-900 rounded-md border border-gray-100 dark:border-gray-700/50 w-3/4"></div>
+                        </div>
+
+                        <!-- Columna 3: Origen / Destino (15%) -->
+                        <div class="w-full md:w-[15%] mt-1 md:mt-0 flex flex-col gap-2">
+                            <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+                            <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 mt-1"></div>
+                        </div>
+
+                        <!-- Columna 4: Dependencias (15%) -->
+                        <div class="w-full md:w-[15%] mt-2 md:mt-0 flex flex-col gap-2">
+                            <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded-full w-20"></div>
+                            <div class="mt-3 h-3 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+                            <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+                        </div>
+
+                        <!-- Columna 5: Acciones (10%) -->
+                        <div class="w-full md:w-[10%] flex flex-col items-center gap-2 mt-3 md:mt-0">
+                            <div class="h-6 bg-gray-200 dark:bg-gray-700 rounded-md w-full"></div>
+                            <div class="h-8 bg-gray-200 dark:bg-gray-700 rounded-md w-full mt-1"></div>
                         </div>
                     </div>
+                </template>
 
-                    <div class="w-full md:w-[10%] flex justify-between items-center md:justify-center mt-3 md:mt-0 gap-3">
-                        <span class="md:hidden text-xs font-bold text-gray-400 uppercase">Estatus:</span>
+                <!-- 2. ESTADO VACÍO (Sin registros) -->
+                <div v-else-if="expedientesPaginados.length === 0" class="text-center py-12 text-gray-500 dark:text-gray-400">
+                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                    </svg>
+                    No se encontraron expedientes en esta bandeja.
+                </div>
 
-                        <div class="flex flex-col items-center gap-2 w-full">
-                            <span class="px-2.5 py-1 text-xs font-bold rounded-md w-full text-center"
-                                :class="badgeColor(item.estatus)">
-                                {{ item.estatus }}
+                <!-- 3. LOS DATOS REALES (Tu código original) -->
+                <template v-else>
+                    <div v-for="(item, index) in expedientesPaginados" :key="item.id"
+                        :id="`expediente-${item.id}`"
+                        class="p-4 md:px-6 md:py-4 flex flex-col md:flex-row md:items-start gap-2 md:gap-4 transition-all duration-1000 ease-out last:rounded-b-xl"
+                        :class="{
+                            'bg-gray-50/50 dark:bg-gray-900/40': item.estatus === 'Concluido' && registroResaltado !== item.id,
+                            'hover:bg-gray-50 dark:hover:bg-gray-700/20': registroResaltado !== item.id,
+                            'relative z-20': menuActivoId === item.id,
+                            'relative z-10': registroResaltado === item.id,
+                            'relative z-0': menuActivoId !== item.id && registroResaltado !== item.id,
+                            'bg-blue-100/80 dark:bg-blue-900/50 ring-2 ring-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.4)] scale-[1.01]': registroResaltado === item.id
+                        }">
+                        
+                        <div class="w-full md:w-[10%] flex flex-col md:block">
+                            <span class="font-bold text-gray-900 dark:text-white text-sm">{{ item.numero_consecutivo }}</span>
+                            <span v-if="item.caracter === 'Urgente' || item.caracter === 'Extraordinario'"
+                                :class="claseBadgeCaracter(item.caracter)">
+                                {{ item.caracter }}
+                            </span>
+                            <div class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                                {{ formatFecha(item.fecha_registro) }}
+                            </div>
+                        </div>
+
+                        <div class="w-full md:w-[50%] flex flex-col md:block mt-1 md:mt-0">
+                            <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">Asunto:</span>
+                            <span class="text-lg text-gray-800 dark:text-white line-clamp-2" :title="item.asunto">
+                                {{ item.asunto }}
                             </span>
 
-                            <div class="relative w-full mt-2">
-                                <button @click.stop="toggleMenu(item.id)"
-                                    class="w-full px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 rounded-md transition-colors flex items-center justify-center gap-2 shadow-sm relative z-20">
-                                    <span>Acciones</span>
-                                    <svg class="w-3.5 h-3.5 transition-transform duration-200"
-                                        :class="{ 'rotate-180': menuActivoId === item.id }" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </button>
+                            <div v-if="item.responsable_tramite"
+                                class="mt-2 flex items-start gap-1.5 p-2 bg-blue-50 dark:bg-blue-900/40 rounded-md border border-blue-100 dark:border-blue-800/50">
+                                <svg class="w-4 h-4 text-blue-500 dark:text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                                    </path>
+                                </svg>
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] font-semibold text-blue-700 dark:text-blue-200">
+                                        Responsable: {{
+                                        item.responsable_tramite }}
+                                    </span>
+                                    <span v-if="item.indicaciones_tramite"
+                                        class="text-[10px] text-blue-600/80 dark:text-blue-300 italic mt-0.5 line-clamp-1"
+                                        :title="item.indicaciones_tramite">"{{ item.indicaciones_tramite }}"
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
 
-                                <transition enter-active-class="transition ease-out duration-100"
-                                    enter-from-class="transform opacity-0 scale-95"
-                                    enter-to-class="transform opacity-100 scale-100"
-                                    leave-active-class="transition ease-in duration-75"
-                                    leave-from-class="transform opacity-100 scale-100"
-                                    leave-to-class="transform opacity-0 scale-95">
-                                    <div v-if="menuActivoId === item.id"
-                                        class="absolute right-0 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-100 dark:border-gray-700 z-30 overflow-hidden flex flex-col"
-                                        :class="expedientesFiltrados.length > 3 && index >= expedientesFiltrados.length - 2
-                                            ? 'bottom-full mb-1 origin-bottom-right'
-                                            : 'top-full mt-1 origin-top-right'
-                                            ">
-                                        <template
-                                            v-if="vistaActual === 'enviados' && item.id_seccion_turnada !== seccionSeleccionada">
-                                            <button @click="abrirModalDetalles(item); cerrarMenu();"
-                                                class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                                    </path>
-                                                </svg>
-                                                Ver Detalles
-                                            </button>
-                                        </template>
+                        <div class="w-full md:w-[15%] flex flex-col md:block mt-1 md:mt-0">
+                            <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">
+                                {{ vistaActual === 'entrada' ? 'Origen:' : 'Destino:' }}
+                            </span>
 
-                                        <template v-else>
-                                            <template v-if="item.estatus === 'Recepcionado'">
-                                                <button @click="abrirModalAtender(item); cerrarMenu();"
-                                                    class="w-full text-left px-4 py-2.5 text-xs font-semibold text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                                    </svg>
-                                                    Asignar Trámite
-                                                </button>
-                                                <button @click="abrirModalEditar(item); cerrarMenu();"
-                                                    class="w-full text-left px-4 py-2.5 text-xs font-semibold text-amber-600 hover:bg-amber-50 dark:text-amber-500 dark:hover:bg-amber-900/30 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                                        </path>
-                                                    </svg>
-                                                    Editar Registro
-                                                </button>
-                                                <button @click="abrirModalDetalles(item); cerrarMenu();"
-                                                    class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
-                                                        </path>
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                                        </path>
-                                                    </svg>
-                                                    Ver Detalles
-                                                </button>
-                                            </template>
+                            <span v-if="vistaActual === 'entrada'"
+                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                {{ item.area_origen?.codigo || "Externo" }} - {{ item.area_origen?.seccion || "No definido" }}
+                            </span>
+                            <span v-else class="text-sm font-medium text-white-600 dark:text-white-400">
+                                {{ item.area_destino?.codigo }} - {{ item.area_destino?.seccion }}
+                            </span>
 
-                                            <template v-if="item.estatus === 'En trámite'">
-                                                <button @click="abrirModalConcluir(item); cerrarMenu();"
-                                                    class="w-full text-left px-4 py-2.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/30 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                                    </svg>
-                                                    Clasificar y Concluir
-                                                </button>
-                                                <button @click="abrirModalAtender(item); cerrarMenu();"
-                                                    class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
-                                                        </path>
-                                                    </svg>
-                                                    Editar Asignación
-                                                </button>
-                                                <button @click="abrirModalDetalles(item); cerrarMenu();"
-                                                    class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
-                                                        </path>
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                                        </path>
-                                                    </svg>
-                                                    Ver Detalles
-                                                </button>
-                                            </template>
+                            <div class="mt-1.5">
+                                <span class="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded-md"
+                                    :class="obtenerValorArreglo(item.tradicion) === 'Original' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'">
+                                    {{ obtenerValorArreglo(item.tradicion) }}
+                                </span>
+                            </div>
+                        </div>
 
-                                            <template v-if="item.estatus === 'Concluido'">
-                                                <button @click="abrirModalDetalles(item); cerrarMenu();"
-                                                    class="w-full text-left px-4 py-2.5 text-xs font-semibold text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 flex items-center gap-2.5 transition-colors">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
-                                                        </path>
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                                        </path>
-                                                    </svg>
-                                                    Auditar Expediente
-                                                </button>
-                                                <button v-if="rolUsuario === 'admin'"
-                                                    @click="abrirModalEdicionAdmin(item); cerrarMenu();"
-                                                    class="w-full text-left px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 flex items-center gap-2.5 transition-colors border-t border-gray-100 dark:border-gray-700/50">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
-                                                        </path>
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
-                                                        </path>
-                                                    </svg>
-                                                    Corrección Administrativa
-                                                </button>
-                                            </template>
+                        <div class="w-full md:w-[15%] flex flex-col md:block mt-2 md:mt-0">
+                            <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-1">Dependencias:</span>
+                            
+                            <div class="flex flex-wrap gap-1">
+                                <template v-if="obtenerNombresDependencias(item.dependencias_ids).length > 0">
+                                    <span v-for="dep in obtenerNombresDependencias(item.dependencias_ids)" :key="dep.id"
+                                        class="inline-block px-2 py-1 rounded text-[10px] font-bold bg-sky-500/75 text-sky-700 border border-sky-200 dark:bg-sky-900/30 dark:text-sky-300 dark:border-sky-800/50 max-w-full whitespace-normal break-words leading-tight"
+                                        :title="dep.nombre_oficial">
+                                        {{ dep.siglas ? `${dep.siglas} - ${dep.nombre_oficial}` : dep.nombre_oficial }}
+                                    </span>
+                                </template>
+                                <span v-else class="text-[11px] text-gray-400 dark:text-gray-500 italic bg-gray-50 dark:bg-gray-800 px-2 py-0.5 rounded border border-gray-100 dark:border-gray-700">Ninguna</span>
+                            </div>
 
-                                            <template v-if="item.estatus === 'Cancelado'">
-                                                <button @click="abrirModalDetalles(item); cerrarMenu();"
-                                                    class="w-full text-left px-4 py-2.5 text-xs font-semibold text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 flex items-center gap-2.5 transition-colors">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
-                                                        </path>
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                                        </path>
-                                                    </svg>
-                                                    Ver Motivo de Cancelación
-                                                </button>
-                                            </template>
-                                            <button
-                                                v-if="item.id_seccion_registro === item.id_seccion_turnada && item.estatus !== 'Concluido' && item.estatus !== 'Cancelado' && item.estatus !== 'En trámite'"
-                                                @click="abrirModalCancelar(item); cerrarMenu();"
-                                                class="w-full text-left px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 flex items-center gap-2.5 transition-colors border-t border-gray-100 dark:border-gray-700">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                                    </path>
-                                                </svg>
-                                                Cancelar Trámite
-                                            </button>
-                                        </template>
+                            <div v-if="item.snapshot_cadido && item.snapshot_cadido.codigo_padre" class="mt-3 pt-2.5 border-t border-gray-200 dark:border-gray-700/60">
+                                <div class="flex flex-col gap-1.5">
+                                    <div class="text-[10px] text-gray-600 dark:text-gray-300 leading-tight">
+                                        <span class="font-bold text-white-700 dark:text-white-400">{{ item.snapshot_cadido.codigo_padre }}</span>
+                                        <span class="block line-clamp-2" :title="item.snapshot_cadido.nombre_padre">{{ item.snapshot_cadido.nombre_padre }}</span>
                                     </div>
-                                </transition>
+                                    <div class="text-[10px] text-gray-600 dark:text-gray-300 leading-tight">
+                                        <span class="font-bold text-white-700 dark:text-white-400">{{ item.snapshot_cadido.codigo_subserie }}</span>
+                                        <span class="block line-clamp-2" :title="item.snapshot_cadido.nombre_subserie">{{ item.snapshot_cadido.nombre_subserie }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="w-full md:w-[10%] flex justify-between items-center md:justify-center mt-3 md:mt-0 gap-3">
+                            <span class="md:hidden text-xs font-bold text-gray-400 uppercase">Estatus:</span>
+
+                            <div class="flex flex-col items-center gap-2 w-full">
+                                <span class="px-2.5 py-1 text-xs font-bold rounded-md w-full text-center"
+                                    :class="badgeColor(item.estatus)">
+                                    {{ item.estatus }}
+                                </span>
+
+                                <div class="relative w-full mt-2">
+                                    <button @click.stop="toggleMenu(item.id)"
+                                        class="w-full px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 rounded-md transition-colors flex items-center justify-center gap-2 shadow-sm relative z-20">
+                                        <span>Acciones</span>
+                                        <svg class="w-3.5 h-3.5 transition-transform duration-200"
+                                            :class="{ 'rotate-180': menuActivoId === item.id }" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </button>
+
+                                    <transition enter-active-class="transition ease-out duration-100"
+                                        enter-from-class="transform opacity-0 scale-95"
+                                        enter-to-class="transform opacity-100 scale-100"
+                                        leave-active-class="transition ease-in duration-75"
+                                        leave-from-class="transform opacity-100 scale-100"
+                                        leave-to-class="transform opacity-0 scale-95">
+                                        <div v-if="menuActivoId === item.id"
+                                            class="absolute right-0 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-100 dark:border-gray-700 z-30 overflow-hidden flex flex-col"
+                                            :class="expedientesFiltrados.length > 3 && index >= expedientesFiltrados.length - 2
+                                                ? 'bottom-full mb-1 origin-bottom-right'
+                                                : 'top-full mt-1 origin-top-right'
+                                                ">
+                                            
+                                            <template
+                                                v-if="vistaActual === 'enviados' && item.id_seccion_turnada !== seccionSeleccionada">
+                                                <button @click="abrirModalDetalles(item); cerrarMenu();"
+                                                    class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                        </path>
+                                                    </svg>
+                                                    Ver Detalles
+                                                </button>
+                                            </template>
+
+                                            <template v-else>
+                                                <template v-if="item.estatus === 'Recepcionado'">
+                                                    <button @click="abrirModalAtender(item); cerrarMenu();"
+                                                        class="w-full text-left px-4 py-2.5 text-xs font-semibold text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                                        </svg>
+                                                        Asignar Trámite
+                                                    </button>
+                                                    <button @click="abrirModalEditar(item); cerrarMenu();"
+                                                        class="w-full text-left px-4 py-2.5 text-xs font-semibold text-amber-600 hover:bg-amber-50 dark:text-amber-500 dark:hover:bg-amber-900/30 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                            </path>
+                                                        </svg>
+                                                        Editar Registro
+                                                    </button>
+                                                    <button @click="abrirModalDetalles(item); cerrarMenu();"
+                                                        class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+                                                            </path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                            </path>
+                                                        </svg>
+                                                        Ver Detalles
+                                                    </button>
+                                                </template>
+
+                                                <template v-if="item.estatus === 'En trámite'">
+                                                    <button @click="abrirModalConcluir(item); cerrarMenu();"
+                                                        class="w-full text-left px-4 py-2.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/30 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                        </svg>
+                                                        Clasificar y Concluir
+                                                    </button>
+                                                    <button @click="abrirModalAtender(item); cerrarMenu();"
+                                                        class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                                                            </path>
+                                                        </svg>
+                                                        Editar Asignación
+                                                    </button>
+                                                    <button @click="abrirModalDetalles(item); cerrarMenu();"
+                                                        class="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+                                                            </path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                            </path>
+                                                        </svg>
+                                                        Ver Detalles
+                                                    </button>
+                                                </template>
+
+                                                <template v-if="item.estatus === 'Concluido'">
+                                                    <button @click="abrirModalDetalles(item); cerrarMenu();"
+                                                        class="w-full text-left px-4 py-2.5 text-xs font-semibold text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 flex items-center gap-2.5 transition-colors">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+                                                            </path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                            </path>
+                                                        </svg>
+                                                        Auditar Expediente
+                                                    </button>
+                                                    <button v-if="rolUsuario === 'admin'"
+                                                        @click="abrirModalEdicionAdmin(item); cerrarMenu();"
+                                                        class="w-full text-left px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 flex items-center gap-2.5 transition-colors border-t border-gray-100 dark:border-gray-700/50">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                                            </path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+                                                            </path>
+                                                        </svg>
+                                                        Corrección Administrativa
+                                                    </button>
+                                                </template>
+
+                                                <template v-if="item.estatus === 'Cancelado'">
+                                                    <button @click="abrirModalDetalles(item); cerrarMenu();"
+                                                        class="w-full text-left px-4 py-2.5 text-xs font-semibold text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 flex items-center gap-2.5 transition-colors">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+                                                            </path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                            </path>
+                                                        </svg>
+                                                        Ver Motivo de Cancelación
+                                                    </button>
+                                                </template>
+                                                <button
+                                                    v-if="item.id_seccion_registro === item.id_seccion_turnada && item.estatus !== 'Concluido' && item.estatus !== 'Cancelado' && item.estatus !== 'En trámite'"
+                                                    @click="abrirModalCancelar(item); cerrarMenu();"
+                                                    class="w-full text-left px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 flex items-center gap-2.5 transition-colors border-t border-gray-100 dark:border-gray-700">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                        </path>
+                                                    </svg>
+                                                    Cancelar Trámite
+                                                </button>
+                                            </template>
+                                        </div>
+                                    </transition>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                
-            </div>
-
-            <div v-if="loading" class="text-center py-12 text-gray-500 flex flex-col items-center">
-                <svg class="animate-spin h-8 w-8 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
-                    viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                    </path>
-                </svg>
-                Cargando inventario...
-            </div>
-            <div v-else-if="expedientesPaginados.length === 0" class="text-center py-12 text-gray-500">
-                No se encontraron expedientes en esta bandeja.
+                </template>
             </div>
             <div v-if="expedientesFiltrados.length > 100" class="flex flex-col sm:flex-row justify-between items-center px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 gap-4">
                 
@@ -568,7 +604,7 @@ const cerrarMenu = () => {
 
 // === ESTADOS DE PAGINACIÓN ===
 const paginaActual = ref(1);
-const registrosPorPagina = ref(100);
+const registrosPorPagina = ref(25);
 
 // Reiniciar la página a 1 si el usuario cambia algún filtro
 watch([filtroEstatus, filtroAnio, seccionSeleccionada, vistaActual], () => {
