@@ -178,9 +178,30 @@
 
                         <div class="w-full md:w-[50%] flex flex-col md:block mt-1 md:mt-0">
                             <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">Asunto:</span>
-                            <span class="text-lg text-gray-800 dark:text-white line-clamp-2" :title="item.asunto">
+                            <div class="flex items-start gap-2">
+                            <!-- El Asunto -->
+                            <span class="text-lg text-gray-800 dark:text-white line-clamp-2 flex-1" :title="item.asunto">
                                 {{ item.asunto }}
                             </span>
+                            
+                            <!-- El Ojito (Solo se muestra si está Concluido o En trámite para no estorbar en nuevos) -->
+                            <button v-if="item.estatus !== 'Recepcionado'" @click.stop="verPrimerPDF(item.id)" 
+                                class="mt-1 p-1.5 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 dark:hover:text-blue-400 transition-colors shrink-0"
+                                title="Ver documento principal">
+                                
+                                <!-- Spinner mientras carga -->
+                                <svg v-if="cargandoPreviewId === item.id" class="w-5 h-5 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                
+                                <!-- Ícono del Ojo -->
+                                <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </button>
+                        </div>
 
                             <div v-if="item.responsable_tramite"
                                 class="mt-2 flex items-start gap-1.5 p-2 bg-blue-50 dark:bg-blue-900/40 rounded-md border border-blue-100 dark:border-blue-800/50">
@@ -518,6 +539,8 @@
         <ModalEdicionAdmin v-model="modalEdicionAdminAbierto" :expediente="expedienteAdmin"
             :catalogoSeries="catalogoSeriesEstructurado" :usuarioActual="usuarioActual || ''"
             @guardado="cargarBandeja" />
+
+        <ModalPDFPreview v-model="modalPreviewAbierto" :rutaArchivo="rutaPreview" />
     </div>
 
 </template>
@@ -534,6 +557,7 @@ import ModalCancelar from '@/components/ModalCancelar.vue';
 import ModalExportar from "@/components/ModalExportar.vue";
 import ModalExportarPDF from '@/components/ModalExportarPDF.vue';
 import ModalEdicionAdmin from '@/components/ModalEdicionAdmin.vue';
+import ModalPDFPreview from '@/components/ModalPDFPreview.vue';
 
 const toast = useToast();
 
@@ -588,6 +612,29 @@ const cambiarVista = async (nuevaVista) => {
     vistaActual.value = nuevaVista;
     filtroEstatus.value = "Todos"; // Limpiamos el filtro por comodidad
     await cargarBandeja();
+};
+
+// === ESTADOS PARA PREVISUALIZACIÓN RÁPIDA DE PDF ===
+const modalPreviewAbierto = ref(false);
+const rutaPreview = ref('');
+const cargandoPreviewId = ref(null);
+
+const verPrimerPDF = async (idExpediente) => {
+    cargandoPreviewId.value = idExpediente;
+    const { data, error } = await supabase
+        .from('archivos_anexos')
+        .select('ruta_supabase')
+        .eq('id_expediente', idExpediente)
+        .ilike('tipo_mime', '%pdf%')
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .single();
+
+    if (data?.ruta_supabase) {
+        rutaPreview.value = data.ruta_supabase;
+        modalPreviewAbierto.value = true;
+    }
+    cargandoPreviewId.value = null;
 };
 
 // === ESTADOS DEL MENÚ DESPLEGABLE (ACCIONES) ===
