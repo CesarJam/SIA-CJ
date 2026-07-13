@@ -26,11 +26,13 @@
                 <button @click="exportarPDF"
                     class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold text-white bg-[#AB0033] hover:bg-[#8A0029] rounded-lg shadow-sm transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z">
+                        </path>
                     </svg>
                     PDF
                 </button>
-                <button @click="abrirModalNuevo"
+                <button v-if="userRole !== 'restringido'" @click="abrirModalNuevo"
                     class="flex-1 md:flex-none px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition-colors">
                     + Registrar Serie
                 </button>
@@ -42,11 +44,12 @@
             class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div
                 class="hidden md:flex items-center gap-4 px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-900/50 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                <div class="w-1/5">Código Serie</div>
-                <div class="w-1/5">Nombre</div>
-                <div class="w-1/5">Sección</div>
-                <div class="w-1/5">Subseries</div>
-                <div class="w-1/5 text-center">Acciones</div>
+                <!-- El ancho cambia a 1/4 si es restringido, si no se queda en 1/5 -->
+                <div :class="userRole === 'restringido' ? 'w-1/4' : 'w-1/5'">Código Serie</div>
+                <div :class="userRole === 'restringido' ? 'w-1/4' : 'w-1/5'">Nombre</div>
+                <div :class="userRole === 'restringido' ? 'w-1/4' : 'w-1/5'">Sección</div>
+                <div :class="userRole === 'restringido' ? 'w-1/4' : 'w-1/5'">Subseries</div>
+                <div v-if="userRole !== 'restringido'" class="w-1/5 text-center">Acciones</div>
             </div>
 
             <div class="divide-y divide-gray-100 dark:divide-gray-700/50">
@@ -54,25 +57,33 @@
                     class="flex flex-col transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/20">
 
                     <div class="p-4 md:px-6 md:py-3.5 flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-                        <div class="w-full md:w-1/5 flex items-center justify-between md:justify-start">
+
+                        <!-- Columna 1 -->
+                        <div :class="userRole === 'restringido' ? 'md:w-1/4' : 'md:w-1/5'"
+                            class="w-full flex items-center justify-between md:justify-start">
                             <span class="md:hidden text-xs font-bold text-gray-400 uppercase">Código:</span>
                             <span class="font-bold text-gray-900 dark:text-white text-sm">{{ item.codigo_serie }}</span>
                         </div>
 
-                        <div class="w-full md:w-1/5 flex flex-col md:block mt-1 md:mt-0">
+                        <!-- Columna 2 -->
+                        <div :class="userRole === 'restringido' ? 'md:w-1/4' : 'md:w-1/5'"
+                            class="w-full flex flex-col md:block mt-1 md:mt-0">
                             <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">Nombre:</span>
                             <span class="text-gray-800 dark:text-gray-200">{{ item.nombre }}</span>
                         </div>
 
-                        <div class="w-full md:w-1/5 flex items-center justify-between md:justify-start">
+                        <!-- Columna 3 -->
+                        <div :class="userRole === 'restringido' ? 'md:w-1/4' : 'md:w-1/5'"
+                            class="w-full flex items-center justify-between md:justify-start">
                             <span class="md:hidden text-xs font-bold text-gray-400 uppercase">Sección:</span>
-                            <span class="text-blue-600 dark:text-blue-400 font-medium">{{
-                                item.cuadro_general?.codigo }} - {{ item.cuadro_general?.seccion }}</span>
+                            <span class="text-blue-600 dark:text-blue-400 font-medium">{{ item.cuadro_general?.codigo }}
+                                - {{ item.cuadro_general?.seccion }}</span>
                         </div>
 
-                        <div class="w-full md:w-1/5 flex items-center justify-between md:justify-start mt-1 md:mt-0">
+                        <!-- Columna 4 -->
+                        <div :class="userRole === 'restringido' ? 'md:w-1/4' : 'md:w-1/5'"
+                            class="w-full flex items-center justify-between md:justify-start mt-1 md:mt-0">
                             <span class="md:hidden text-xs font-bold text-gray-400 uppercase">Subseries:</span>
-
                             <button @click="toggleExpandir(item.id)"
                                 class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-colors"
                                 :class="{ 'ring-2 ring-blue-500/50': filasExpandidas.includes(item.id) }">
@@ -86,8 +97,9 @@
                             </button>
                         </div>
 
-                        <div
-                            class="w-full md:w-1/5 flex items-center justify-end md:justify-center gap-4 mt-3 md:mt-0 pt-3 md:pt-0 border-t md:border-t-0 border-gray-100 dark:border-gray-700">
+                        <!-- Columna 5: Ocultamos todo el bloque de botones si es restringido -->
+                        <div v-if="userRole !== 'restringido'"
+                            class="w-full md:w-[20%] flex items-center justify-end md:justify-center gap-4 mt-3 md:mt-0 pt-3 md:pt-0 border-t md:border-t-0 border-gray-100 dark:border-gray-700">
                             <button @click="abrirModalEdicion(item)"
                                 class="flex items-center gap-1.5 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-semibold text-sm transition-colors px-3 py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,7 +146,7 @@
 
                 </div>
             </div>
-            
+
             <div v-if="loading" class="text-center py-12 text-gray-500 flex flex-col items-center">
                 <svg class="animate-spin h-8 w-8 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
                     viewBox="0 0 24 24">
@@ -253,6 +265,7 @@ import { ref, computed, watch, onMounted, onUnmounted, nextTick, defineAsyncComp
 import { supabase } from '@/supabase'
 import { useToast } from '@/composables/useToast'
 
+
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import logoSIA from '@/assets/logo-transparente.png'
@@ -268,6 +281,7 @@ const editandoId = ref(null)
 const filtroSeccion = ref('')
 const inputsNombres = ref([])
 const filasExpandidas = ref([])
+const userRole = ref('')
 
 const form = ref({
     id_seccion: '',
@@ -296,18 +310,19 @@ const seriesFiltradas = computed(() => {
 
 // === LÓGICA DE DATOS ===
 const cargarInformacion = async () => {
-    loading.value = true 
-    
+    loading.value = true
+
     try {
         const { data: { user } } = await supabase.auth.getUser()
         const { data: userData } = await supabase.from('usuarios').select('secciones_permitidas, rol').eq('email', user.email).single()
+        userRole.value = userData.rol
 
         let querySec = supabase.from('cuadro_general').select('id, codigo, seccion').order('codigo')
         if (userData.rol !== 'admin') {
             querySec = querySec.in('codigo', userData.secciones_permitidas)
         }
         const { data: secciones } = await querySec
-        
+
         // Asignamos las secciones
         seccionesDisponibles.value = secciones || []
 
@@ -318,12 +333,12 @@ const cargarInformacion = async () => {
 
         const { data: series } = await supabase.from('series').select('*, cuadro_general(codigo, seccion)').order('codigo_serie')
         listaSeries.value = series || []
-        
+
     } catch (error) {
         console.error("Error al cargar Series:", error)
         toast.error("Error al cargar el catálogo de series.")
     } finally {
-        loading.value = false 
+        loading.value = false
     }
 }
 
@@ -467,7 +482,7 @@ const exportarCSV = () => {
     link.href = url;
     link.download = `Series_${codigoSeccion}.csv`;
     link.click();
-    
+
     // Limpieza de memoria
     setTimeout(() => URL.revokeObjectURL(url), 100);
 }
@@ -500,7 +515,7 @@ const exportarPDF = async () => {
         doc.setFont('helvetica', 'bold');
         doc.text('SERIES Y SUBSERIES DOCUMENTALES', pageWidth / 2, 15, { align: 'center' });
         doc.text("CONSEJERÍA JURÍDICA DEL PODER EJECUTIVO DEL ESTADO DE GUERRERO", pageWidth / 2, 20, { align: 'center' });
-        
+
         const fechaActual = new Date().toLocaleDateString('es-MX', {
             day: '2-digit',
             month: 'long',
@@ -518,12 +533,12 @@ const exportarPDF = async () => {
 
         // --- 2. CABECERAS DE LA TABLA ---
         const cabeceras = [
-            "Código Serie", 
-            "Serie", 
-            "Código Subserie", 
+            "Código Serie",
+            "Serie",
+            "Código Subserie",
             "Subserie"
         ];
-        
+
         // --- 3. MAPEAMOS LOS DATOS (Igual que en el CSV) ---
         const filas = [];
         seriesFiltradas.value.forEach(serie => {
@@ -554,17 +569,17 @@ const exportarPDF = async () => {
 
         // --- 4. DIBUJAR LA TABLA CON AUTOTABLE ---
         autoTable(doc, {
-            startY: 50, 
+            startY: 50,
             head: [cabeceras],
             body: filas,
-            headStyles: { 
+            headStyles: {
                 fillColor: '#AB0033', // Guinda Institucional
                 textColor: '#FFFFFF', // Texto Blanco
                 fontSize: 9,
                 halign: 'center'
             },
-            styles: { 
-                fontSize: 8, 
+            styles: {
+                fontSize: 8,
                 cellPadding: 3,
                 overflow: 'linebreak'
             },
@@ -583,7 +598,7 @@ const exportarPDF = async () => {
         // --- 5. GUARDAR Y DESCARGAR ---
         const nombreArchivo = `Series_${codigoSeccion}.pdf`;
         doc.save(nombreArchivo);
-        
+
         toast.success("Catálogo de Series PDF exportado correctamente.");
 
     } catch (error) {
