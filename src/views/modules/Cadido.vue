@@ -28,7 +28,9 @@
                 <button @click="exportarPDF"
                     class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold text-white bg-[#AB0033] hover:bg-[#8A0029] rounded-lg shadow-sm transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z">
+                        </path>
                     </svg>
                     PDF
                 </button>
@@ -92,7 +94,7 @@
                                     <div class="flex items-center gap-4 flex-1 min-w-0">
                                         <span
                                             class="text-blue-600 dark:text-blue-400 font-black w-40 shrink-0 break-words">{{
-                                            sub.codigoSubserie }}</span>
+                                                sub.codigoSubserie }}</span>
                                         <span class="font-medium text-gray-800 dark:text-gray-200 truncate">{{
                                             sub.nombre }}</span>
                                     </div>
@@ -112,7 +114,8 @@
                                             {{ sub.tecnica_seleccion }}
                                         </span>
 
-                                        <button @click="abrirModalValoracion(item, sub, index)"
+                                        <button v-if="userRole !== 'restringido'"
+                                            @click="abrirModalValoracion(item, sub, index)"
                                             class="ml-2 flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
@@ -268,6 +271,7 @@ import autoTable from 'jspdf-autotable'
 import logoSIA from '@/assets/logo-transparente.png'
 
 const toast = useToast()
+const userRole = ref('')
 
 // Estado Global
 const loading = ref(true)
@@ -318,6 +322,7 @@ const cargarInformacion = async () => {
     try {
         const { data: { user } } = await supabase.auth.getUser()
         const { data: userData } = await supabase.from('usuarios').select('secciones_permitidas, rol').eq('email', user.email).single()
+        userRole.value = userData.rol
 
         let querySec = supabase.from('cuadro_general').select('id, codigo, seccion').order('codigo')
         if (userData.rol !== 'admin') {
@@ -430,7 +435,7 @@ const exportarCSV = () => {
                 const valor = sub.valor_documental || 'No asignado';
                 const destino = sub.tecnica_seleccion || 'No asignado';
                 const dp = sub.datos_personales || 'No';
-                
+
                 // Limpiamos observaciones por si el usuario escribió comillas dobles
                 const obs = sub.observaciones ? String(sub.observaciones).replace(/"/g, '""') : '';
 
@@ -446,7 +451,7 @@ const exportarCSV = () => {
     link.href = url;
     link.download = `CADIDO_${codigoSeccion}.csv`;
     link.click();
-    
+
     // Limpieza de memoria (buena práctica en JS)
     setTimeout(() => URL.revokeObjectURL(url), 100);
 }
@@ -479,7 +484,7 @@ const exportarPDF = async () => {
         doc.setFont('helvetica', 'bold');
         doc.text('CATÁLOGO DE DISPOSICIÓN DOCUMENTAL (CADIDO)', pageWidth / 2, 15, { align: 'center' });
         doc.text("CONSEJERÍA JURÍDICA DEL PODER EJECUTIVO DEL ESTADO DE GUERRERO", pageWidth / 2, 20, { align: 'center' });
-        
+
         const fechaActual = new Date().toLocaleDateString('es-MX', {
             day: '2-digit',
             month: 'long',
@@ -497,19 +502,19 @@ const exportarPDF = async () => {
 
         // --- 2. CABECERAS DE LA TABLA (Tus 11 columnas) ---
         const cabeceras = [
-            "Código Serie", 
-            "Serie", 
-            "Código Subserie", 
-            "Subserie", 
-            "Valor Documental", 
-            "Años Trámite", 
-            "Años Concentración", 
-            "Total", 
-            "Destino", 
-            "Datos Personales", 
+            "Código Serie",
+            "Serie",
+            "Código Subserie",
+            "Subserie",
+            "Valor Documental",
+            "Años Trámite",
+            "Años Concentración",
+            "Total",
+            "Destino",
+            "Datos Personales",
             "Observaciones"
         ];
-        
+
         // --- 3. MAPEAMOS LOS DATOS ---
         const filas = [];
         seriesFiltradas.value.forEach(serie => {
@@ -547,22 +552,22 @@ const exportarPDF = async () => {
 
         // --- 4. DIBUJAR LA TABLA CON AUTOTABLE ---
         autoTable(doc, {
-            startY: 50, 
+            startY: 50,
             head: [cabeceras],
             body: filas,
-            headStyles: { 
+            headStyles: {
                 fillColor: '#AB0033', // Guinda institucional
                 textColor: '#FFFFFF', // Texto Blanco
                 fontSize: 8,
                 halign: 'center'
             },
-            styles: { 
-                fontSize: 7, 
+            styles: {
+                fontSize: 7,
                 cellPadding: 2,
                 overflow: 'linebreak'
             },
             alternateRowStyles: {
-                fillColor: '#f9fafb' 
+                fillColor: '#f9fafb'
             },
             columnStyles: {
                 1: { cellWidth: 40 }, // Serie
@@ -574,7 +579,7 @@ const exportarPDF = async () => {
         // --- 5. GUARDAR Y DESCARGAR ---
         const nombreArchivo = `CADIDO_${codigoSeccion}.pdf`;
         doc.save(nombreArchivo);
-        
+
         toast.success("Catálogo PDF exportado correctamente.");
 
     } catch (error) {
