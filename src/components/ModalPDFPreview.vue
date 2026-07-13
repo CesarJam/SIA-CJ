@@ -21,7 +21,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { supabase } from '@/supabase';
 
 const props = defineProps({
@@ -29,9 +29,24 @@ const props = defineProps({
     rutaArchivo: String // Recibe la ruta desde Inventario.vue
 });
 
-defineEmits(['update:modelValue']);
-
+const emit = defineEmits(['update:modelValue']);
 const signedUrl = ref(null);
+
+// 2. Función para manejar la tecla Esc
+const handleKeydown = (e) => {
+    if (e.key === 'Escape' && props.modelValue) {
+        emit('update:modelValue', false);
+    }
+};
+
+// 3. Registrar el evento al montar y quitarlo al desmontar
+onMounted(() => {
+    window.addEventListener('keydown', handleKeydown);
+});
+
+onUnmounted(() => {
+    window.removeEventListener('keydown', handleKeydown);
+});
 
 watch(() => props.rutaArchivo, async (newRuta) => {
     if (newRuta) {
