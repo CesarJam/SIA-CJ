@@ -262,9 +262,10 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted, nextTick, defineAsyncComponent } from 'vue'
-import { supabase } from '@/supabase'
+import { useRoute } from 'vue-router'
+// --- IMPORTAMOS EL SERVICIO ---
+import { seriesService } from '@/services/seriesService'
 import { useToast } from '@/composables/useToast'
-
 
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
@@ -295,44 +296,35 @@ const modalEliminar = ref({ abierto: false, id: null, nombre: '' })
 const toggleExpandir = (id) => {
     const index = filasExpandidas.value.indexOf(id)
     if (index > -1) {
-        // Si ya está abierta, la cerramos
         filasExpandidas.value.splice(index, 1)
     } else {
-        // Si está cerrada, la abrimos
         filasExpandidas.value.push(id)
     }
 }
 
-//Lógica que filtra la lista original dependiendo del selector
 const seriesFiltradas = computed(() => {
     return listaSeries.value.filter(serie => serie.id_seccion === filtroSeccion.value)
 })
 
-// === LÓGICA DE DATOS ===
+// === LÓGICA DE DATOS (REFACTORIZADA) ===
 const cargarInformacion = async () => {
     loading.value = true
 
     try {
-        const { data: { user } } = await supabase.auth.getUser()
-        const { data: userData } = await supabase.from('usuarios').select('secciones_permitidas, rol').eq('email', user.email).single()
+        // 1. Obtener contexto del usuario
+        const userData = await seriesService.obtenerContextoUsuario()
         userRole.value = userData.rol
 
-        let querySec = supabase.from('cuadro_general').select('id, codigo, seccion').order('codigo')
-        if (userData.rol !== 'admin') {
-            querySec = querySec.in('codigo', userData.secciones_permitidas)
-        }
-        const { data: secciones } = await querySec
+        // 2. Obtener secciones permitidas
+        seccionesDisponibles.value = await seriesService.obtenerSecciones(userData.rol, userData.secciones_permitidas)
 
-        // Asignamos las secciones
-        seccionesDisponibles.value = secciones || []
-
-        // Seleccionar la primera coincidencia automáticamente si el filtro está vacío
+        // Auto-seleccionar la primera sección si el filtro está vacío
         if (seccionesDisponibles.value.length > 0 && !filtroSeccion.value) {
             filtroSeccion.value = seccionesDisponibles.value[0].id
         }
 
-        const { data: series } = await supabase.from('series').select('*, cuadro_general(codigo, seccion)').order('codigo_serie')
-        listaSeries.value = series || []
+        // 3. Cargar las series
+        listaSeries.value = await seriesService.obtenerSeries()
 
     } catch (error) {
         console.error("Error al cargar Series:", error)
@@ -357,11 +349,8 @@ const abrirModalEdicion = (item) => {
 
 const cerrarModal = () => { modalAbierto.value = false }
 
-//Función para mantener la secuencia perfecta
 const actualizarCodigosSubseries = () => {
-    // Si aún no escriben el código principal, usamos 'SERIE' como prefijo visual temporal
     const prefijoBase = form.value.codigo_serie ? form.value.codigo_serie.trim() : 'SERIE'
-
     form.value.subseries.forEach((sub, index) => {
         sub.codigoSubserie = `${prefijoBase}.${index + 1}`
     })
@@ -376,10 +365,8 @@ const agregarSubserie = async () => {
         nombre: ''
     })
 
-    // TRUCO PRO UX: Esperar a que el DOM se actualice y enfocar el nuevo campo
     await nextTick()
     if (inputsNombres.value && inputsNombres.value.length > 0) {
-        // Filtramos posibles elementos nulos (que quedan a veces al borrar filas)
         const inputsActivos = inputsNombres.value.filter(el => el !== null)
         if (inputsActivos.length > 0) {
             inputsActivos[inputsActivos.length - 1].focus()
@@ -392,14 +379,13 @@ const removerSubserie = (index) => {
     actualizarCodigosSubseries()
 }
 
-// Observa cambios en el código principal
 watch(() => form.value.codigo_serie, (nuevoCodigo) => {
-    // Solo actualiza si ya hay subseries en la lista
     if (form.value.subseries.length > 0) {
         actualizarCodigosSubseries()
     }
 })
 
+// === CRUD (REFACTORIZADO) ===
 const guardarSerie = async () => {
     if (!form.value.codigo_serie || !form.value.id_seccion) return toast.error('Faltan campos obligatorios')
 
@@ -410,15 +396,20 @@ const guardarSerie = async () => {
         subseries: form.value.subseries
     }
 
-    const { error } = editandoId.value
-        ? await supabase.from('series').update(payload).eq('id', editandoId.value)
-        : await supabase.from('series').insert([payload])
-
-    if (error) return toast.error(error.message)
-
-    toast.success(editandoId.value ? 'Serie actualizada' : 'Serie registrada')
-    cargarInformacion()
-    cerrarModal()
+    try {
+        if (editandoId.value) {
+            await seriesService.actualizarRegistro(editandoId.value, payload)
+            toast.success('Serie actualizada')
+        } else {
+            await seriesService.crearRegistro(payload)
+            toast.success('Serie registrada')
+        }
+        cargarInformacion()
+        cerrarModal()
+    } catch (error) {
+        console.error("Error al guardar:", error)
+        toast.error(error.message || 'Error al guardar la serie')
+    }
 }
 
 const eliminarSerie = (item) => {
@@ -426,26 +417,28 @@ const eliminarSerie = (item) => {
 }
 
 const confirmarEliminacion = async () => {
-    await supabase.from('series').delete().eq('id', modalEliminar.value.id)
-    toast.success('Serie eliminada')
-    cargarInformacion()
-    modalEliminar.value.abierto = false
+    try {
+        await seriesService.eliminarRegistro(modalEliminar.value.id)
+        toast.success('Serie eliminada')
+        cargarInformacion()
+    } catch (error) {
+        console.error("Error al eliminar:", error)
+        toast.error("Ocurrió un error al intentar eliminar la serie.")
+    } finally {
+        modalEliminar.value.abierto = false
+    }
 }
 
+// === EXPORTAR A CSV OFICIAL ===
 const exportarCSV = () => {
-    // 1. Obtener la información de la sección seleccionada actualmente
     const seccionSeleccionada = seccionesDisponibles.value.find(s => s.id === filtroSeccion.value);
     const nombreSeccion = seccionSeleccionada ? seccionSeleccionada.seccion : "No definida";
     const codigoSeccion = seccionSeleccionada ? seccionSeleccionada.codigo : "S/C";
 
-    // 2. Generar la fecha actual con formato en español
     const fechaActual = new Date().toLocaleDateString('es-MX', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric'
+        day: '2-digit', month: 'long', year: 'numeric'
     });
 
-    // 3. Construir las filas del encabezado oficial
     const fila1 = `;"CONSEJERÍA JURÍDICA DEL PODER EJECUTIVO DEL ESTADO DE GUERRERO"`;
     const fila2 = ``;
     const fila3 = `;"Sección";"${nombreSeccion}"`;
@@ -453,62 +446,43 @@ const exportarCSV = () => {
     const fila5 = `;"Fecha de exportación";"${fechaActual}"`;
     const fila6 = ``;
 
-    // 4. Nuevas cabeceras
     const cabeceras = "CÓDIGO SERIE;SERIE;CÓDIGO SUBSERIE;SUBSERIE";
-
-    // 5. Unir los encabezados con el BOM
     let csv = `\uFEFF${fila1}\n${fila2}\n${fila3}\n${fila4}\n${fila5}\n${fila6}\n${cabeceras}\n`;
 
-    // 6. Mapear los datos (desglosando cada subserie en una nueva fila)
     seriesFiltradas.value.forEach(serie => {
-        // Limpiamos el nombre de la serie por si lleva comillas
         const nombreSerie = serie.nombre ? String(serie.nombre).replace(/"/g, '""') : '';
-
         if (serie.subseries && serie.subseries.length > 0) {
             serie.subseries.forEach(sub => {
                 const nombreSubserie = sub.nombre ? String(sub.nombre).replace(/"/g, '""') : '';
                 csv += `"${serie.codigo_serie}";"${nombreSerie}";"${sub.codigoSubserie}";"${nombreSubserie}"\n`;
             });
         } else {
-            // Si la serie existe pero aún no tiene subseries registradas, mostramos la serie y dejamos los otros campos vacíos
             csv += `"${serie.codigo_serie}";"${nombreSerie}";"";""\n`;
         }
     });
 
-    // 7. Generar y descargar el archivo dinámicamente con el nombre de la sección
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
     link.download = `Series_${codigoSeccion}.csv`;
     link.click();
-
-    // Limpieza de memoria
     setTimeout(() => URL.revokeObjectURL(url), 100);
 }
 
-// Exportación a PDF Oficial para Series
+// === EXPORTAR A PDF OFICIAL ===
 const exportarPDF = async () => {
     try {
         const seccionSeleccionada = seccionesDisponibles.value.find(s => s.id === filtroSeccion.value);
         const nombreSeccion = seccionSeleccionada ? seccionSeleccionada.seccion : "No definida";
         const codigoSeccion = seccionSeleccionada ? seccionSeleccionada.codigo : "S/C";
 
-        // --- 1. CONFIGURAR EL DOCUMENTO PDF ---
-        const doc = new jsPDF({
-            orientation: 'landscape',
-            unit: 'mm',
-            format: 'legal' // Tamaño Oficio Horizontal
-        });
-
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'legal' });
         const img = new Image();
         img.src = logoSIA;
-        await new Promise((resolve) => {
-            img.onload = resolve;
-        });
+        await new Promise((resolve) => { img.onload = resolve; });
 
         doc.addImage(img, 'PNG', 300, 20, 24, 24);
-
         const pageWidth = doc.internal.pageSize.getWidth();
 
         doc.setFontSize(12);
@@ -517,9 +491,7 @@ const exportarPDF = async () => {
         doc.text("CONSEJERÍA JURÍDICA DEL PODER EJECUTIVO DEL ESTADO DE GUERRERO", pageWidth / 2, 20, { align: 'center' });
 
         const fechaActual = new Date().toLocaleDateString('es-MX', {
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric'
+            day: '2-digit', month: 'long', year: 'numeric'
         });
 
         doc.setFontSize(10);
@@ -531,34 +503,19 @@ const exportarPDF = async () => {
         doc.text(`Sección: ${nombreSeccion}`, 14, 32);
         doc.text(`Código: ${codigoSeccion}`, 14, 38);
 
-        // --- 2. CABECERAS DE LA TABLA ---
-        const cabeceras = [
-            "Código Serie",
-            "Serie",
-            "Código Subserie",
-            "Subserie"
-        ];
-
-        // --- 3. MAPEAMOS LOS DATOS (Igual que en el CSV) ---
+        const cabeceras = ["Código Serie", "Serie", "Código Subserie", "Subserie"];
         const filas = [];
+        
         seriesFiltradas.value.forEach(serie => {
             if (serie.subseries && serie.subseries.length > 0) {
                 serie.subseries.forEach(sub => {
                     filas.push([
-                        serie.codigo_serie || "",
-                        serie.nombre || "",
-                        sub.codigoSubserie || "",
-                        sub.nombre || ""
+                        serie.codigo_serie || "", serie.nombre || "",
+                        sub.codigoSubserie || "", sub.nombre || ""
                     ]);
                 });
             } else {
-                // Si no tiene subseries, la dejamos en blanco
-                filas.push([
-                    serie.codigo_serie || "",
-                    serie.nombre || "",
-                    "",
-                    ""
-                ]);
+                filas.push([serie.codigo_serie || "", serie.nombre || "", "", ""]);
             }
         });
 
@@ -567,38 +524,18 @@ const exportarPDF = async () => {
             return;
         }
 
-        // --- 4. DIBUJAR LA TABLA CON AUTOTABLE ---
         autoTable(doc, {
-            startY: 50,
-            head: [cabeceras],
-            body: filas,
-            headStyles: {
-                fillColor: '#AB0033', // Guinda Institucional
-                textColor: '#FFFFFF', // Texto Blanco
-                fontSize: 9,
-                halign: 'center'
-            },
-            styles: {
-                fontSize: 8,
-                cellPadding: 3,
-                overflow: 'linebreak'
-            },
-            alternateRowStyles: {
-                fillColor: '#f9fafb' // Gris claro para filas pares
-            },
-            // Como son pocas columnas, podemos hacerlas más anchas para que se lea mejor
+            startY: 50, head: [cabeceras], body: filas,
+            headStyles: { fillColor: '#AB0033', textColor: '#FFFFFF', fontSize: 9, halign: 'center' },
+            styles: { fontSize: 8, cellPadding: 3, overflow: 'linebreak' },
+            alternateRowStyles: { fillColor: '#f9fafb' },
             columnStyles: {
-                0: { cellWidth: 40 }, // Código Serie
-                1: { cellWidth: 100 }, // Nombre Serie
-                2: { cellWidth: 40 }, // Código Subserie
-                3: { cellWidth: 'auto' } // Nombre Subserie (Toma el resto del espacio)
+                0: { cellWidth: 40 }, 1: { cellWidth: 100 },
+                2: { cellWidth: 40 }, 3: { cellWidth: 'auto' }
             }
         });
 
-        // --- 5. GUARDAR Y DESCARGAR ---
-        const nombreArchivo = `Series_${codigoSeccion}.pdf`;
-        doc.save(nombreArchivo);
-
+        doc.save(`Series_${codigoSeccion}.pdf`);
         toast.success("Catálogo de Series PDF exportado correctamente.");
 
     } catch (error) {
