@@ -411,7 +411,8 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
-import { supabase } from '@/supabase'
+// --- IMPORTAMOS EL NUEVO SERVICIO ---
+import { oficialiaService } from '@/services/oficialiaService'
 import { useToast } from '@/composables/useToast'
 
 import ModalRegistroDocumento from '@/components/ModalRegistroDocumento.vue'
@@ -426,30 +427,25 @@ const loading = ref(true)
 const listaExpedientes = ref([])
 const idSeccionOficialia = ref(null)
 const usuarioActual = ref(null)
-const vistaActual = ref("enviados"); // Oficialía es más de envío
+const rolUsuario = ref(null)
+const vistaActual = ref("enviados")
+
 const cambiarVista = async (nuevaVista) => {
-    if (vistaActual.value === nuevaVista) return;
-    vistaActual.value = nuevaVista;
-    filtroEstatus.value = "Todos";
-    paginaActual.value = 1;
-    await cargarDatos();
-};
+    if (vistaActual.value === nuevaVista) return
+    vistaActual.value = nuevaVista
+    filtroEstatus.value = "Todos"
+    paginaActual.value = 1
+    await cargarDatos()
+}
 
 // === ESTADOS DEL MENÚ DESPLEGABLE (ACCIONES) ===
-const menuActivoId = ref(null);
-
-const toggleMenu = (id) => {
-    menuActivoId.value = menuActivoId.value === id ? null : id;
-};
-
-const cerrarMenu = () => {
-    menuActivoId.value = null;
-};
+const menuActivoId = ref(null)
+const toggleMenu = (id) => menuActivoId.value = menuActivoId.value === id ? null : id
+const cerrarMenu = () => menuActivoId.value = null
 
 // === ESTADOS DE PAGINACIÓN ===
-const paginaActual = ref(1);
-const registrosPorPagina = 100;
-
+const paginaActual = ref(1)
+const registrosPorPagina = 100
 
 // === FILTROS ===
 const anioActual = new Date().getFullYear()
@@ -461,6 +457,16 @@ const filtroEstatus = ref("Todos")
 const modalRegistroAbierto = ref(false)
 const expedienteAEditar = ref(null)
 
+const abrirModalNuevo = () => {
+    expedienteAEditar.value = null
+    modalRegistroAbierto.value = true
+}
+
+const abrirModalEditar = (item) => {
+    expedienteAEditar.value = item
+    modalRegistroAbierto.value = true
+}
+
 // === ESTADOS MODAL DETALLES ===
 const modalDetallesAbierto = ref(false)
 const expedienteDetalle = ref(null)
@@ -469,46 +475,33 @@ const abrirModalDetalles = (item) => {
     modalDetallesAbierto.value = true
 }
 
-// === ESTADOS PARA MODAL DE CONFIRMACIÓN ===
-const modalConfirmarAbierto = ref(false);
-const expedienteAConcluir = ref(null);
-const procesando = ref(false);
+// === ESTADOS PARA MODAL DE CONFIRMACIÓN (CONCLUIR) ===
+const modalConfirmarAbierto = ref(false)
+const expedienteAConcluir = ref(null)
+const procesando = ref(false)
 
 const abrirModalConfirmar = (item) => {
-    expedienteAConcluir.value = item;
-    modalConfirmarAbierto.value = true;
-};
+    expedienteAConcluir.value = item
+    modalConfirmarAbierto.value = true
+}
 
 const cerrarModalConfirmar = () => {
-    if (!procesando.value) modalConfirmarAbierto.value = false;
-};
+    if (!procesando.value) modalConfirmarAbierto.value = false
+}
 
 const ejecutarConcluir = async () => {
-    procesando.value = true;
+    procesando.value = true
     try {
-        const { error } = await supabase
-            .from('expedientes')
-            .update({
-                estatus: 'Concluido',
-                id_usuario_actualizacion: usuarioActual.value
-            })
-            .eq('id', expedienteAConcluir.value.id);
-
-        if (error) throw error;
-
-        toast.success("Expediente concluido correctamente.");
-        await cargarDatos();
+        await oficialiaService.concluirExpediente(expedienteAConcluir.value.id, usuarioActual.value)
+        toast.success("Expediente concluido correctamente.")
+        await cargarDatos()
     } catch (err) {
-        toast.error("Error al concluir el expediente.");
+        toast.error("Error al concluir el expediente.")
     } finally {
-        // PRIMERO apagamos el estado de procesando
-        procesando.value = false;
-        // LUEGO mandamos a cerrar el modal
-        cerrarModalConfirmar();
+        procesando.value = false
+        cerrarModalConfirmar()
     }
-};
-
-
+}
 
 // === ESTADOS Y LÓGICA DE CANCELACIÓN (Soft Delete) ===
 const modalCancelarAbierto = ref(false)
@@ -517,135 +510,6 @@ const cancelarId = ref(null)
 const folioACancelar = ref('')
 const motivoCancelacion = ref('')
 
-
-const dependenciasFiltradas = computed(() => {
-    if (!busquedaDependencia.value) return catalogoDependencias.value
-    const termino = busquedaDependencia.value.toLowerCase()
-    return catalogoDependencias.value.filter(dep =>
-        dep.nombre_oficial.toLowerCase().includes(termino) ||
-        (dep.siglas && dep.siglas.toLowerCase().includes(termino))
-    )
-})
-
-const dependenciasSeleccionadasInfo = computed(() => {
-    return catalogoDependencias.value.filter(dep => form.value.dependencias_ids.includes(dep.id))
-})
-
-const removerDependencia = (id) => {
-    form.value.dependencias_ids = form.value.dependencias_ids.filter(depId => depId !== id)
-}
-
-const formDependencia = ref({
-    nombre_oficial: '',
-    siglas: '',
-    titular: '',
-    tipo_ente: 'Estatal'
-})
-
-const abrirModalDependencia = () => {
-    formDependencia.value = { nombre_oficial: '', siglas: '', titular: '', tipo_ente: 'Estatal' }
-    modalDependenciaAbierto.value = true
-}
-
-const cerrarModalDependencia = () => {
-    if (!procesandoDependencia.value) modalDependenciaAbierto.value = false
-}
-
-
-// === CARGA INICIAL Y FILTRADA ===
-const cargarDatos = async () => {
-    loading.value = true
-
-    try {
-        const { data: { user } } = await supabase.auth.getUser()
-        const { data: userData } = await supabase.from('usuarios').select('id, rol, secciones_permitidas').eq('email', user.email).single()
-        usuarioActual.value = userData.id
-        rolUsuario.value = userData.rol // <--- AHORA GUARDAMOS EL ROL
-
-        const codigoOficialia = 'OFP'
-
-        if (userData.rol === 'admin' || (userData.secciones_permitidas && userData.secciones_permitidas.includes(codigoOficialia))) {
-            const { data: sec } = await supabase.from('cuadro_general')
-                .select('id')
-                .eq('codigo', codigoOficialia)
-                .single()
-
-            idSeccionOficialia.value = sec?.id
-        }
-
-        if (idSeccionOficialia.value) {
-            // === CARGAR SERIES PARA EL MODAL ADMIN ===
-            const { data: seriesDB } = await supabase
-                .from("series")
-                .select("id, codigo_serie, nombre, subseries")
-                .eq("id_seccion", idSeccionOficialia.value)
-                .order("codigo_serie");
-
-            let structuredData = [];
-            if (seriesDB) {
-                seriesDB.forEach((seriePadre) => {
-                    if (seriePadre.subseries && Array.isArray(seriePadre.subseries)) {
-                        let subseriesWithParentInfo = seriePadre.subseries.map((sub) => ({
-                            ...sub,
-                            id_serie_padre: seriePadre.id,
-                            codigo_serie_padre: seriePadre.codigo_serie,
-                            nombre_serie_padre: seriePadre.nombre,
-                        }));
-                        structuredData.push({
-                            id: seriePadre.id,
-                            codigo_serie: seriePadre.codigo_serie,
-                            nombre: seriePadre.nombre,
-                            subseries: subseriesWithParentInfo,
-                        });
-                    }
-                });
-            }
-            catalogoSeriesEstructurado.value = structuredData;
-
-            // === CARGAR EXPEDIENTES ===
-            let query = supabase
-                .from('expedientes')
-                .select(`*, area_destino:id_seccion_turnada (codigo, seccion), area_origen:id_seccion_registro (codigo, seccion)`)
-                .gte("fecha_registro", `${filtroAnio.value}-01-01`)
-                .lte("fecha_registro", `${filtroAnio.value}-12-31`)
-                .order('fecha_registro', { ascending: false })
-                .order('hora_registro', { ascending: false })
-
-            if (vistaActual.value === "entrada") {
-                query = query
-                    .eq('id_seccion_turnada', idSeccionOficialia.value)
-                    .or(`id_seccion_registro.neq.${idSeccionOficialia.value},tipo_registro.eq.Recibido`);
-            } else {
-                query = query
-                    .eq('id_seccion_registro', idSeccionOficialia.value)
-                    .or(`id_seccion_turnada.neq.${idSeccionOficialia.value},tipo_registro.eq.Enviado`);
-            }
-
-            const { data: expedientes, error } = await query
-            if (error) throw error
-            listaExpedientes.value = expedientes || []
-        }
-    } catch (error) {
-        console.error("Error al cargar datos de Oficialía:", error)
-        toast.error("Error al cargar los registros.")
-    } finally {
-        loading.value = false
-    }
-}
-
-// === GESTIÓN DEL MODAL ===
-
-const abrirModalNuevo = () => {
-    expedienteAEditar.value = null // Null significa "Modo Creación"
-    modalRegistroAbierto.value = true
-}
-
-const abrirModalEditar = (item) => {
-    expedienteAEditar.value = item // Le pasamos la fila completa para "Modo Edición"
-    modalRegistroAbierto.value = true
-}
-
-// === LÓGICA DE CANCELACIÓN ===
 const abrirModalCancelar = (item) => {
     cancelarId.value = item.id
     folioACancelar.value = item.numero_consecutivo
@@ -662,18 +526,8 @@ const ejecutarCancelacion = async () => {
     procesandoCancelacion.value = true
     try {
         const notaJustificacion = `[CANCELADO DESDE OFICIALÍA]: ${motivoCancelacion.value}`
-
-        const { error } = await supabase
-            .from('expedientes')
-            .update({
-                estatus: 'Cancelado',
-                observaciones: notaJustificacion,
-                id_usuario_actualizacion: usuarioActual.value
-            })
-            .eq('id', cancelarId.value)
-
-        if (error) throw error
-
+        await oficialiaService.cancelarExpediente(cancelarId.value, notaJustificacion, usuarioActual.value)
+        
         toast.success(`Folio ${folioACancelar.value} cancelado exitosamente.`)
         await cargarDatos()
         modalCancelarAbierto.value = false
@@ -685,31 +539,81 @@ const ejecutarCancelacion = async () => {
     }
 }
 
+// === CATÁLOGO GLOBAL DE DEPENDENCIAS ===
+const catalogoDependenciasGlobal = ref([])
+
+const cargarCatalogoDependenciasGlobal = async () => {
+    try {
+        catalogoDependenciasGlobal.value = await oficialiaService.cargarCatalogoDependenciasGlobal()
+    } catch (err) {
+        console.error("Error al cargar dependencias globales:", err)
+    }
+}
+
+const obtenerNombresDependencias = (ids) => {
+    if (!ids || !Array.isArray(ids) || ids.length === 0) return []
+    return catalogoDependenciasGlobal.value.filter(dep => ids.includes(dep.id))
+}
+
+const catalogoSeriesEstructurado = ref([]) 
+
+// === CARGA INICIAL Y FILTRADA (REFACTORIZADA) ===
+const cargarDatos = async () => {
+    loading.value = true
+
+    try {
+        // 1. Obtener contexto (Usuario y si tiene acceso a Oficialía)
+        const contexto = await oficialiaService.inicializarContextoOficialia()
+        usuarioActual.value = contexto.userData.id
+        rolUsuario.value = contexto.userData.rol
+        idSeccionOficialia.value = contexto.idSeccionOficialia
+
+        if (idSeccionOficialia.value) {
+            // 2. Cargar Series para Admin
+            catalogoSeriesEstructurado.value = await oficialiaService.cargarSeriesParaConclusion(idSeccionOficialia.value)
+
+            // 3. Cargar Expedientes
+            listaExpedientes.value = await oficialiaService.cargarBandeja(
+                filtroAnio.value, 
+                idSeccionOficialia.value, 
+                vistaActual.value
+            )
+        } else {
+             toast.error("No tienes permisos de Oficialía de Partes.")
+        }
+    } catch (error) {
+        console.error("Error al cargar datos de Oficialía:", error)
+        toast.error("Error al cargar los registros.")
+    } finally {
+        loading.value = false
+    }
+}
+
 watch([filtroEstatus, filtroAnio, vistaActual], () => {
-    paginaActual.value = 1;
-});
+    paginaActual.value = 1
+})
 
 const expedientesFiltrados = computed(() => {
-    if (filtroEstatus.value === "Todos") return listaExpedientes.value;
-    return listaExpedientes.value.filter(exp => exp.estatus === filtroEstatus.value);
-});
+    if (filtroEstatus.value === "Todos") return listaExpedientes.value
+    return listaExpedientes.value.filter(exp => exp.estatus === filtroEstatus.value)
+})
 
 const totalPaginas = computed(() => {
-    return Math.ceil(expedientesFiltrados.value.length / registrosPorPagina) || 1;
-});
+    return Math.ceil(expedientesFiltrados.value.length / registrosPorPagina) || 1
+})
 
 const expedientesPaginados = computed(() => {
-    const inicio = (paginaActual.value - 1) * registrosPorPagina;
-    const fin = inicio + registrosPorPagina;
-    return expedientesFiltrados.value.slice(inicio, fin);
-});
+    const inicio = (paginaActual.value - 1) * registrosPorPagina
+    const fin = inicio + registrosPorPagina
+    return expedientesFiltrados.value.slice(inicio, fin)
+})
 
 const irAPagina = (pag) => {
     if (pag >= 1 && pag <= totalPaginas.value) {
-        paginaActual.value = pag;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        paginaActual.value = pag
+        window.scrollTo({ top: 0, behavior: 'smooth' })
     }
-};
+}
 
 // === ESTADOS MODAL ATENDER ===
 const modalAtenderAbierto = ref(false)
@@ -720,72 +624,20 @@ const abrirModalAtender = (item) => {
     modalAtenderAbierto.value = true
 }
 
-const concluirExpediente = async (item) => {
-    if (!confirm(`¿Estás seguro de concluir el folio ${item.numero_consecutivo}?`)) return;
-
-    try {
-        const { error } = await supabase
-            .from('expedientes')
-            .update({
-                estatus: 'Concluido',
-                id_usuario_actualizacion: usuarioActual.value
-            })
-            .eq('id', item.id);
-
-        if (error) throw error;
-        toast.success("Expediente concluido correctamente.");
-        await cargarDatos();
-    } catch (err) {
-        toast.error("Error al concluir el expediente.");
-    }
-};
-
-// === CATÁLOGO GLOBAL DE DEPENDENCIAS ===
-const catalogoDependenciasGlobal = ref([]);
-
-const cargarCatalogoDependenciasGlobal = async () => {
-    try {
-        const { data, error } = await supabase.from('dependencias').select('id, nombre_oficial, siglas');
-        if (!error && data) {
-            catalogoDependenciasGlobal.value = data;
-        }
-    } catch (err) {
-        console.error("Error al cargar dependencias globales:", err);
-    }
-};
-
-const obtenerNombresDependencias = (ids) => {
-    if (!ids || !Array.isArray(ids) || ids.length === 0) return [];
-    return catalogoDependenciasGlobal.value.filter(dep => ids.includes(dep.id));
-};
-
-const rolUsuario = ref(null); // Para saber si es admin
-const catalogoSeriesEstructurado = ref([]); // Requerido por el modal admin
-
 // === ESTADOS MODAL EDICIÓN ADMIN ===
-const modalEdicionAdminAbierto = ref(false);
-const expedienteAdmin = ref(null);
+const modalEdicionAdminAbierto = ref(false)
+const expedienteAdmin = ref(null)
 
 const abrirModalEdicionAdmin = (item) => {
-    expedienteAdmin.value = item;
-    modalEdicionAdminAbierto.value = true;
-};
+    expedienteAdmin.value = item
+    modalEdicionAdminAbierto.value = true
+}
 
 // === UTILIDADES VISUALES ===
-
-// UTILIDAD PARA ARREGLOS DE BD (Soporte, Tradición, Condición)
 const obtenerValorArreglo = (valor) => {
     if (!valor) return ''
-
-    // Si es un arreglo nativo de JavaScript
     if (Array.isArray(valor)) return valor[0]
-
-    // Si viene como string crudo desde la BD (ej. '["Original"]' o '{"Original"}')
-    if (typeof valor === 'string') {
-        // Limpieza con Expresión Regular: quita corchetes, llaves y comillas dobles
-        return valor.replace(/[[\]"{}]/g, '').trim()
-    }
-
+    if (typeof valor === 'string') return valor.replace(/[[\]"{}]/g, '').trim()
     return valor
 }
 
@@ -806,22 +658,17 @@ const badgeColor = (estatus) => {
     }
 }
 
-// Event Listeners (Accesibilidad)
-
 // === ACCESIBILIDAD (TECLADO) ===
 const handleKeydown = (e) => {
     if (e.key === 'Escape') {
-        // Si el modal de cancelación está abierto, lo cierra
         if (modalCancelarAbierto.value && !procesandoCancelacion.value) {
-            cerrarModalCancelar();
+            cerrarModalCancelar()
         }
-        // NUEVO: Si el modal de confirmación de concluir está abierto, lo cierra
         else if (modalConfirmarAbierto.value && !procesando.value) {
-            cerrarModalConfirmar();
+            cerrarModalConfirmar()
         }
     }
-};
-
+}
 
 onMounted(async () => {
     await cargarCatalogoDependenciasGlobal()
