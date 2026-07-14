@@ -547,8 +547,10 @@
 
 <script setup>
 import { ref, onMounted, computed, watch, onUnmounted, nextTick } from "vue";
-import { supabase } from "@/supabase";
+// --- IMPORTAMOS EL SERVICIO ---
+import { inventarioService } from "@/services/inventarioService";
 import { useToast } from "@/composables/useToast";
+
 import ModalRegistroDocumento from '@/components/ModalRegistroDocumento.vue';
 import ModalAtender from '@/components/ModalAtender.vue';
 import ModalConcluir from '@/components/ModalConcluir.vue';
@@ -565,13 +567,12 @@ const modalNuevoAbierto = ref(false);
 const expedienteAEditar = ref(null);
 
 const abrirModalEditar = (item) => {
-    expedienteAEditar.value = item; // Guardamos los datos del expediente a editar
-    modalNuevoAbierto.value = true; // Abrimos el mismo modal
+    expedienteAEditar.value = item;
+    modalNuevoAbierto.value = true;
 };
 
 // === ESTADOS GLOBALES ===
 const loading = ref(true);
-const procesando = ref(false);
 const listaExpedientes = ref([]);
 const usuarioActual = ref(null);
 const rolUsuario = ref(null);
@@ -580,11 +581,10 @@ const areasUsuario = ref([]);
 const seccionSeleccionada = ref(null);
 const miSeccion = ref(null);
 const filtroEstatus = ref("Todos");
-const vistaActual = ref("entrada"); // 'entrada' | 'enviados'
+const vistaActual = ref("entrada");
 const registroResaltado = ref(null);
 
 const anioActual = new Date().getFullYear();
-// Crea un arreglo de 8 elementos (El año actual + 7 hacia atrás)
 const opcionesAnios = ref(Array.from({ length: 8 }, (_, i) => anioActual - i));
 const filtroAnio = ref(anioActual);
 
@@ -593,10 +593,7 @@ const catalogoDependencias = ref([]);
 
 const cargarCatalogoDependenciasGlobal = async () => {
     try {
-        const { data, error } = await supabase.from('dependencias').select('id, nombre_oficial, siglas');
-        if (!error && data) {
-            catalogoDependencias.value = data;
-        }
+        catalogoDependencias.value = await inventarioService.cargarCatalogoDependenciasGlobal();
     } catch (err) {
         console.error("Error al cargar dependencias globales:", err);
     }
@@ -610,7 +607,7 @@ const obtenerNombresDependencias = (ids) => {
 const cambiarVista = async (nuevaVista) => {
     if (vistaActual.value === nuevaVista) return;
     vistaActual.value = nuevaVista;
-    filtroEstatus.value = "Todos"; // Limpiamos el filtro por comodidad
+    filtroEstatus.value = "Todos";
     await cargarBandeja();
 };
 
@@ -621,27 +618,26 @@ const cargandoPreviewId = ref(null);
 
 const verPrimerPDF = async (idExpediente) => {
     cargandoPreviewId.value = idExpediente;
-    const { data, error } = await supabase
-        .from('archivos_anexos')
-        .select('ruta_supabase')
-        .eq('id_expediente', idExpediente)
-        .ilike('tipo_mime', '%pdf%')
-        .order('created_at', { ascending: true })
-        .limit(1)
-        .single();
-
-    if (data?.ruta_supabase) {
-        rutaPreview.value = data.ruta_supabase;
-        modalPreviewAbierto.value = true;
+    try {
+        const ruta = await inventarioService.obtenerPrimerPDFExpediente(idExpediente);
+        if (ruta) {
+            rutaPreview.value = ruta;
+            modalPreviewAbierto.value = true;
+        } else {
+             toast.info("No se encontró un documento PDF principal para este expediente.");
+        }
+    } catch (error) {
+        console.error("Error al obtener preview PDF:", error);
+        toast.error("No se pudo cargar la vista previa.");
+    } finally {
+        cargandoPreviewId.value = null;
     }
-    cargandoPreviewId.value = null;
 };
 
 // === ESTADOS DEL MENÚ DESPLEGABLE (ACCIONES) ===
 const menuActivoId = ref(null);
 
 const toggleMenu = (id) => {
-    // Si el menú ya está abierto, lo cierra. Si no, abre el de este ID.
     menuActivoId.value = menuActivoId.value === id ? null : id;
 };
 
@@ -653,7 +649,6 @@ const cerrarMenu = () => {
 const paginaActual = ref(1);
 const registrosPorPagina = ref(25);
 
-// Reiniciar la página a 1 si el usuario cambia algún filtro
 watch([filtroEstatus, filtroAnio, seccionSeleccionada, vistaActual], () => {
     paginaActual.value = 1;
 });
@@ -663,7 +658,6 @@ const totalPaginas = computed(() => {
     return Math.ceil(expedientesFiltrados.value.length / registrosPorPagina.value) || 1;
 });
 
-// Este es el arreglo que se dibujará en la tabla
 const expedientesPaginados = computed(() => {
     if (registrosPorPagina.value === 0) return expedientesFiltrados.value;
 
@@ -675,71 +669,42 @@ const expedientesPaginados = computed(() => {
 const irAPagina = (pag) => {
     if (pag >= 1 && pag <= totalPaginas.value) {
         paginaActual.value = pag;
-        window.scrollTo({ top: 0, behavior: 'smooth' }); // Sube la pantalla suavemente
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 };
 const toggleVerTodos = () => {
     if (registrosPorPagina.value === 0) {
-        // Si ya estaba viendo todos, regresa a la vista de 100
         registrosPorPagina.value = 100;
         paginaActual.value = 1;
     } else {
-        // Cambia al modo "Ver todos"
         registrosPorPagina.value = 0;
         paginaActual.value = 1;
     }
 };
 
-// === ESTADOS MODAL 1: ATENDER ===
+// === ESTADOS MODALES ===
 const modalAtenderAbierto = ref(false);
 const expedienteAAtender = ref(null);
 
-// === ESTADOS MODAL 2: CONCLUIR ===
 const modalConcluirAbierto = ref(false);
 const expedienteAConcluir = ref(null);
 const catalogoSeriesEstructurado = ref([]);
 
-// === ESTADOS MODAL 3: DETALLES Y BITÁCORA ===
 const modalDetallesAbierto = ref(false);
 const expedienteDetalle = ref(null);
 
-// === ESTADOS MODAL 4: CANCELAR ===
 const modalCancelarAbierto = ref(false);
 const expedienteACancelar = ref(null);
 
-// == ESTADOS MODAL 5: EDICIÓN ADMIN ===
 const modalEdicionAdminAbierto = ref(false);
 const expedienteAdmin = ref(null);
 
-// === FLUJO 1: ASIGNAR / ATENDER ===
-const abrirModalAtender = (item) => {
-    expedienteAAtender.value = item;
-    modalAtenderAbierto.value = true;
-};
-
-// === FLUJO 2: CONCLUIR Y SNAPSHOT ===
-const abrirModalConcluir = (item) => {
-    expedienteAConcluir.value = item;
-    modalConcluirAbierto.value = true;
-};
-
-// === FLUJO 3: DETALLES ===
-const abrirModalDetalles = async (item) => {
-    expedienteDetalle.value = item;
-    modalDetallesAbierto.value = true;
-};
-
-// === FLUJO 4: CANCELAR ===
-const abrirModalCancelar = (item) => {
-    expedienteACancelar.value = item;
-    modalCancelarAbierto.value = true;
-};
-
-// === FLUJO 5: EDICIÓN ADMIN ===
-const abrirModalEdicionAdmin = (item) => {
-    expedienteAdmin.value = item;
-    modalEdicionAdminAbierto.value = true;
-};
+// === FLUJOS MODALES ===
+const abrirModalAtender = (item) => { expedienteAAtender.value = item; modalAtenderAbierto.value = true; };
+const abrirModalConcluir = (item) => { expedienteAConcluir.value = item; modalConcluirAbierto.value = true; };
+const abrirModalDetalles = async (item) => { expedienteDetalle.value = item; modalDetallesAbierto.value = true; };
+const abrirModalCancelar = (item) => { expedienteACancelar.value = item; modalCancelarAbierto.value = true; };
+const abrirModalEdicionAdmin = (item) => { expedienteAdmin.value = item; modalEdicionAdminAbierto.value = true; };
 
 // === COMPUTADOS ===
 const expedientesFiltrados = computed(() => {
@@ -749,77 +714,35 @@ const expedientesFiltrados = computed(() => {
     );
 });
 
-const detalleSerieSeleccionada = computed(() => {
-    if (!codigoSubserieConcluir.value) return null;
-    for (const serie of catalogoSeriesEstructurado.value) {
-        const subFound = serie.subseries.find(
-            (s) => s.codigoSubserie === codigoSubserieConcluir.value,
-        );
-        if (subFound) return subFound;
-    }
-    return null;
-});
-
-// UTILIDAD PARA ARREGLOS DE BD (Soporte, Tradición, Condición)
+// UTILIDAD PARA ARREGLOS DE BD
 const obtenerValorArreglo = (valor) => {
     if (!valor) return "";
-
-    // Si es un arreglo nativo de JavaScript
     if (Array.isArray(valor)) return valor[0];
-
-    // Si viene como string crudo desde la BD (ej. '["Original"]' o '{"Original"}')
-    if (typeof valor === "string") {
-        // Limpieza con Expresión Regular: quita corchetes, llaves y comillas dobles
-        return valor.replace(/[[\]"{}]/g, "").trim();
-    }
-
+    if (typeof valor === "string") return valor.replace(/[[\]"{}]/g, "").trim();
     return valor;
 };
 
-// === CARGAS DE BASE DE DATOS ===
+// === CARGAS DE BASE DE DATOS (REFACTORIZADA) ===
 const inicializarUsuario = async () => {
     try {
-        const { data: { user } } = await supabase.auth.getUser();
-        const { data: userData } = await supabase
-            .from("usuarios")
-            .select("id, secciones_permitidas, rol")
-            .eq("email", user.email)
-            .single();
-
+        const { userData } = await inventarioService.inicializarUsuario();
         usuarioActual.value = userData.id;
         rolUsuario.value = userData.rol;
 
-        // CARGAMOS EL CATÁLOGO DE DEPENDENCIAS DE FORMA GLOBAL
         await cargarCatalogoDependenciasGlobal();
 
-        // Construimos la consulta base de áreas
-        let querySec = supabase.from("cuadro_general").select("id, codigo, seccion").order("codigo");
+        areasUsuario.value = await inventarioService.obtenerAreasUsuario(userData.rol, userData.secciones_permitidas);
 
-        // Si NO es admin, validamos estrictamente sus secciones permitidas
-        if (userData.rol !== 'admin') {
-            if (!userData.secciones_permitidas || userData.secciones_permitidas.length === 0) {
-                loading.value = false; // Apagamos el loader si no tiene áreas
-                return;
-            }
-            querySec = querySec.in("codigo", userData.secciones_permitidas);
-        }
-
-        // Ejecutamos la consulta
-        const { data: secciones } = await querySec;
-        areasUsuario.value = secciones || [];
-
-        // Si tiene áreas (o es admin y cargó todas), cargamos la primera
         if (areasUsuario.value.length > 0) {
             seccionSeleccionada.value = areasUsuario.value[0].id;
             await cargarBandeja();
         } else {
-            loading.value = false; // Apagamos el loader si la tabla cuadro_general está vacía
+            loading.value = false;
         }
-
     } catch (error) {
         console.error("Error inicializando:", error);
         toast.error("Error al inicializar sesión.");
-        loading.value = false; // Seguro contra fallos
+        loading.value = false;
     }
 };
 
@@ -827,67 +750,21 @@ const cargarBandeja = async () => {
     if (!seccionSeleccionada.value) return;
     loading.value = true;
 
-    // Obtenemos los datos visuales del área actual para el título
-    miSeccion.value = areasUsuario.value.find(
-        (a) => a.id === seccionSeleccionada.value,
-    );
+    miSeccion.value = areasUsuario.value.find((a) => a.id === seccionSeleccionada.value);
 
     try {
-        let query = supabase
-            .from("expedientes")
-            .select("*, area_origen:id_seccion_registro (codigo, seccion), area_destino:id_seccion_turnada (codigo, seccion)")
-            .gte("fecha_registro", `${filtroAnio.value}-01-01`)
-            .lte("fecha_registro", `${filtroAnio.value}-12-31`)
-            .order("fecha_registro", { ascending: false })
-            .order("hora_registro", { ascending: false });
+        // 1. Cargar expedientes
+        listaExpedientes.value = await inventarioService.cargarBandeja(
+            filtroAnio.value, 
+            seccionSeleccionada.value, 
+            vistaActual.value
+        );
 
-        // Lógica dinámica del filtro
-        if (vistaActual.value === "entrada") {
-            // BANDEJA DE ENTRADA: 
-            // 1. Debe estar turnado a mi área
-            // 2. Y (O fue creado por otra área, O es un documento externo "Recibido")
-            query = query
-                .eq("id_seccion_turnada", seccionSeleccionada.value)
-                .or(`id_seccion_registro.neq.${seccionSeleccionada.value},tipo_registro.eq.Recibido`);           
-        } else {
-            // MIS ENVIADOS: 
-            query = query
-                .eq("id_seccion_registro", seccionSeleccionada.value)
-                .or(`id_seccion_turnada.neq.${seccionSeleccionada.value},tipo_registro.eq.Enviado`);
-        }
-
-        const { data: expedientes, error } = await query;
-        if (error) throw error;
-
-        listaExpedientes.value = expedientes || [];
-
-        const { data: seriesDB } = await supabase
-            .from("series")
-            .select("id, codigo_serie, nombre, subseries")
-            .eq("id_seccion", seccionSeleccionada.value)
-            .order("codigo_serie");
-
-        let structuredData = [];
-        if (seriesDB) {
-            seriesDB.forEach((seriePadre) => {
-                if (seriePadre.subseries && Array.isArray(seriePadre.subseries)) {
-                    let subseriesWithParentInfo = seriePadre.subseries.map((sub) => ({
-                        ...sub,
-                        id_serie_padre: seriePadre.id,
-                        codigo_serie_padre: seriePadre.codigo_serie,
-                        nombre_serie_padre: seriePadre.nombre,
-                    }));
-                    structuredData.push({
-                        id: seriePadre.id,
-                        codigo_serie: seriePadre.codigo_serie,
-                        nombre: seriePadre.nombre,
-                        subseries: subseriesWithParentInfo,
-                    });
-                }
-            });
-        }
-        catalogoSeriesEstructurado.value = structuredData;
+        // 2. Cargar series para conclusión
+        catalogoSeriesEstructurado.value = await inventarioService.cargarSeriesParaConclusion(seccionSeleccionada.value);
+        
     } catch (error) {
+        console.error(error);
         toast.error("Error al cargar datos del área.");
     } finally {
         loading.value = false;
@@ -901,54 +778,36 @@ const formatFecha = (fechaISO) => {
     return `${day}/${month}/${year}`;
 };
 
-// Utilidad para la línea de tiempo (formatea fecha y hora)
 const formatFechaHora = (isoString) => {
     if (!isoString) return "";
     const date = new Date(isoString);
-    return date.toLocaleString("es-MX", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    });
+    return date.toLocaleString("es-MX", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 };
 
 const abrirModalNuevoInterno = () => {
-    // Verificamos que haya un área seleccionada para usarla como origen
     if (!seccionSeleccionada.value) {
         return toast.error("Selecciona un área en la cabecera primero.");
     }
-    expedienteAEditar.value = null; // <-- LIMPIAMOS LA VARIABLE AQUÍ
+    expedienteAEditar.value = null;
     modalNuevoAbierto.value = true;
 };
 
-// Intercepta el éxito, cierra el modal, recarga y hace scroll
 const onRegistroInternoExitoso = async (idsInsertados) => {
     modalNuevoAbierto.value = false;
     await cargarBandeja();           
 
-    // Si recibimos IDs, buscamos cuál mostrar
     if (idsInsertados && Array.isArray(idsInsertados) && idsInsertados.length > 0) {
-        
-        // Verificamos si alguno de los IDs insertados existe en la vista actual (Paginada o Ver Todos)
-        const idVisible = idsInsertados.find(id => 
-            expedientesPaginados.value.some(exp => exp.id === id)
-        );
+        const idVisible = idsInsertados.find(id => expedientesPaginados.value.some(exp => exp.id === id));
 
         if (idVisible) {
             registroResaltado.value = idVisible;
-            
-            // Esperamos a que el DOM se actualice con los nuevos datos
             await nextTick();
             
-            // Buscamos el elemento y hacemos scroll suave
             const elemento = document.getElementById(`expediente-${idVisible}`);
             if (elemento) {
                 elemento.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
 
-            // Quitamos el resplandor después de 3 segundos
             setTimeout(() => {
                 if (registroResaltado.value === idVisible) {
                     registroResaltado.value = null;
@@ -958,70 +817,45 @@ const onRegistroInternoExitoso = async (idsInsertados) => {
     }
 };
 
-// ==ESTADOS MODAL 6: MODAL EXPORTAR ===
+// == EXPORTACIÓN ===
 const modalExportarAbierto = ref(false);
-
-// == FLUJO MODAL 6: MODAL EXPORTAR
 const abrirModalExportar = () => {
-    if (!seccionSeleccionada.value) {
-        return toast.error("Selecciona un área en la cabecera primero.");
-    }
+    if (!seccionSeleccionada.value) return toast.error("Selecciona un área en la cabecera primero.");
     modalExportarAbierto.value = true;
 };
 
-// ==ESTADOS MODAL 7: MODAL EXPORTAR PDF ===
 const modalExportarPDFAbierto = ref(false);
-
-// == FLUJO MODAL 7: MODAL EXPORTAR PDF
 const abrirModalExportarPDF = () => {
     if (!seccionSeleccionada.value) return toast.error("Selecciona un área en la cabecera primero.");
     modalExportarPDFAbierto.value = true;
 };
 
-// Función para asignar colores dinámicos al badge de Carácter en la tabla
 const claseBadgeCaracter = (caracter) => {
     const c = (caracter || '').toLowerCase()
-
-    // Clases base que comparten todos los badges del inventario
     const clasesBase = "ml-1 inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border mb-0.5 "
 
-    if (c.includes('urgente')) {
-        return clasesBase + "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 border-red-200 dark:border-red-800"
-    }
-    if (c.includes('extraordinario') || c.includes('extra')) {
-        return clasesBase + "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400 border-purple-200 dark:border-purple-800"
-    }
-
-    // Por si en un futuro decides mostrar también el Ordinario
+    if (c.includes('urgente')) return clasesBase + "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 border-red-200 dark:border-red-800"
+    if (c.includes('extraordinario') || c.includes('extra')) return clasesBase + "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400 border-purple-200 dark:border-purple-800"
     return clasesBase + "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700"
 }
 
 const badgeColor = (estatus) => {
     switch (estatus) {
-        case "Recepcionado":
-            return "bg-blue-100 text-blue-800 dark:bg-blue-900/80 dark:text-blue-300 border border-blue-300 dark:border-blue-600";
-        case "En trámite":
-            return "bg-amber-100 text-amber-800 dark:bg-amber-900/80 dark:text-amber-300 border border-amber-300 dark:border-amber-600";
-        case "Concluido":
-            return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/80 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-600";
-        case "Cancelado":
-            return "bg-red-100 text-red-800 dark:bg-red-900/80 dark:text-red-300 border border-red-300 dark:border-red-600";
-        default:
-            return "bg-gray-100 text-gray-800 dark:bg-gray-900/80 dark:text-gray-300 border border-gray-300 dark:border-gray-600";
+        case "Recepcionado": return "bg-blue-100 text-blue-800 dark:bg-blue-900/80 dark:text-blue-300 border border-blue-300 dark:border-blue-600";
+        case "En trámite": return "bg-amber-100 text-amber-800 dark:bg-amber-900/80 dark:text-amber-300 border border-amber-300 dark:border-amber-600";
+        case "Concluido": return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/80 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-600";
+        case "Cancelado": return "bg-red-100 text-red-800 dark:bg-red-900/80 dark:text-red-300 border border-red-300 dark:border-red-600";
+        default: return "bg-gray-100 text-gray-800 dark:bg-gray-900/80 dark:text-gray-300 border border-gray-300 dark:border-gray-600";
     }
 };
-// === ATAJOS DE TECLADO ===
+
 const handleAtajosTeclado = (e) => {
-    // Si presiona Ctrl + Barra espaciadora (e.code === 'Space' o e.key === ' ')
     if (e.ctrlKey && (e.code === 'Space' || e.key === ' ')) {
-        e.preventDefault(); // Evita que la página haga scroll hacia abajo (comportamiento por defecto del espacio)
-        
-        // Solo abrimos el modal si no está abierto ya
-        if (!modalNuevoAbierto.value) {
-            abrirModalNuevoInterno();
-        }
+        e.preventDefault(); 
+        if (!modalNuevoAbierto.value) abrirModalNuevoInterno();
     }
 };
+
 onMounted(() => {
     inicializarUsuario();
     window.addEventListener('keydown', handleAtajosTeclado);
@@ -1030,5 +864,4 @@ onMounted(() => {
 onUnmounted(() => {
     window.removeEventListener('keydown', handleAtajosTeclado);
 });
-
 </script>
