@@ -286,8 +286,7 @@ const cargarBitacora = async (idExpediente) => {
             .from("bitacora_movimientos")
             .select(`*, usuario:id_usuario (nombre, email)`)
             .eq("id_expediente", idExpediente)
-            .order("fecha_hora", { ascending: false })
-
+            .order("fecha_hora", { ascending: false })           
         if (error) throw error
         historialBitacora.value = data || []
     } catch (error) {

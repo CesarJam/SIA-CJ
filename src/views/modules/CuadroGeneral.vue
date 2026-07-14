@@ -187,7 +187,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, defineAsyncComponent } from 'vue'
 import { useRoute } from 'vue-router'
-import { supabase } from '@/supabase'
+import { cuadroGeneralService } from '@/services/cuadroGeneralService'
 import { useToast } from '@/composables/useToast'
 
 import jsPDF from 'jspdf'
@@ -216,19 +216,12 @@ const modalEliminar = ref({
     codigo: ''
 })
 
-// === CARGA DE DATOS ===
+// === CARGA DE DATOS (REFACTORIZADO) ===
 const cargarDatos = async () => {
     loading.value = true
-
     try {
-        const { data, error } = await supabase
-            .from('cuadro_general')
-            .select('*')
-            .order('codigo', { ascending: true })
-
-        if (error) throw error
-        listaCuadro.value = data || []
-
+        // Llamada limpia al servicio
+        listaCuadro.value = await cuadroGeneralService.obtenerTodos()
     } catch (error) {
         console.error("Error al cargar Cuadro General:", error)
         toast.error("Error al cargar el catálogo de secciones.")
@@ -240,7 +233,6 @@ const cargarDatos = async () => {
 // === LÓGICA DE TECLADO (ACCESIBILIDAD) ===
 const handleKeydown = (e) => {
     if (e.key === 'Escape') {
-        // Si el modal está abierto y NO hay un confirm modal bloqueando arriba
         if (modalAbierto.value && !modalEliminar.value.abierto) {
             cerrarModal()
         }
@@ -273,53 +265,60 @@ const cerrarModal = () => {
     modalAbierto.value = false
 }
 
-// === CRUD ===
+// === CRUD (REFACTORIZADO) ===
 const guardarRegistro = async () => {
     if (!form.value.codigo || !form.value.seccion) {
         alert("Por favor completa el código y la sección.")
         return
     }
 
-    if (editandoId.value) {
-        const { error } = await supabase
-            .from('cuadro_general')
-            .update({ seccion: form.value.seccion, funcion: form.value.funcion })
-            .eq('id', editandoId.value)
-        toast.success('Sección actualizada correctamente')
-
-        if (error) console.error("Error al actualizar:", error)
-    } else {
-        const { error } = await supabase
-            .from('cuadro_general')
-            .insert([{
-                codigo: form.value.codigo.trim(),
-                seccion: form.value.seccion.trim(),
+    try {
+        if (editandoId.value) {
+            // Llamada al servicio de actualización
+            await cuadroGeneralService.actualizarRegistro(editandoId.value, {
+                seccion: form.value.seccion,
                 funcion: form.value.funcion
-            }])
-        toast.success('Nueva sección registrada con éxito')
+            })
+            toast.success('Sección actualizada correctamente')
+        } else {
+            // Llamada al servicio de creación
+            await cuadroGeneralService.crearRegistro({
+                codigo: form.value.codigo,
+                seccion: form.value.seccion,
+                funcion: form.value.funcion
+            })
+            toast.success('Nueva sección registrada con éxito')
+        }
 
-        if (error) {
-            if (error.code === '23505') {
-                toast.error('Ese código de sección ya existe')
-            } else {
-                toast.error('Ocurrió un error en el servidor')
-            }
+        await cargarDatos()
+        cerrarModal()
+
+    } catch (error) {
+        if (error.code === '23505') {
+            toast.error('Ese código de sección ya existe')
+        } else {
+            console.error("Error en CRUD:", error)
+            toast.error('Ocurrió un error en el servidor')
         }
     }
-
-    await cargarDatos()
-    cerrarModal()
 }
 
-// === ELIMINAR ===
+// === ELIMINAR (REFACTORIZADO) ===
 const eliminarRegistro = (id, codigo) => {
     modalEliminar.value = { abierto: true, id, codigo }
 }
 
 const confirmarEliminacion = async () => {
     if (modalEliminar.value.id) {
-        await supabase.from('cuadro_general').delete().eq('id', modalEliminar.value.id)
-        await cargarDatos()
+        try {
+            // Llamada al servicio de eliminación
+            await cuadroGeneralService.eliminarRegistro(modalEliminar.value.id)
+            await cargarDatos()
+            toast.success("Sección eliminada.")
+        } catch (error) {
+            console.error("Error al eliminar:", error)
+            toast.error("No se pudo eliminar el registro.")
+        }
     }
     modalEliminar.value.abierto = false
 }
