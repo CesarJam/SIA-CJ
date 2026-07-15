@@ -199,8 +199,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { authService } from '../services/authService'
-import { supabase } from '@/supabase'
+import { authService } from '@/services/authService'
+import { perfilService } from '@/services/perfilService'
 import { useToast } from '@/composables/useToast'
 
 const router = useRouter()
@@ -234,7 +234,7 @@ onMounted(async () => {
   }
 })
 
-// === LÓGICA DE SUBIDA DE IMAGEN ===
+// === LÓGICA DE SUBIDA DE IMAGEN (REFACTORIZADA) ===
 const triggerFileInput = () => {
   if (!uploadingAvatar.value) {
     fileInput.value.click()
@@ -260,36 +260,10 @@ const subirAvatar = async (event) => {
     const user = session?.user
     if (!user) throw new Error('No hay sesión activa')
 
-    // 1. Crear nombre único para la imagen
-    const fileExt = file.name.split('.').pop()
-    const filePath = `${user.id}/avatar-${Date.now()}.${fileExt}`
+    // Llamada limpia al nuevo servicio
+    const newAvatarUrl = await perfilService.actualizarAvatar(file, user.id)
 
-    // 2. Subir a Supabase Storage (Bucket 'avatars')
-    const { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(filePath, file, {
-        upsert: true,
-        contentType: file.type,
-        cacheControl: '3600'
-      })
-
-    if (uploadError) throw uploadError
-
-    // 3. Obtener la URL pública de la nueva imagen
-    const { data: publicUrlData } = supabase.storage
-      .from('avatars')
-      .getPublicUrl(filePath)
-
-    const newAvatarUrl = publicUrlData.publicUrl
-
-    // 4. Actualizar los metadatos del usuario en Supabase Auth
-    const { error: updateError } = await supabase.auth.updateUser({
-      data: { avatar_url: newAvatarUrl }
-    })
-
-    if (updateError) throw updateError
-
-    // 5. Actualizar la interfaz
+    // Actualizar la interfaz
     userProfile.value.avatar = newAvatarUrl
     toast.success('Foto de perfil actualizada correctamente')
 
@@ -298,7 +272,7 @@ const subirAvatar = async (event) => {
     toast.error('Error al subir imagen. Verifica que el bucket "avatars" exista y sea público.')
   } finally {
     uploadingAvatar.value = false
-    event.target.value = '' // Limpiar el input para permitir subir la misma imagen otra vez si falla
+    event.target.value = '' // Limpiar el input
   }
 }
 
