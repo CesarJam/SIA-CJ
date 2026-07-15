@@ -61,7 +61,8 @@
 
 <script setup>
 import { ref } from 'vue'
-import { supabase } from '@/supabase'
+// --- IMPORTAMOS EL SERVICIO DE AUTENTICACIÓN ---
+import { authService } from '@/services/authService'
 
 const email = ref('')
 const cargando = ref(false)
@@ -73,20 +74,13 @@ const solicitarRecuperacion = async () => {
     cargando.value = true
     mensaje.value = { texto: '', tipo: '' }
 
-    // NOTA IMPORTANTE: Reemplaza esta IP y puerto por los que estés usando 
-    // en tu entorno de desarrollo Vue actualmente (ej. localhost:5173 o tu IP)
     const urlRedireccion = `${window.location.origin}/actualizar-password`
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email.value, {
-      redirectTo: urlRedireccion,
-    })
-
-    if (error) throw error
+    // --- LLAMADA LIMPIA AL SERVICIO ---
+    await authService.resetPassword(email.value, urlRedireccion)
 
     correoEnviado.value = true
     
-    // Por motivos de seguridad, es buena práctica no confirmar si el correo existe o no
-    // para evitar enumeración de usuarios.
     mensaje.value = {
       texto: 'Si el correo está registrado en nuestro sistema, recibirás un enlace para restablecer tu contraseña en unos minutos.',
       tipo: 'exito'

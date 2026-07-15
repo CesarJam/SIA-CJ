@@ -73,7 +73,19 @@ export const authService = {
     
     if (error) throw error
     return data
-  }
+  },
 
-  
+  /**
+   * Envía un correo electrónico con el enlace para restablecer la contraseña.
+   * @param {string} email - Correo del usuario
+   * @param {string} redirectToUrl - URL a la que se redirigirá tras hacer clic en el enlace
+   */
+  async resetPassword(email, redirectToUrl) {
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectToUrl,
+    })
+    
+    if (error) throw error
+    return data
+  }  
 }
