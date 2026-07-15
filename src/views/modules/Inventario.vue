@@ -794,6 +794,8 @@ const abrirModalNuevoInterno = () => {
 
 const onRegistroInternoExitoso = async (idsInsertados) => {
     modalNuevoAbierto.value = false;
+    
+    // 1. Recargamos la información (Skeletons aparecen y luego desaparecen)
     await cargarBandeja();           
 
     if (idsInsertados && Array.isArray(idsInsertados) && idsInsertados.length > 0) {
@@ -801,13 +803,19 @@ const onRegistroInternoExitoso = async (idsInsertados) => {
 
         if (idVisible) {
             registroResaltado.value = idVisible;
+            
+            // 2. Esperamos a que Vue inyecte el HTML real en lugar de los skeletons
             await nextTick();
             
-            const elemento = document.getElementById(`expediente-${idVisible}`);
-            if (elemento) {
-                elemento.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+            // 3. TRUCO: Le damos 150ms al navegador para que calcule las alturas y posiciones (Layout/Paint)
+            setTimeout(() => {
+                const elemento = document.getElementById(`expediente-${idVisible}`);
+                if (elemento) {
+                    elemento.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 150);
 
+            // 4. Quitamos el resplandor después de 3 segundos
             setTimeout(() => {
                 if (registroResaltado.value === idVisible) {
                     registroResaltado.value = null;
