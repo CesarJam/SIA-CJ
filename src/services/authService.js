@@ -52,5 +52,28 @@ export const authService = {
     }
 
     return data
+  },
+
+  /**
+   * Registra un nuevo usuario en Supabase Auth.
+   * @param {string} email - Correo del usuario
+   * @param {string} password - Contraseña del usuario
+   * @param {string} displayName - Nombre completo para guardar en los metadatos
+   */
+  async registerUser(email, password, displayName) {
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: {
+          display_name: displayName
+        }
+      }
+    })
+    
+    if (error) throw error
+    return data
   }
+
+  
 }

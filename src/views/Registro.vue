@@ -119,7 +119,8 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { supabase } from '@/supabase' 
+// --- IMPORTAMOS EL SERVICIO DE AUTENTICACIÓN ---
+import { authService } from '@/services/authService' 
 
 const router = useRouter()
 const formulario = ref({
@@ -151,21 +152,16 @@ const registrarUsuario = async () => {
     cargando.value = true
     mensaje.value = { texto: '', tipo: '' }
 
-    const { data, error } = await supabase.auth.signUp({
-      email: formulario.value.email,
-      password: formulario.value.password,
-      options: {
-        data: {
-          display_name: formulario.value.nombre
-        }
-      }
-    })
-
-    if (error) throw error
+    // --- LLAMADA LIMPIA AL SERVICIO ---
+    await authService.registerUser(
+      formulario.value.email,
+      formulario.value.password,
+      formulario.value.nombre
+    )
 
     registroExitoso.value = true
     mensaje.value = {
-      texto: '¡Registro exitoso! Solicita al administrador del sistema acceso a tu catálogo de tu área.  Serás redirigido al sistema en unos segundos...',
+      texto: '¡Registro exitoso! Solicita al administrador del sistema acceso a tu catálogo de tu área. Serás redirigido al sistema en unos segundos...',
       tipo: 'exito'
     }
 
