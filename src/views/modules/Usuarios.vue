@@ -156,7 +156,8 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, defineAsyncComponent } from 'vue'
-import { supabase } from '@/supabase'
+// --- IMPORTAMOS EL NUEVO SERVICIO ---
+import { usuariosService } from '@/services/usuariosService'
 import { useToast } from '@/composables/useToast'
 
 const ConfirmModal = defineAsyncComponent(() => import('@/components/ConfirmModal.vue'))
@@ -174,19 +175,28 @@ const form = ref({
   nomenclaturaExpedienteArea: ''
 })
 
-// Cargar Datos
-const cargarDatos = async () => {
-  // Cargar Usuarios
-  const { data: users } = await supabase.from('usuarios').select('*').order('nombre')
-  listaUsuarios.value = users || []
+const modalEliminar = ref({
+  abierto: false,
+  usuarioId: null
+})
 
-  // Cargar Secciones para los Checkboxes (de la tabla cuadro_general)
-  const { data: sections } = await supabase.from('cuadro_general').select('codigo, seccion').order('codigo')
-  todasLasSecciones.value = sections || []
+// === CARGA DE DATOS (REFACTORIZADA) ===
+const cargarDatos = async () => {
+  try {
+    const [users, sections] = await Promise.all([
+      usuariosService.obtenerUsuarios(),
+      usuariosService.obtenerSecciones()
+    ])
+    
+    listaUsuarios.value = users
+    todasLasSecciones.value = sections
+  } catch (error) {
+    console.error("Error al cargar datos:", error)
+    toast.error("Ocurrió un error al cargar la información")
+  }
 }
 
-onMounted(cargarDatos)
-
+// === GESTIÓN DEL PANEL ===
 const abrirPanelNuevo = () => {
   editandoId.value = null
   form.value = { email: '', nombre: '', rol: 'cliente', secciones_permitidas: [], nomenclaturaExpedienteArea: '' }
@@ -203,6 +213,7 @@ const cerrarPanel = () => {
   panelAbierto.value = false
 }
 
+// === ACTUALIZACIÓN (REFACTORIZADA) ===
 const guardarUsuario = async () => {
   // 1. Validación de campos vacíos
   if (!form.value.email || !form.value.nombre) {
@@ -210,15 +221,11 @@ const guardarUsuario = async () => {
   }
 
   // 2. Validación de formato de correo (Regex)
-  // Esta regla exige: texto + @ + texto + . + texto (sin espacios)
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!emailRegex.test(form.value.email.trim())) {
     return toast.error('Por favor, ingresa un correo electrónico válido (ej. usuario@ejemplo.com)')
   }
 
-  let dbError = null
-
-  // Limpiamos los espacios en blanco accidentales antes de guardar
   const payload = {
     ...form.value,
     email: form.value.email.trim(),
@@ -226,57 +233,38 @@ const guardarUsuario = async () => {
     nomenclaturaExpedienteArea: form.value.nomenclaturaExpedienteArea ? form.value.nomenclaturaExpedienteArea.trim() : null
   }
 
-  // 3. Persistencia en Base de Datos
-  if (editandoId.value) {
-    const { error } = await supabase
-      .from('usuarios')
-      .update(payload)
-      .eq('id', editandoId.value);
-
-    dbError = error;
-  } else {
-    // Ya no permitimos crear desde aquí. 
-    console.error("Operación no permitida: Solo se pueden editar usuarios existentes.");
-    return;
-  }
-
-  // 4. Manejo de Errores y Éxito
-  if (dbError) {
-    // Si Supabase detecta que el correo ya existe por la regla UNIQUE, lanzará un error
-    if (dbError.code === '23505') { // Código de error de PostgreSQL para "Unique Violation"
+  try {
+    if (editandoId.value) {
+      await usuariosService.actualizarUsuario(editandoId.value, payload)
+      toast.success('Usuario actualizado correctamente')
+      await cargarDatos()
+      cerrarPanel()
+    } else {
+      console.error("Operación no permitida: Solo se pueden editar usuarios existentes.")
+    }
+  } catch (error) {
+    if (error.code === '23505') { 
       return toast.error('Este correo ya está registrado en el sistema')
     }
-    return toast.error(dbError.message || 'Error al guardar el usuario')
+    toast.error(error.message || 'Error al guardar el usuario')
   }
-
-  toast.success('Usuario actualizado correctamente')
-  await cargarDatos()
-  cerrarPanel()
 }
 
-const modalEliminar = ref({
-  abierto: false,
-  usuarioId: null
-})
-
+// === ELIMINACIÓN (REFACTORIZADA) ===
 const eliminarUser = (id) => {
-  modalEliminar.value = {
-    abierto: true,
-    usuarioId: id
-  }
+  modalEliminar.value = { abierto: true, usuarioId: id }
 }
 
 const confirmarEliminacion = async () => {
   if (modalEliminar.value.usuarioId) {
-    const { error } = await supabase.from('usuarios').delete().eq('id', modalEliminar.value.usuarioId)
-    if (error) {
-      toast.error(error.message || 'Error al intentar eliminar el usuario')
-    } else {
+    try {
+      await usuariosService.eliminarUsuario(modalEliminar.value.usuarioId)
       toast.success('Acceso revocado correctamente')
       await cargarDatos()
+    } catch (error) {
+      toast.error(error.message || 'Error al intentar eliminar el usuario')
     }
   }
-  // Cerramos el modal independientemente del resultado
   modalEliminar.value.abierto = false
 }
 
@@ -284,23 +272,22 @@ const cancelarEliminacion = () => {
   modalEliminar.value.abierto = false
 }
 
-// Función para manejar el cierre del panel lateral con ESC
+// === ACCESIBILIDAD ===
 const handleKeydown = (e) => {
   if (e.key === 'Escape') {
-    // Solo cerramos el panel lateral si está abierto Y el modal de eliminar no lo está
     if (panelAbierto.value && !modalEliminar.value.abierto) {
       cerrarPanel()
     }
   }
 }
 
+// === CICLO DE VIDA (UNIFICADO) ===
 onMounted(async () => {
   await cargarDatos()
-  document.addEventListener('keydown', handleKeydown) // Registrar tecla
+  document.addEventListener('keydown', handleKeydown)
 })
 
 onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeydown) // Limpiar memoria
+  document.removeEventListener('keydown', handleKeydown)
 })
-
 </script>
