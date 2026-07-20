@@ -110,7 +110,6 @@
             <h3 class="text-md font-bold text-gray-900 dark:text-white mb-2">Cuarta Sesión Ordinaria</h3>
             <p class="text-sm text-gray-600 dark:text-gray-400">Cuarta sesión ordinaria.
             Entrega de información de inventarios de trámite trimestre octubre-diciembre 2026.
-
             Valoraciones documentales. 
             Revisión del PADA 2027.  Revisión de los instrumentos de archivos.
             </p>
