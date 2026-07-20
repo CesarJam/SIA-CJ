@@ -647,7 +647,7 @@ const cerrarMenu = () => {
 
 // === ESTADOS DE PAGINACIÓN ===
 const paginaActual = ref(1);
-const registrosPorPagina = ref(25);
+const registrosPorPagina = ref(25); //si se cambia este valor tambien modificarlo en el toggleVerTodos
 
 watch([filtroEstatus, filtroAnio, seccionSeleccionada, vistaActual], () => {
     paginaActual.value = 1;
@@ -674,7 +674,7 @@ const irAPagina = (pag) => {
 };
 const toggleVerTodos = () => {
     if (registrosPorPagina.value === 0) {
-        registrosPorPagina.value = 100;
+        registrosPorPagina.value = 25;
         paginaActual.value = 1;
     } else {
         registrosPorPagina.value = 0;
