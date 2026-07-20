@@ -82,14 +82,19 @@
             class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
             <span
               class="text-[10px] font-bold uppercase tracking-wider text-blue-900 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-full mb-3 inline-block">
-              27 MAY 2026
+              20 JULIO 2026
             </span>
             <span
-              class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2.5 py-1 rounded-full mb-3 inline-block">Actualización</span>
+              class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2.5 py-1 rounded-full mb-3 inline-block">Próxima Reunión</span>
 
-            <h3 class="text-md font-bold text-gray-900 dark:text-white mb-2">Nuevo Catálogo CADIDO</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Se han actualizado los valores documentales en el
-              sistema. Por favor revisa el módulo CADIDO para consultar los nuevos plazos de conservación.</p>
+            <h3 class="text-md font-bold text-gray-900 dark:text-white mb-2">Tercera Sesión Ordinaria</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">5 de octubre del 2026
+              Tercera Sesión ordinaria.
+              Entrega de información
+              de inventarios de trámite
+              trimestre julio-septiembre
+              2026.
+            </p>
           </div>
 
           <!-- Tarjeta Noticia 2 -->
@@ -97,15 +102,21 @@
             class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
             <span
               class="text-[10px] font-bold uppercase tracking-wider text-blue-900 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-full mb-3 inline-block">
-              27 MAY 2026
+              20 JULIO 2026
             </span>
             <span
               class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2.5 py-1 rounded-full mb-3 inline-block">Aviso
               Institucional</span>
-            <h3 class="text-md font-bold text-gray-900 dark:text-white mb-2">Jornada de Archivo de Trámite</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Te recordamos que el próximo 1 de julio se
-              realiza la revisión de inventarios y transferencias primarias.</p>
+            <h3 class="text-md font-bold text-gray-900 dark:text-white mb-2">Cuarta Sesión Ordinaria</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Cuarta sesión ordinaria.
+            Entrega de información de inventarios de trámite trimestre octubre-diciembre 2026.
+
+            Valoraciones documentales. 
+            Revisión del PADA 2027.  Revisión de los instrumentos de archivos.
+            </p>
           </div>
+
+          <!-- Noticias RSS -->
           <div class="lg:col-span-2 space-y-6">
             <div class="flex items-center gap-2 mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
               <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -132,35 +143,42 @@
             <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <a v-for="(noticia, index) in noticiasRss" :key="index" :href="noticia.link" target="_blank"
                 class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-blue-800 dark:hover:border-blue-500 transition-all group flex flex-col justify-between">
-                
+
                 <div class="flex flex-col h-full">
-                  <div v-if="noticia.imagen" class="w-full h-40 mb-4 overflow-hidden rounded-lg shrink-0 border border-gray-100 dark:border-gray-700">
-                    <img :src="noticia.imagen" alt="Noticia" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                  <div v-if="noticia.imagen"
+                    class="w-full h-40 mb-4 overflow-hidden rounded-lg shrink-0 border border-gray-100 dark:border-gray-700">
+                    <img :src="noticia.imagen" alt="Noticia"
+                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                   </div>
 
                   <span
                     class="text-[10px] font-bold uppercase tracking-wider text-blue-900 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-full mb-3 inline-block self-start">
                     {{ formatearFecha(noticia.pubDate) }}
                   </span>
-                  
-                  <h3 class="text-md font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-800 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+
+                  <h3
+                    class="text-md font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-800 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
                     {{ noticia.title }}
                   </h3>
-                  
+
                   <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 text-ellipsis overflow-hidden">
                     {{ noticia.description }}
                   </p>
                 </div>
-                
-                <div class="mt-4 text-xs font-semibold text-blue-800 dark:text-blue-400 flex items-center gap-1 shrink-0">
+
+                <div
+                  class="mt-4 text-xs font-semibold text-blue-800 dark:text-blue-400 flex items-center gap-1 shrink-0">
                   Leer artículo completo
-                  <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                  <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                   </svg>
                 </div>
               </a>
             </div>
           </div>
+
         </div>
       </div>
 
@@ -201,24 +219,24 @@
                 </svg>
               </div>
               <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700/50 flex justify-end">
-                <a href="https://www.msn.com/es-mx/el-tiempo/mapas/temperature/in-Chilpancingo-de-los-Bravo,GRO?loc=eyJsIjoiQ2hpbHBhbmNpbmdvIGRlIGxvcyBCcmF2byIsInIiOiJHUk8iLCJjIjoiTcOpeGljbyIsImkiOiJNWCIsImciOiJlcy1teCIsIngiOiItOTkuNTAwNTk4OTA3NDcwNyIsInkiOiIxNy41NTE1NzIyMDk3Mjc1MjgifQ%3D%3D&weadegreetype=C&zoom=7" 
-                   target="_blank" 
-                   rel="noopener noreferrer"
-                   class="inline-flex items-center gap-1 text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors group">
+                <a href="https://www.msn.com/es-mx/el-tiempo/mapas/temperature/in-Chilpancingo-de-los-Bravo,GRO?loc=eyJsIjoiQ2hpbHBhbmNpbmdvIGRlIGxvcyBCcmF2byIsInIiOiJHUk8iLCJjIjoiTcOpeGljbyIsImkiOiJNWCIsImciOiJlcy1teCIsIngiOiItOTkuNTAwNTk4OTA3NDcwNyIsInkiOiIxNy41NTE1NzIyMDk3Mjc1MjgifQ%3D%3D&weadegreetype=C&zoom=7"
+                  target="_blank" rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1 text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors group">
                   Ver mapa en tiempo real
-                  <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                  <svg
+                    class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                   </svg>
                 </a>
               </div>
-              
+
             </div>
           </div>
         </div>
 
-        
-
-                  <!-- WIDGET FACEBOOK -->
+        <!-- WIDGET FACEBOOK -->
         <div>
           <div
             class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col items-center overflow-hidden">
@@ -236,7 +254,8 @@
 
           </div>
         </div>
-<!-- WIDGET ENLACES DE INTERÉS -->
+
+        <!-- WIDGET ENLACES DE INTERÉS -->
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Enlaces Oficiales
           </h3>
@@ -276,6 +295,7 @@
               </a>
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -305,6 +325,7 @@ const formatearFecha = (fechaISO) => {
   });
 }
 
+// ==== Obtener el clima local ===
 const obtenerClimaLocal = async () => {
   try {
     // Coordenadas de Chilpancingo de los Bravo, Gro (Lat: 17.5506, Lon: -99.5057)
@@ -349,7 +370,7 @@ const obtenerRss = async () => {
   try {
     //https://techcrunch.com/feed/
     const rssURL = 'https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/mexico/portada';
-    const url = 'https://api.rss2json.com/v1/api.json?rss_url='+rssURL;
+    const url = 'https://api.rss2json.com/v1/api.json?rss_url=' + rssURL;
     console.log(url);
     const response = await fetch(url)
     if (!response.ok) throw new Error('Error al obtener el feed')
@@ -359,11 +380,11 @@ const obtenerRss = async () => {
     noticiasRss.value = data.items.slice(0, 4).map(item => {
       // 1. Creamos un elemento virtual para usar el motor del navegador
       const divVirtual = document.createElement('div')
-      
+
       // 2. Primer paso de limpieza (por si viene doblemente escapado)
       divVirtual.innerHTML = item.description || item.content || ''
       let htmlDecodificado = divVirtual.textContent || divVirtual.innerText || ''
-      
+
       // 3. Segundo paso: lo inyectamos ahora sí como HTML real
       divVirtual.innerHTML = htmlDecodificado
 
@@ -383,7 +404,7 @@ const obtenerRss = async () => {
         title: item.title,
         link: item.link,
         pubDate: item.pubDate,
-        imagen: imagen, 
+        imagen: imagen,
         description: textoLimpio.trim() // Quitamos espacios en blanco extra
       }
     })
@@ -394,7 +415,6 @@ const obtenerRss = async () => {
     loadingRss.value = false
   }
 }
-
 
 onMounted(() => {
   obtenerClimaLocal()
