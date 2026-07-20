@@ -62,7 +62,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { supabase } from '@/supabase'
+import { authService } from '@/services/authService'
 
 const router = useRouter()
 const nuevaPassword = ref('')
@@ -81,12 +81,8 @@ const guardarPassword = async () => {
     cargando.value = true
     mensaje.value = { texto: '', tipo: '' }
 
-    // Supabase ya extrajo el token de la URL, solo debemos enviar el update
-    const { error } = await supabase.auth.updateUser({
-      password: nuevaPassword.value
-    })
-
-    if (error) throw error
+    // --- LLAMADA LIMPIA AL SERVICIO ---
+    await authService.updatePassword(nuevaPassword.value)
 
     actualizacionExitosa.value = true
     mensaje.value = {

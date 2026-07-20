@@ -87,5 +87,18 @@ export const authService = {
     
     if (error) throw error
     return data
-  }  
+  },
+
+  /**
+   * Actualiza la contraseña del usuario actualmente autenticado (o que acaba de recuperar su cuenta vía token).
+   * @param {string} newPassword - La nueva contraseña del usuario
+   */
+  async updatePassword(newPassword) {
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword
+    })
+    
+    if (error) throw error
+    return data
+  } 
 }
