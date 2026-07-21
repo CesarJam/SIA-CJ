@@ -96,7 +96,6 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { supabase } from '@/supabase'
 import { useToast } from '@/composables/useToast'
 import ModalVisor from '@/components/ModalVisor.vue' 
 import { archivosService } from '@/services/archivosService'
