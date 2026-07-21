@@ -124,9 +124,9 @@
 
 <script setup>
 import { ref, watch, onMounted, onUnmounted} from 'vue'
-import { supabase } from '@/supabase'
 import { useToast } from '@/composables/useToast'
 import GestorDocumental from '@/components/GestorDocumental.vue'
+import { inventarioService } from '@/services/inventarioService'
 
 const props = defineProps({
     modelValue: { type: Boolean, required: true },
@@ -181,12 +181,11 @@ const ejecutarAtencion = async () => {
     procesando.value = true
 
     try {
-        // Obtenemos lo que escribió el usuario. Si está vacío, le ponemos "No especificado"
         const responsableFinal = form.value.responsable_tramite.trim() ? form.value.responsable_tramite.trim() : "No especificado"
 
         const payload = {
             estatus: "En trámite",
-            responsable_tramite: responsableFinal, // <-- Usamos el valor evaluado
+            responsable_tramite: responsableFinal,
             indicaciones_tramite: form.value.indicaciones_tramite.trim(),
             inmueble: form.value.inmueble,
             id_usuario_actualizacion: props.usuarioActual,
@@ -195,24 +194,18 @@ const ejecutarAtencion = async () => {
             condicion_acceso: form.value.condicion_acceso,
         }
 
-        const { error } = await supabase
-            .from("expedientes")
-            .update(payload)
-            .eq("id", props.expediente.id)
-
-        if (error) throw error
+        // --- LLAMADA LIMPIA AL SERVICIO ---
+        await inventarioService.atenderExpediente(props.expediente.id, payload)
 
         toast.success("Trámite asignado y actualizado correctamente.")
 
         emit('guardado')
-
         procesando.value = false
         cerrarModal()
-        return
 
+        return
     } catch (error) {
         toast.error("Error al asignar el trámite.")
-    } finally {
         procesando.value = false
     }
 }

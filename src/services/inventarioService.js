@@ -115,5 +115,17 @@ export const inventarioService = {
              throw error
         }
         return data?.ruta_supabase || null
+    },
+    
+    // 7 Actualiza el estatus de un expediente a "En trámite" y asigna los datos físicos y responsables.
+    // Desde MODAL ATENDER
+    async atenderExpediente(expedienteId, payload) {
+        const { data, error } = await supabase
+        .from('expedientes')
+        .update(payload)
+        .eq('id', expedienteId)
+
+        if (error) throw error
+        return data
     }
 }
