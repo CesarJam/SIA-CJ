@@ -67,9 +67,8 @@
 
 <script setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue'
-import { supabase } from '@/supabase'
 import { useToast } from '@/composables/useToast'
-
+import { inventarioService } from '@/services/inventarioService'
 
 // Recibimos las variables desde Inventario.vue
 const props = defineProps({
@@ -120,26 +119,9 @@ const generarYDescargarCSV = async () => {
         else if (exportarParams.value.trimestre === '3') { fechaInicio = `${anio}-07-01`; fechaFin = `${anio}-09-30`; }
         else if (exportarParams.value.trimestre === '4') { fechaInicio = `${anio}-10-01`; fechaFin = `${anio}-12-31`; }
 
-        let query = supabase
-            .from("expedientes")
-            .select("numero_consecutivo, asunto, fojas, soporte, snapshot_cadido, tradicion, condicion_acceso, fecha_registro, ubicacion_url, inmueble")
-            .gte("fecha_registro", fechaInicio)
-            .lte("fecha_registro", fechaFin)
-            .order("fecha_registro", { ascending: true })
-            .limit(5000);
-
         const secId = props.seccionId;
 
-        if (exportarParams.value.tipo === "entrada") {
-            query = query.eq("id_seccion_turnada", secId).neq("tipo_registro", "Enviado");
-        } else if (exportarParams.value.tipo === "enviados") {
-            query = query.eq("id_seccion_registro", secId).or(`id_seccion_turnada.neq.${secId},tipo_registro.eq.Enviado`);
-        } else {
-            query = query.or(`id_seccion_turnada.eq.${secId},id_seccion_registro.eq.${secId}`);
-        }
-
-        const { data, error } = await query;
-        if (error) throw error;
+        const data = await inventarioService.obtenerExpedientesParaExportar(secId, exportarParams.value.tipo, fechaInicio, fechaFin);
 
         if (!data || data.length === 0) {
             toast.info("No hay registros en este periodo y bandeja para exportar.");

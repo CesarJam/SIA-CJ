@@ -325,4 +325,40 @@ export const inventarioService = {
 
     return true;
   },
+
+  /**
+   * === Modal Exportar ===
+   */
+
+  //Obtiene los expedientes filtrados por fechas y tipo de bandeja para exportación a CSV.
+  async obtenerExpedientesParaExportar(secId, tipo, fechaInicio, fechaFin) {
+    let query = supabase
+      .from("expedientes")
+      .select(
+        "numero_consecutivo, asunto, fojas, soporte, snapshot_cadido, tradicion, condicion_acceso, fecha_registro, ubicacion_url, inmueble",
+      )
+      .gte("fecha_registro", fechaInicio)
+      .lte("fecha_registro", fechaFin)
+      .order("fecha_registro", { ascending: true })
+      .limit(5000);
+
+    if (tipo === "entrada") {
+      query = query
+        .eq("id_seccion_turnada", secId)
+        .neq("tipo_registro", "Enviado");
+    } else if (tipo === "enviados") {
+      query = query
+        .eq("id_seccion_registro", secId)
+        .or(`id_seccion_turnada.neq.${secId},tipo_registro.eq.Enviado`);
+    } else {
+      query = query.or(
+        `id_seccion_turnada.eq.${secId},id_seccion_registro.eq.${secId}`,
+      );
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    return data || [];
+  },
 };
