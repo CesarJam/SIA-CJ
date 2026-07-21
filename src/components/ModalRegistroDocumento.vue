@@ -281,8 +281,8 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { supabase } from '@/supabase'
 import { useToast } from '@/composables/useToast'
+import { inventarioService } from '@/services/inventarioService'
 
 const props = defineProps({
     modelValue: { type: Boolean, required: true }, // v-model para abrir/cerrar
@@ -410,11 +410,7 @@ const guardarDependencia = async () => {
 
     procesandoDependencia.value = true
     try {
-        const { data, error } = await supabase.from('dependencias').insert([formDependencia.value]).select()
-        if (error) {
-            if (error.code === '23505') throw new Error("Ya existe una dependencia con este nombre exacto.")
-            throw error
-        }
+        const data = await inventarioService.crearDependencia(formDependencia.value)
         toast.success("Dependencia registrada correctamente")
         if (data && data.length > 0) {
             catalogoDependencias.value.push(data[0])
@@ -424,7 +420,11 @@ const guardarDependencia = async () => {
         }
         modalDependenciaAbierto.value = false
     } catch (err) {
-        toast.error(err.message || "Error al guardar la dependencia.")
+        if (err.code === '23505') {
+            toast.error("Ya existe una dependencia con este nombre exacto.")
+        } else {
+            toast.error(err.message || "Error al guardar la dependencia.")
+        }
     } finally {
         procesandoDependencia.value = false
     }
@@ -432,19 +432,23 @@ const guardarDependencia = async () => {
 
 // === LÓGICA DE CATÁLOGOS ===
 const cargarCatalogos = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    const { data: userData } = await supabase.from('usuarios').select('id, nomenclaturaExpedienteArea').eq('email', user.email).single()
-    usuarioActual.value = userData.id
-    nomenclaturaUsuario.value = userData.nomenclaturaExpedienteArea || ''
+    try {
+        const userData = await inventarioService.obtenerDatosUsuarioParaRegistro()
+        usuarioActual.value = userData.id
+        nomenclaturaUsuario.value = userData.nomenclaturaExpedienteArea || ''
 
-    if (catalogoDependencias.value.length === 0) {
-        const { data: dependencias } = await supabase.from('dependencias').select('id, nombre_oficial, siglas').eq('activo', true).order('nombre_oficial')
-        catalogoDependencias.value = dependencias || []
-    }
-
-    if (catalogoSecciones.value.length === 0) {
-        const { data: secciones } = await supabase.from('cuadro_general').select('id, codigo, seccion').order('codigo')
-        catalogoSecciones.value = secciones || []
+        if (catalogoDependencias.value.length === 0 || catalogoSecciones.value.length === 0) {
+            const catalogos = await inventarioService.obtenerCatalogosParaRegistro()
+            
+            if (catalogoDependencias.value.length === 0) {
+                catalogoDependencias.value = catalogos.dependencias || []
+            }
+            if (catalogoSecciones.value.length === 0) {
+                catalogoSecciones.value = catalogos.secciones || []
+            }
+        }
+    } catch (error) {
+        toast.error("Error al cargar los catálogos.")
     }
 }
 
@@ -543,14 +547,10 @@ const ejecutarTurnado = async () => {
         });
 
         console.log("Datos a insertar:", JSON.stringify(batchInsertData, null, 2));
-        console.log("UID de sesión actual:", (await supabase.auth.getUser()).data.user.id);
+        console.log("UID de sesión actual:", usuarioActual.value);
 
         // 4. Insertamos todo de golpe en la base de datos
-        const { data, error } = await supabase.from('expedientes').insert(batchInsertData).select()
-        if (error) {
-            if (error.code === '23505') throw new Error(`El folio ${form.value.numero_consecutivo} ya fue registrado.`)
-            throw error
-        }
+        const data = await inventarioService.registrarExpedientesBatch(batchInsertData)
 
         const msj = esTurnadoExterno
             ? `Oficio enviado a ${form.value.areas_destino.length} área(s). Acuse generado en su inventario.`
@@ -564,7 +564,11 @@ const ejecutarTurnado = async () => {
         procesando.value = false
         cerrarModal()
     } catch (err) {
-        toast.error(err.message || "Error al intentar registrar el documento.")
+        if (err.code === '23505') {
+            toast.error(`El folio ${form.value.numero_consecutivo} ya fue registrado.`)
+        } else {
+            toast.error(err.message || "Error al intentar registrar el documento.")
+        }
         procesando.value = false
     }
 }
@@ -575,7 +579,7 @@ const ejecutarEdicion = async () => {
 
     procesando.value = true
     try {
-        const { error } = await supabase.from('expedientes').update({
+        const payload = {
             numero_consecutivo: form.value.numero_consecutivo,
             asunto: form.value.asunto.trim(),
             fojas: form.value.fojas,
@@ -585,21 +589,20 @@ const ejecutarEdicion = async () => {
             id_usuario_actualizacion: usuarioActual.value,
             caracter: form.value.caracter,
             fecha_registro: form.value.fecha_registro
-        }).eq('id', props.datosEditar.id).select()
-
-        if (error) {
-            if (error.code === '23505') throw new Error("Ese folio ya existe en el área destino seleccionada.")
-            throw error
         }
+
+        await inventarioService.actualizarExpedienteEdicion(props.datosEditar.id, payload)
 
         toast.success("Registro actualizado correctamente")
         emit('guardado',[props.datosEditar.id])
         procesando.value = false
         cerrarModal()
     } catch (err) {
-        toast.error(err.message || "Error al actualizar el registro.")
-        procesando.value = false
-    } finally {
+        if (err.code === '23505') {
+            toast.error("Ese folio ya existe en el área destino seleccionada.")
+        } else {
+            toast.error(err.message || "Error al actualizar el registro.")
+        }
         procesando.value = false
     }
 }
