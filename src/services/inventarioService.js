@@ -239,4 +239,19 @@ export const inventarioService = {
     if (error) throw error;
     return data;
   },
+
+  /**
+   *  === Modal Cancelar ===
+   */
+
+   // Actualiza el estatus de un expediente a "Cancelado" y añade la nota de justificación.
+  async cancelarExpediente(expedienteId, payload) {
+    const { data, error } = await supabase
+      .from('expedientes')
+      .update(payload)
+      .eq('id', expedienteId)
+
+    if (error) throw error
+    return data
+  },
 };

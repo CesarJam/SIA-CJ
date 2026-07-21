@@ -39,8 +39,8 @@
 
 <script setup>
 import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
-import { supabase } from '@/supabase'
 import { useToast } from '@/composables/useToast'
+import { inventarioService } from '@/services/inventarioService'
 
 const props = defineProps({
     modelValue: { type: Boolean, required: true },
@@ -73,16 +73,14 @@ const ejecutarCancelacion = async () => {
     try {
         const notaJustificacion = `[CANCELADO POR ÁREA LOCAL]: ${motivoCancelacion.value}`
 
-        const { error } = await supabase
-            .from('expedientes')
-            .update({
-                estatus: 'Cancelado',
-                observaciones: notaJustificacion,
-                id_usuario_actualizacion: props.usuarioActual
-            })
-            .eq('id', props.expediente.id)
+        const payload = {
+            estatus: 'Cancelado',
+            observaciones: notaJustificacion,
+            id_usuario_actualizacion: props.usuarioActual
+        }
 
-        if (error) throw error
+        // --- LLAMADA LIMPIA AL SERVICIO ---
+        await inventarioService.cancelarExpediente(props.expediente.id, payload)
 
         toast.success(`Folio ${props.expediente.numero_consecutivo} cancelado exitosamente.`)
         emit('guardado')
