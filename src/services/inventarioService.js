@@ -132,7 +132,7 @@ export const inventarioService = {
 
   /**
    * ==== MODULO MODAL REGISTRO ====
-   **/
+   */
 
   /**
    * Obtiene los datos básicos del usuario necesarios para crear registros (como su nomenclatura).
@@ -211,11 +211,26 @@ export const inventarioService = {
   },
 
   /**
-   *  === Modal Atender
-   **/
+   *  === Modal Atender ===
+   */
 
   // Actualiza el estatus de un expediente a "En trámite" y asigna los datos físicos y responsables.
   async atenderExpediente(expedienteId, payload) {
+    const { data, error } = await supabase
+      .from("expedientes")
+      .update(payload)
+      .eq("id", expedienteId);
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * === Modal Concluir ===
+   */
+
+  // Actualiza el estatus de un expediente a "Concluido" y guarda su clasificación archivística (Snapshot).
+  async concluirExpediente(expedienteId, payload) {
     const { data, error } = await supabase
       .from("expedientes")
       .update(payload)

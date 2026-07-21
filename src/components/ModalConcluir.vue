@@ -119,8 +119,8 @@
 
 <script setup>
 import { ref, watch, computed, nextTick, onMounted, onUnmounted } from 'vue'
-import { supabase } from '@/supabase'
 import { useToast } from '@/composables/useToast'
+import { inventarioService } from '@/services/inventarioService'
 
 const props = defineProps({
     modelValue: { type: Boolean, required: true },
@@ -226,12 +226,7 @@ const ejecutarConclusion = async () => {
             snapshot_cadido: snapshotCadido
         }
 
-        const { error } = await supabase
-            .from("expedientes")
-            .update(payload)
-            .eq("id", props.expediente.id)
-
-        if (error) throw error
+        await inventarioService.concluirExpediente(props.expediente.id, payload)
 
         toast.success(`Expediente clasificado y archivado.`)
         emit('guardado')
