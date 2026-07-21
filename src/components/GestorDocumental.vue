@@ -99,6 +99,7 @@ import { ref, onMounted, watch } from 'vue'
 import { supabase } from '@/supabase'
 import { useToast } from '@/composables/useToast'
 import ModalVisor from '@/components/ModalVisor.vue' 
+import { archivosService } from '@/services/archivosService'
 
 const props = defineProps({
     expedienteId: { type: String, required: true },
@@ -114,26 +115,17 @@ const subiendo = ref(false)
 
 // Estado para la animación de "Arrastrar y Soltar"
 const isDragging = ref(false)
-
 const visorAbierto = ref(false)
 const archivoActualUrl = ref('')
 const archivoActualNombre = ref('')
 const archivoActualTipo = ref('')
 
 const cargarArchivos = async () => {
-    // Si por alguna extraña razón el componente se abre sin grupoId, detenemos la búsqueda
     if (!props.grupoId) return; 
 
     cargandoArchivos.value = true
     try {
-        const { data, error } = await supabase
-            .from('archivos_anexos')
-            .select('*')
-            .eq('id_grupo', props.grupoId)
-            .order('created_at', { ascending: false })
-
-        if (error) throw error
-        archivos.value = data || []
+        archivos.value = await archivosService.obtenerArchivosAnexos(props.grupoId)
     } catch (error) {
         toast.error("Error al cargar los documentos anexos.")
     } finally {
@@ -160,43 +152,17 @@ const procesarArchivos = async (files) => {
     if (!files || files.length === 0) return
 
     subiendo.value = true
-    const { data: { user } } = await supabase.auth.getUser()
 
     try {
         for (let i = 0; i < files.length; i++) {
             const file = files[i]
             
-            // Validamos que sea un tipo de archivo permitido antes de subirlo
             const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg']
             if (!allowedTypes.includes(file.type)) {
                 toast.error(`El archivo ${file.name} no es un formato válido.`)
                 continue
             }
-
-            const cleanFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
-            const folderName = props.grupoId;
-            const rutaStorage = `${folderName}/${Date.now()}_${cleanFileName}`
-
-            const { error: uploadError } = await supabase.storage
-                .from('expedientes')
-                .upload(rutaStorage, file)
-
-            if (uploadError) throw uploadError
-
-
-            const { error: dbError } = await supabase
-                .from('archivos_anexos')
-                .insert([{
-                    id_expediente: props.expedienteId,
-                    id_grupo: props.grupoId,
-                    nombre_archivo: file.name,
-                    tipo_mime: file.type,
-                    tamano_bytes: file.size,
-                    ruta_supabase: rutaStorage,
-                    id_usuario_subida: user?.id
-                }])
-
-            if (dbError) throw dbError
+            await archivosService.subirArchivo(file, props.grupoId, props.expedienteId)
         }
 
         toast.success("Archivo(s) subido(s) correctamente.")
@@ -210,13 +176,7 @@ const procesarArchivos = async (files) => {
 
 const abrirVisor = async (archivo) => {
     try {
-        const { data, error } = await supabase.storage
-            .from('expedientes')
-            .createSignedUrl(archivo.ruta_supabase, 3600)
-
-        if (error) throw error
-
-        archivoActualUrl.value = data.signedUrl
+        archivoActualUrl.value = await archivosService.obtenerUrlFirmada(archivo.ruta_supabase)
         archivoActualNombre.value = archivo.nombre_archivo
         archivoActualTipo.value = archivo.tipo_mime
         
@@ -228,13 +188,9 @@ const abrirVisor = async (archivo) => {
 
 const descargarArchivo = async (archivo) => {
     try {
-        const { data, error } = await supabase.storage
-            .from('expedientes')
-            .download(archivo.ruta_supabase)
-
-        if (error) throw error
-
-        const url = URL.createObjectURL(data)
+        const blob = await archivosService.descargarBlob(archivo.ruta_supabase)
+        
+        const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
         a.download = archivo.nombre_archivo
@@ -249,19 +205,8 @@ const eliminarArchivo = async (archivo) => {
     if (!confirm(`¿Estás seguro de eliminar el archivo ${archivo.nombre_archivo}?`)) return
     
     try {
-        const { error: storageError } = await supabase.storage
-            .from('expedientes')
-            .remove([archivo.ruta_supabase])
-            
-        if (storageError) throw storageError
-
-        const { error: dbError } = await supabase
-            .from('archivos_anexos')
-            .delete()
-            .eq('id', archivo.id)
-
-        if (dbError) throw dbError
-
+        await archivosService.eliminarArchivoCompleto(archivo.id, archivo.ruta_supabase)
+        
         toast.success("Archivo eliminado.")
         await cargarArchivos()
     } catch (error) {
