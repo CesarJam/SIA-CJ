@@ -261,9 +261,9 @@
 
 <script setup>
 import { ref, watch, computed, nextTick, onMounted, onUnmounted } from 'vue'
-import { supabase } from '@/supabase'
 import { useToast } from '@/composables/useToast'
 import GestorDocumental from '@/components/GestorDocumental.vue'
+import { inventarioService } from '@/services/inventarioService'
 
 const props = defineProps({
     modelValue: { type: Boolean, required: true },
@@ -299,8 +299,7 @@ const obtenerValorArreglo = (valor) => {
 // Cargar catálogo de dependencias
 const cargarDependencias = async () => {
     if (catalogoDependencias.value.length === 0) {
-        const { data } = await supabase.from('dependencias').select('id, nombre_oficial, siglas').eq('activo', true).order('nombre_oficial')
-        catalogoDependencias.value = data || []
+        catalogoDependencias.value = await inventarioService.obtenerDependenciasActivas()
     }
 }
 
@@ -407,16 +406,14 @@ const ejecutarCorreccion = async () => {
             }
         }
 
-        const { error } = await supabase.from("expedientes").update(payload).eq("id", props.expediente.id)
-        if (error) throw error
-
-        // Insertamos en la bitácora automáticamente que un admin modificó esto
-        await supabase.from("bitacora_movimientos").insert([{
+        const bitacoraPayload = {
             id_expediente: props.expediente.id,
             id_usuario: props.usuarioActual,
             accion: "Corrección Administrativa",
             detalles: { mensaje: "Un administrador modificó los datos del expediente concluido, incluyendo sus dependencias vinculadas." }
-        }])
+        }
+
+        await inventarioService.aplicarCorreccionAdministrativa(props.expediente.id, payload, bitacoraPayload)
 
         toast.success(`Corrección administrativa aplicada.`)
         emit('guardado')

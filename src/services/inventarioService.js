@@ -244,42 +244,85 @@ export const inventarioService = {
    *  === Modal Cancelar ===
    */
 
-   // Actualiza el estatus de un expediente a "Cancelado" y añade la nota de justificación.
+  // Actualiza el estatus de un expediente a "Cancelado" y añade la nota de justificación.
   async cancelarExpediente(expedienteId, payload) {
     const { data, error } = await supabase
-      .from('expedientes')
+      .from("expedientes")
       .update(payload)
-      .eq('id', expedienteId)
+      .eq("id", expedienteId);
 
-    if (error) throw error
-    return data
+    if (error) throw error;
+    return data;
   },
 
   /**
-   *  === Modal Detalles === 
+   *  === Modal Detalles ===
    */
 
-   // Obtiene la información de múltiples dependencias basándose en un arreglo de IDs.
+  // Obtiene la información de múltiples dependencias basándose en un arreglo de IDs.
   async obtenerDependenciasPorIds(ids) {
     const { data, error } = await supabase
-      .from('dependencias')
-      .select('id, nombre_oficial, siglas')
-      .in('id', ids)
-      .order('nombre_oficial')
-      
-    if (error) throw error
-    return data || []
+      .from("dependencias")
+      .select("id, nombre_oficial, siglas")
+      .in("id", ids)
+      .order("nombre_oficial");
+
+    if (error) throw error;
+    return data || [];
   },
 
   // Obtiene el historial de movimientos (bitácora) de un expediente específico.
   async obtenerBitacoraPorExpediente(idExpediente) {
     const { data, error } = await supabase
-      .from('bitacora_movimientos')
+      .from("bitacora_movimientos")
       .select(`*, usuario:id_usuario (nombre, email)`)
-      .eq('id_expediente', idExpediente)
-      .order('fecha_hora', { ascending: false })
-      
-    if (error) throw error
-    return data || []
-  }
+      .eq("id_expediente", idExpediente)
+      .order("fecha_hora", { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  /**
+   * === Modal Edicion Admin
+   */
+
+  // Obtiene el catálogo completo de dependencias activas.
+  async obtenerDependenciasActivas() {
+    const { data, error } = await supabase
+      .from("dependencias")
+      .select("id, nombre_oficial, siglas")
+      .eq("activo", true)
+      .order("nombre_oficial");
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  /**
+   * Aplica una corrección administrativa a un expediente (modo Super Admin)
+   * y registra el movimiento en la bitácora automáticamente.
+   */
+  async aplicarCorreccionAdministrativa(
+    expedienteId,
+    payload,
+    bitacoraPayload,
+  ) {
+    // 1. Actualizar expediente
+    const { error: updateError } = await supabase
+      .from("expedientes")
+      .update(payload)
+      .eq("id", expedienteId);
+
+    if (updateError) throw updateError;
+
+    // 2. Registrar en bitácora automáticamente
+    const { error: bitacoraError } = await supabase
+      .from("bitacora_movimientos")
+      .insert([bitacoraPayload]);
+
+    if (bitacoraError) throw bitacoraError;
+
+    return true;
+  },
 };
