@@ -223,8 +223,8 @@
 
 <script setup>
 import { ref, watch, nextTick } from 'vue'
-import { supabase } from '@/supabase'
 import GestorDocumental from '@/components/GestorDocumental.vue'
+import { inventarioService } from '@/services/inventarioService'
 
 const props = defineProps({
     modelValue: { type: Boolean, required: true },
@@ -264,14 +264,7 @@ const cargarDependencias = async (ids) => {
     }
     loadingDependencias.value = true
     try {
-        const { data, error } = await supabase
-            .from('dependencias')
-            .select('id, nombre_oficial, siglas')
-            .in('id', ids)
-            .order('nombre_oficial')
-            
-        if (error) throw error
-        dependenciasVinculadas.value = data || []
+        dependenciasVinculadas.value = await inventarioService.obtenerDependenciasPorIds(ids)
     } catch (error) {
         console.error("Error al cargar dependencias:", error)
     } finally {
@@ -282,13 +275,7 @@ const cargarDependencias = async (ids) => {
 const cargarBitacora = async (idExpediente) => {
     loadingBitacora.value = true
     try {
-        const { data, error } = await supabase
-            .from("bitacora_movimientos")
-            .select(`*, usuario:id_usuario (nombre, email)`)
-            .eq("id_expediente", idExpediente)
-            .order("fecha_hora", { ascending: false })           
-        if (error) throw error
-        historialBitacora.value = data || []
+        historialBitacora.value = await inventarioService.obtenerBitacoraPorExpediente(idExpediente)
     } catch (error) {
         console.error("Error al cargar bitácora:", error)
     } finally {

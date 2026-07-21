@@ -254,4 +254,32 @@ export const inventarioService = {
     if (error) throw error
     return data
   },
+
+  /**
+   *  === Modal Detalles === 
+   */
+
+   // Obtiene la información de múltiples dependencias basándose en un arreglo de IDs.
+  async obtenerDependenciasPorIds(ids) {
+    const { data, error } = await supabase
+      .from('dependencias')
+      .select('id, nombre_oficial, siglas')
+      .in('id', ids)
+      .order('nombre_oficial')
+      
+    if (error) throw error
+    return data || []
+  },
+
+  // Obtiene el historial de movimientos (bitácora) de un expediente específico.
+  async obtenerBitacoraPorExpediente(idExpediente) {
+    const { data, error } = await supabase
+      .from('bitacora_movimientos')
+      .select(`*, usuario:id_usuario (nombre, email)`)
+      .eq('id_expediente', idExpediente)
+      .order('fecha_hora', { ascending: false })
+      
+    if (error) throw error
+    return data || []
+  }
 };
