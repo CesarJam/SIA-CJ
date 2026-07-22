@@ -361,4 +361,19 @@ export const inventarioService = {
 
     return data || [];
   },
+
+  /**
+   * === Modal PDF Preview ===
+   */
+  
+   // Obtiene una URL firmada (temporal) para visualizar o descargar un archivo del bucket.
+  async obtenerUrlFirmada(ruta, tiempoExpiracion = 3600) {
+    const { data, error } = await supabase.storage
+      .from('expedientes')
+      .createSignedUrl(ruta, tiempoExpiracion);
+
+    if (error) throw error;
+    
+    return data.signedUrl;
+  }
 };
