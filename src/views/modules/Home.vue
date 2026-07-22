@@ -49,7 +49,7 @@
         <span class="text-sm font-bold text-gray-800 dark:text-gray-200">Ir al Inventario</span>
       </router-link>
 
-      <router-link to="/oficialia"
+      <a href="https://pdfmastertool.netlify.app/" target="_blank" rel="noopener noreferrer"
         class="flex flex-col items-center py-3 px-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:-translate-y-1 hover:border-blue-500 transition-all group text-center">
         <div
           class="w-10 h-10 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
@@ -59,8 +59,8 @@
             </path>
           </svg>
         </div>
-        <span class="text-sm font-bold text-gray-800 dark:text-gray-200">Oficialía de Partes</span>
-      </router-link>
+        <span class="text-xs font-bold text-gray-800 dark:text-gray-200">Herramienta de renombrado <br> PDF MasterTool</span>
+      </a>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
