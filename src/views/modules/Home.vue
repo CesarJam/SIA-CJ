@@ -59,14 +59,15 @@
             </path>
           </svg>
         </div>
-        <span class="text-xs font-bold text-gray-800 dark:text-gray-200">Herramienta de renombrado <br> PDF MasterTool</span>
+        <span class="text-xs font-bold text-gray-800 dark:text-gray-200">Herramienta de renombrado <br> PDF
+          MasterTool</span>
       </a>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
       <!-- COLUMNA PRINCIPAL: Noticias Relevantes (Ocupa 2/3) -->
-      <div class="lg:col-span-2 space-y-6">
+      <div class="lg:col-span-2  space-y-6">
         <div class="flex items-center gap-2 mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
           <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -76,47 +77,36 @@
           <h2 class="text-xl font-bold text-gray-800 dark:text-white">Noticias Relevantes</h2>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Tarjeta Noticia 1 -->
-          <div
-            class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
-            <span
-              class="text-[10px] font-bold uppercase tracking-wider text-blue-900 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-full mb-3 inline-block">
-              20 JULIO 2026
-            </span>
-            <span
-              class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2.5 py-1 rounded-full mb-3 inline-block">Próxima Reunión</span>
+        <!-- UN SOLO CONTENEDOR GRID PRINCIPAL (3 columnas) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-            <h3 class="text-md font-bold text-gray-900 dark:text-white mb-2">Tercera Sesión Ordinaria</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">5 de octubre del 2026
-              Tercera Sesión ordinaria.
-              Entrega de información
-              de inventarios de trámite
-              trimestre julio-septiembre
-              2026.
-            </p>
+          <!-- Estado de carga y sin noticias -->
+          <div v-if="noticiasLocales.length === 0" class="col-span-1 md:col-span-3 text-center text-gray-500 py-8">
+            No hay noticias relevantes publicadas en este momento.
           </div>
 
-          <!-- Tarjeta Noticia 2 -->
-          <div
+          <!-- Iteración de Noticias Dinámicas -->
+          <div v-else v-for="noticia in noticiasLocales" :key="noticia.id"
             class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
-            <span
-              class="text-[10px] font-bold uppercase tracking-wider text-blue-900 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-full mb-3 inline-block">
-              20 JULIO 2026
-            </span>
-            <span
-              class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2.5 py-1 rounded-full mb-3 inline-block">Aviso
-              Institucional</span>
-            <h3 class="text-md font-bold text-gray-900 dark:text-white mb-2">Cuarta Sesión Ordinaria</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Cuarta sesión ordinaria.
-            Entrega de información de inventarios de trámite trimestre octubre-diciembre 2026.
-            Valoraciones documentales. 
-            Revisión del PADA 2027.  Revisión de los instrumentos de archivos.
-            </p>
+
+            <div class="flex flex-wrap gap-2 mb-3">
+              <span
+                class="text-[10px] font-bold uppercase tracking-wider text-blue-900 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-full">
+                {{ formatearFecha(noticia.fecha_etiqueta) }}
+              </span>
+              <span
+                :class="`text-[10px] font-bold uppercase tracking-wider text-${noticia.categoria_color}-600 dark:text-${noticia.categoria_color}-400 bg-${noticia.categoria_color}-50 dark:bg-${noticia.categoria_color}-900/30 px-2.5 py-1 rounded-full`">
+                {{ noticia.categoria_texto }}
+              </span>
+            </div>
+
+            <h3 class="text-md font-bold text-gray-900 dark:text-white mb-2">{{ noticia.titulo }}</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">{{ noticia.descripcion }}</p>
           </div>
 
           <!-- Noticias RSS -->
-          <div class="lg:col-span-2 space-y-6">
+          <!-- OJO: Aquí cambiamos a md:col-span-3 para que abarque todo el ancho debajo de las 3 noticias de arriba -->
+          <div class="col-span-1 md:col-span-3 space-y-6 mt-4">
             <div class="flex items-center gap-2 mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
               <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -303,6 +293,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { noticiasService } from '@/services/noticiasService'
 
 const loadingClima = ref(true)
 const climaActual = ref({
@@ -316,7 +307,11 @@ const loadingRss = ref(true)
 // Función para darle formato a la fecha en tu template
 const formatearFecha = (fechaISO) => {
   if (!fechaISO) return '';
-  const fecha = new Date(fechaISO);
+
+  // Si la fecha viene solo como "YYYY-MM-DD", le agregamos tiempo para evitar desfases de zona horaria
+  const fechaSegura = fechaISO.length === 10 ? `${fechaISO}T12:00:00` : fechaISO;
+
+  const fecha = new Date(fechaSegura);
   return fecha.toLocaleDateString('es-MX', {
     day: 'numeric',
     month: 'short',
@@ -415,9 +410,32 @@ const obtenerRss = async () => {
   }
 }
 
+// Variable reactiva para las noticias de Supabase
+const noticiasLocales = ref([])
+
+// Safelist virtual para Tailwind v4 (necesario aquí también)
+const tailwindSafelist = [
+  'text-blue-600', 'bg-blue-50', 'dark:text-blue-400', 'dark:bg-blue-900/30',
+  'text-indigo-600', 'bg-indigo-50', 'dark:text-indigo-400', 'dark:bg-indigo-900/30',
+  'text-emerald-600', 'bg-emerald-50', 'dark:text-emerald-400', 'dark:bg-emerald-900/30',
+  'text-amber-600', 'bg-amber-50', 'dark:text-amber-400', 'dark:bg-amber-900/30',
+  'text-red-600', 'bg-red-50', 'dark:text-red-400', 'dark:bg-red-900/30',
+  'text-purple-600', 'bg-purple-50', 'dark:text-purple-400', 'dark:bg-purple-900/30',
+];
+
+const obtenerNoticiasDeBaseDeDatos = async () => {
+  try {
+    // Solo traeremos las 4 más recientes para cuidar el rendimiento
+    noticiasLocales.value = await noticiasService.obtenerNoticiasHome(3)
+  } catch (error) {
+    console.error('Error cargando noticias de la BD:', error)
+  }
+}
+
 onMounted(() => {
   obtenerClimaLocal()
   cargarFacebookSDK()
   obtenerRss()
+  obtenerNoticiasDeBaseDeDatos()
 })
 </script>

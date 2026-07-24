@@ -92,6 +92,12 @@ const routes = [
                 component: () => import('../views/modules/Inventario.vue'),
                 meta: { requiresAuth: true }
             },
+            {
+                path: 'noticias', 
+                name: 'Noticias',
+                component: () => import('../views/modules/NoticiasAdmin.vue'),
+                meta: { requiresAuth: true }
+            },
         ]
     }
 ]
