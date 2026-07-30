@@ -217,6 +217,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { authService } from '@/services/authService'
 import { perfilService } from '@/services/perfilService'
 import { useToast } from '@/composables/useToast'
+import { supabase } from '@/supabase'
 
 const router = useRouter()
 const route = useRoute()
@@ -242,7 +243,27 @@ onMounted(async () => {
     if (session?.user) {
       const metadata = session.user.user_metadata
       userProfile.value.name = metadata.display_name || metadata.full_name || metadata.name || session.user.email
-      userProfile.value.avatar = metadata.avatar_url || metadata.picture || `https://ui-avatars.com/api/?name=${userProfile.value.name}&background=random`
+      
+      let rawAvatar = metadata.avatar_url || metadata.picture
+
+      // 1. LIMPIEZA AUTOMÁTICA: Si el usuario ya tiene una IP quemada en la BD, extraemos solo la ruta
+      if (rawAvatar && rawAvatar.includes('/storage/v1/object/public/avatars/')) {
+          rawAvatar = rawAvatar.split('/storage/v1/object/public/avatars/')[1]
+      }
+
+      // 2. CONSTRUCCIÓN DINÁMICA DE LA URL
+      if (rawAvatar) {
+          if (rawAvatar.startsWith('http')) {
+              userProfile.value.avatar = rawAvatar
+          } else {
+              // Si es una ruta de nuestro bucket, le pedimos a Supabase la URL actual (respetará Tailscale o Local)
+              const { data } = supabase.storage.from('avatars').getPublicUrl(rawAvatar)
+              userProfile.value.avatar = data.publicUrl
+          }
+      } else {
+          // Fallback al avatar generado
+          userProfile.value.avatar = `https://ui-avatars.com/api/?name=${userProfile.value.name}&background=random`
+      }
     }
   } catch (error) {
     console.error("Error al obtener la sesión en el Dashboard:", error)
@@ -275,11 +296,14 @@ const subirAvatar = async (event) => {
     const user = session?.user
     if (!user) throw new Error('No hay sesión activa')
 
-    // Llamada limpia al nuevo servicio
-    const newAvatarUrl = await perfilService.actualizarAvatar(file, user.id)
+    // 1. Recibimos el filePath del servicio
+    const filePath = await perfilService.actualizarAvatar(file, user.id)
 
-    // Actualizar la interfaz
-    userProfile.value.avatar = newAvatarUrl
+    // 2. Construimos la URL pública dinámicamente con la IP de la red actual
+    const { data } = supabase.storage.from('avatars').getPublicUrl(filePath)
+
+    // 3. Actualizamos la interfaz
+    userProfile.value.avatar = data.publicUrl
     toast.success('Foto de perfil actualizada correctamente')
 
   } catch (error) {

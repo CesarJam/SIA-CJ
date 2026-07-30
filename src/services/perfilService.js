@@ -17,20 +17,14 @@ export const perfilService = {
 
         if (uploadError) throw uploadError
 
-        // 3. Obtener la URL pública de la nueva imagen
-        const { data: publicUrlData } = supabase.storage
-            .from('avatars')
-            .getPublicUrl(filePath)
-
-        const newAvatarUrl = publicUrlData.publicUrl
-
-        // 4. Actualizar los metadatos del usuario en Supabase Auth
+        // 3. Actualizar los metadatos guardando SOLAMENTE la ruta relativa
         const { error: updateError } = await supabase.auth.updateUser({
-            data: { avatar_url: newAvatarUrl }
+            data: { avatar_url: filePath } // Guardamos solo la ruta (ej: "1234/avatar-5678.jpg")
         })
 
         if (updateError) throw updateError
 
-        return newAvatarUrl
+        // 4. Retornamos la ruta en lugar de la URL pública
+        return filePath
     }
 }
