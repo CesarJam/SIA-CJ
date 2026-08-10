@@ -1,5 +1,229 @@
 <template>
     <div>
+        <!-- ================= MODAL 1: REGISTRO PRINCIPAL ================= -->
+        <div
+            :class="['fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 md:p-6', modelValue ? 'pointer-events-auto' : 'pointer-events-none']">
+            <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0"
+                enter-to-class="opacity-100" leave-active-class="ease-in duration-200" leave-from-class="opacity-100"
+                leave-to-class="opacity-0">
+                <div v-if="modelValue" class="absolute inset-0 bg-black/70 backdrop-blur-sm" @click="cerrarModal"></div>
+            </transition>
+
+            <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0 scale-95"
+                enter-to-class="opacity-100 scale-100" leave-active-class="ease-in duration-200"
+                leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
+
+                <div v-if="modelValue"
+                    class="relative bg-white dark:bg-gray-800 sm:rounded-2xl shadow-2xl w-full h-full sm:h-auto max-w-[100vw] sm:max-w-[95vw] 2xl:max-w-[1600px] overflow-hidden flex flex-col border-0 sm:border border-gray-200 dark:border-gray-700 max-h-[100vh] sm:max-h-[95vh]">
+
+                    <!-- Cabecera -->
+                    <div
+                        class="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 flex justify-between items-center shrink-0">
+                        <h2 class="text-xl font-bold text-gray-800 dark:text-white">
+                            {{ isEditing ? 'Editar Registro' : titulo }}
+                        </h2>
+                        <button @click="cerrarModal" class="text-gray-400 hover:text-gray-600 transition-colors p-1">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Cambio Móvil CLAVE: overflow-y-auto en celular, md:overflow-hidden en escritorio -->
+                    <div
+                        class="p-4 sm:p-6 flex-1 min-h-0 flex flex-col md:flex-row gap-5 md:gap-6 overflow-y-auto md:overflow-hidden">
+
+                        <!-- COLUMNA 1: Datos del Documento -->
+                        <div :class="['flex flex-col gap-4 sm:gap-5 bg-gray-50 dark:bg-gray-900/50 p-4 sm:p-5 rounded-xl border border-gray-200 dark:border-gray-700 md:overflow-y-auto min-h-0 shrink-0 md:shrink',
+                            mostrarAreaDestino ? 'md:w-[33%]' : 'md:w-1/2']">
+                            <h3
+                                class="text-base font-bold text-gray-700 dark:text-gray-300 mb-1 sm:mb-2 border-b border-gray-200 dark:border-gray-700 pb-2 shrink-0">
+                                1. Datos del Documento
+                            </h3>
+
+                            <div class="flex flex-col gap-4">
+                                <div class="flex flex-col">
+                                    <label class="block text-sm font-bold text-gray-500 uppercase mb-1.5">No.
+                                        Consecutivo</label>
+                                    <input v-model="form.numero_consecutivo" type="text"
+                                        placeholder="Ej: CJ/DA/001/2026" required
+                                        class="w-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+                                </div>
+
+                                <div class="flex flex-col">
+                                    <label class="block text-sm font-bold text-gray-500 uppercase mb-1.5">Fecha
+                                        Documento <span class="text-red-500">*</span></label>
+                                    <input v-model="form.fecha_registro" type="date" required
+                                        class="w-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:[color-scheme:dark]">
+                                </div>
+
+                                <div class="flex flex-col">
+                                    <label class="block text-sm font-bold text-gray-500 uppercase mb-1.5">No.
+                                        Fojas</label>
+                                    <input v-model.number="form.fojas" type="number" min="1" required
+                                        class="w-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+                                </div>
+
+                                <!-- Cambio Móvil: grid-cols-1 a sm:grid-cols-2 -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="flex flex-col">
+                                        <label
+                                            class="block text-sm font-bold text-gray-500 uppercase mb-1.5">Carácter</label>
+                                        <select v-model="form.caracter"
+                                            class="w-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+                                            <option value="Ordinario">Ordinario</option>
+                                            <option value="Urgente">Urgente</option>
+                                            <option value="Extraordinario">Extraordinario</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="flex flex-col">
+                                        <label class="block text-sm font-bold text-gray-500 uppercase mb-1.5">Tipo de
+                                            Registro</label>
+                                        <select v-model="form.tipo_registro"
+                                            class="w-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+                                            <option value="Recibido">Recibido / Interno</option>
+                                            <option value="Enviado">Enviado (Salida Externa)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-col flex-1 min-h-[120px]">
+                                    <label class="block text-sm font-bold text-gray-500 uppercase mb-1.5">Asunto</label>
+                                    <textarea v-model="form.asunto" placeholder="Descripción breve del oficio..."
+                                        required
+                                        class="w-full h-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- COLUMNA 2: Dependencias Involucradas -->
+                        <div :class="['flex flex-col bg-gray-50 dark:bg-gray-900/50 p-4 sm:p-5 rounded-xl border border-gray-200 dark:border-gray-700 min-h-0 shrink-0 md:shrink',
+                            mostrarAreaDestino ? 'md:w-[40%]' : 'md:w-1/2']">
+
+                            <div class="shrink-0">
+                                <div
+                                    class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
+                                    <h3 class="text-base font-bold text-gray-700 dark:text-gray-300">
+                                        2. Dependencias Involucradas
+                                    </h3>
+                                    <button class="text-sm text-blue-600 font-bold hover:underline"
+                                        @click="abrirModalDependencia">+ Nueva</button>
+                                </div>
+
+                                <div class="flex flex-wrap gap-2 mb-4" v-if="dependenciasSeleccionadasInfo.length > 0">
+                                    <span v-for="dep in dependenciasSeleccionadasInfo" :key="dep.id"
+                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-bold bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 shadow-sm border border-blue-200 dark:border-blue-800">
+                                        {{ dep.siglas || dep.nombre_oficial }}
+                                        <button @click.prevent="removerDependencia(dep.id)"
+                                            class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-white transition-colors p-1">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                        </button>
+                                    </span>
+                                </div>
+
+                                <div class="relative mb-3">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <input v-model="busquedaDependencia" type="text" placeholder="Buscar dependencia..."
+                                        class="w-full pl-10 pr-3 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition-colors">
+                                </div>
+                            </div>
+
+                            <!-- Cambio Móvil CLAVE: min-h-250px en celulares para no colapsar -->
+                            <div
+                                class="flex-1 min-h-[250px] max-h-[50vh] md:max-h-none md:min-h-0 overflow-y-auto space-y-1 border border-gray-200 dark:border-gray-700 rounded-md p-2 bg-white dark:bg-gray-800 shadow-inner">
+                                <label v-for="dep in dependenciasFiltradas" :key="dep.id"
+                                    class="flex items-start gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg cursor-pointer transition-colors">
+                                    <input type="checkbox" :value="dep.id" v-model="form.dependencias_ids"
+                                        class="mt-1 w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                                    <div class="flex flex-col">
+                                        <span class="text-base font-semibold text-gray-700 dark:text-gray-200">{{
+                                            dep.nombre_oficial }}</span>
+                                        <span v-if="dep.siglas" class="text-xs font-bold text-gray-400 mt-0.5">{{
+                                            dep.siglas }}</span>
+                                    </div>
+                                </label>
+                                <div v-if="dependenciasFiltradas.length === 0"
+                                    class="text-center py-6 text-base text-gray-500">
+                                    No se encontraron dependencias con "{{ busquedaDependencia }}"
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- COLUMNA 3: Área Destino -->
+                        <div v-if="mostrarAreaDestino"
+                            class="flex flex-col bg-blue-50/50 dark:bg-blue-900/10 p-4 sm:p-5 rounded-xl border border-blue-100 dark:border-blue-800/30 md:w-[27%] min-h-0 shrink-0 md:shrink">
+
+                            <div
+                                class="flex justify-between items-center mb-4 border-b border-blue-200 dark:border-blue-800/50 pb-2 shrink-0">
+                                <h3 class="text-base font-bold text-blue-800 dark:text-blue-300">
+                                    3. Turnar a (Opcional)
+                                </h3>
+                            </div>
+
+                            <div v-if="!isEditing" class="flex-1 flex flex-col min-h-0">
+                                <p
+                                    class="text-sm text-blue-600 dark:text-blue-400 mb-3 font-medium bg-blue-100/50 dark:bg-blue-900/30 p-3 rounded shrink-0">
+                                    <span class="font-bold">Nota:</span> Si no seleccionas destino, es un
+                                    <strong>Trámite Interno Local</strong>.
+                                </p>
+
+                                <!-- Cambio Móvil CLAVE: min-h-200px en celulares -->
+                                <div
+                                    class="flex-1 min-h-[200px] max-h-[50vh] md:max-h-none md:min-h-0 overflow-y-auto space-y-1 pr-1">
+                                    <label v-for="sec in catalogoSeccionesAFiltrar" :key="sec.id"
+                                        class="flex items-start gap-3 p-3 hover:bg-white dark:hover:bg-gray-800 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-gray-200 dark:hover:border-gray-700">
+                                        <input type="checkbox" :value="sec.id" v-model="form.areas_destino"
+                                            class="mt-0.5 w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                                        <span class="text-sm text-gray-700 dark:text-gray-200 leading-tight">
+                                            <strong class="text-blue-600 dark:text-blue-400 block mb-0.5">{{ sec.codigo
+                                                }}</strong>
+                                            {{ sec.seccion }}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div v-else class="flex flex-col">
+                                <select v-model="form.id_seccion_turnada"
+                                    class="w-full px-3 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-800/50 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+                                    <option v-for="sec in catalogoSeccionesAFiltrar" :key="sec.id" :value="sec.id">
+                                        {{ sec.codigo }} - {{ sec.seccion }}
+                                    </option>
+                                </select>
+                                <p class="text-sm text-blue-600/70 dark:text-blue-400/70 mt-2">
+                                    Al editar, solo modificas el destino de esta copia.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones Inferiores (Cambio Móvil: flex-col-reverse) -->
+                    <div
+                        class="p-4 sm:p-5 border-t border-gray-200 dark:border-gray-700 flex flex-col-reverse sm:flex-row justify-end gap-3 bg-gray-50 dark:bg-gray-900/40 shrink-0">
+                        <button @click="cerrarModal" :disabled="procesando"
+                            class="w-full sm:w-auto px-5 py-3 sm:py-2.5 text-base text-gray-600 dark:text-gray-300 font-semibold border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50">Cancelar</button>
+                        <button @click="isEditing ? ejecutarEdicion() : ejecutarTurnado()" :disabled="procesando"
+                            class="w-full sm:w-auto px-6 py-3 sm:py-2.5 text-base bg-blue-600 text-white rounded-lg font-bold shadow-md hover:bg-blue-700 transform transition-all active:scale-95 disabled:opacity-70 flex items-center justify-center gap-2">
+                            <span v-if="procesando">Procesando...</span>
+                            <span v-else>Registrar y Turnar</span>
+                        </button>
+                    </div>
+                </div>
+            </transition>
+        </div>
+
+        <!-- ================= MODAL 2: NUEVA DEPENDENCIA ================= -->
         <div
             :class="['fixed inset-0 z-[70] flex items-center justify-center p-4', modalDependenciaAbierto ? 'pointer-events-auto' : 'pointer-events-none']">
             <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0"
@@ -26,24 +250,26 @@
                         </button>
                     </div>
 
-                    <div class="p-6 space-y-5">
+                    <div class="p-5 sm:p-6 space-y-4 sm:space-y-5">
                         <div>
                             <label class="block text-sm font-bold text-gray-500 uppercase mb-1.5">Nombre Oficial <span
                                     class="text-red-500">*</span></label>
                             <input v-model="formDependencia.nombre_oficial" type="text"
                                 placeholder="Ej: Secretaría de Salud"
-                                class="w-full px-3 py-2.5 text-base bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
+                                class="w-full px-3 py-2.5 text-base bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
+
+                        <!-- Cambio Móvil: grid-cols-1 a sm:grid-cols-2 -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-bold text-gray-500 uppercase mb-1.5">Siglas</label>
                                 <input v-model="formDependencia.siglas" type="text" placeholder="Ej: SSG"
-                                    class="w-full px-3 py-2.5 text-base bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
+                                    class="w-full px-3 py-2.5 text-base bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-gray-500 uppercase mb-1.5">Tipo</label>
                                 <select v-model="formDependencia.tipo_ente"
-                                    class="w-full px-3 py-2.5 text-base bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
+                                    class="w-full px-3 py-2.5 text-base bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
                                     <option value="Estatal">Estatal</option>
                                     <option value="Federal">Federal</option>
                                     <option value="Municipal">Municipal</option>
@@ -57,220 +283,19 @@
                             <label class="block text-sm font-bold text-gray-500 uppercase mb-1.5">Titular /
                                 Representante</label>
                             <input v-model="formDependencia.titular" type="text" placeholder="Nombre completo"
-                                class="w-full px-3 py-2.5 text-base bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
+                                class="w-full px-3 py-2.5 text-base bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
                         </div>
                     </div>
 
+                    <!-- Cambio Móvil: flex-col-reverse en botones -->
                     <div
-                        class="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/40">
+                        class="p-4 border-t border-gray-200 dark:border-gray-700 flex flex-col-reverse sm:flex-row justify-end gap-3 bg-gray-50 dark:bg-gray-900/40">
                         <button @click="cerrarModalDependencia" :disabled="procesandoDependencia"
-                            class="px-5 py-2.5 text-base text-gray-600 dark:text-gray-300 font-semibold border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Cancelar</button>
+                            class="w-full sm:w-auto px-5 py-2.5 text-base text-gray-600 dark:text-gray-300 font-semibold border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Cancelar</button>
                         <button @click="guardarDependencia" :disabled="procesandoDependencia"
-                            class="px-5 py-2.5 text-base bg-blue-600 text-white rounded-lg font-bold shadow-md hover:bg-blue-700 flex items-center gap-2">
+                            class="w-full sm:w-auto px-5 py-2.5 text-base bg-blue-600 text-white rounded-lg font-bold shadow-md hover:bg-blue-700 flex items-center justify-center gap-2">
                             <span v-if="procesandoDependencia" class="animate-pulse">Guardando...</span>
                             <span v-else>Guardar</span>
-                        </button>
-                    </div>
-                </div>
-            </transition>
-        </div>
-
-        <div
-            :class="['fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6', modelValue ? 'pointer-events-auto' : 'pointer-events-none']">
-            <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0"
-                enter-to-class="opacity-100" leave-active-class="ease-in duration-200" leave-from-class="opacity-100"
-                leave-to-class="opacity-0">
-                <div v-if="modelValue" class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="cerrarModal"></div>
-            </transition>
-
-            <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0 scale-95"
-                enter-to-class="opacity-100 scale-100" leave-active-class="ease-in duration-200"
-                leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
-                <div v-if="modelValue"
-                    class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col border border-gray-200 dark:border-gray-700 max-h-[90vh]">
-
-                    <div
-                        class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 flex justify-between items-center shrink-0">
-                        <h2 class="text-xl font-bold text-gray-800 dark:text-white">
-                            {{ isEditing ? 'Editar Registro' : titulo }}
-                        </h2>
-                        <button @click="cerrarModal" class="text-gray-400 hover:text-gray-600 transition-colors">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div class="p-6 overflow-y-auto space-y-6">
-
-                        <div
-                            class="bg-gray-50 dark:bg-gray-900/50 p-5 rounded-xl border border-gray-200 dark:border-gray-700">
-                            <h3
-                                class="text-base font-bold text-gray-700 dark:text-gray-300 mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
-                                1. Datos del Documento</h3>
-
-                            <div class="grid grid-cols-1 md:grid-cols-5 gap-5 items-stretch">
-
-                                <div class="flex flex-col">
-                                    <label class="block text-sm font-bold text-gray-500 uppercase mb-2">No.
-                                        Consecutivo</label>
-                                    <input v-model="form.numero_consecutivo" type="text"
-                                        placeholder="Ej: CJ/DA/001/2026" required
-                                        class="mt-auto w-full px-3 py-2.5 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
-                                </div>
-
-                                <div class="flex flex-col">
-                                    <label class="block text-sm font-bold text-gray-500 uppercase mb-2">Fecha
-                                        Documento <span class="text-red-500">*</span></label>
-                                    <input v-model="form.fecha_registro" type="date" required
-                                        class="mt-auto w-full px-3 py-2.5 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:[color-scheme:dark]">
-                                </div>
-
-                                <div class="flex flex-col">
-                                    <label class="block text-sm font-bold text-gray-500 uppercase mb-2">No.
-                                        Fojas</label>
-                                    <input v-model.number="form.fojas" type="number" min="1" required
-                                        class="mt-auto w-full px-3 py-2.5 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
-                                </div>
-
-                                <div class="flex flex-col">
-                                    <label class="block text-sm font-bold text-gray-500 uppercase mb-2">Carácter /
-                                        Prioridad</label>
-                                    <select v-model="form.caracter"
-                                        class="mt-auto w-full px-3 py-2.5 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
-                                        <option value="Ordinario">Ordinario</option>
-                                        <option value="Urgente">Urgente</option>
-                                        <option value="Extraordinario">Extraordinario</option>
-                                    </select>
-                                </div>
-
-                                <div class="flex flex-col">
-                                    <label class="block text-sm font-bold text-gray-500 uppercase mb-2">Tipo de
-                                        Registro</label>
-                                    <select v-model="form.tipo_registro"
-                                        class="mt-auto w-full px-3 py-2.5 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
-                                        <option value="Recibido">Recibido / Interno</option>
-                                        <option value="Enviado">Enviado (Salida Externa)</option>
-                                    </select>
-                                </div>
-
-                                <div class="md:col-span-5 flex flex-col">
-                                    <label class="block text-sm font-bold text-gray-500 uppercase mb-2">Asunto</label>
-                                    <textarea v-model="form.asunto" rows="2"
-                                        placeholder="Descripción breve del oficio..." required
-                                        class="mt-auto w-full px-3 py-2.5 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"></textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div
-                            class="bg-gray-50 dark:bg-gray-900/50 p-5 rounded-xl border border-gray-200 dark:border-gray-700">
-                            <div
-                                class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
-                                <h3 class="text-base font-bold text-gray-700 dark:text-gray-300">
-                                    2. Dependencias Involucradas
-                                </h3>
-                                <button class="text-sm text-indigo-600 font-bold hover:underline"
-                                    @click="abrirModalDependencia">+ Nueva Dependencia</button>
-                            </div>
-
-                            <div class="flex flex-wrap gap-2 mb-4" v-if="dependenciasSeleccionadasInfo.length > 0">
-                                <span v-for="dep in dependenciasSeleccionadasInfo" :key="dep.id"
-                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-bold bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300 shadow-sm border border-indigo-200 dark:border-indigo-800">
-                                    {{ dep.siglas || dep.nombre_oficial }}
-                                    <button @click.prevent="removerDependencia(dep.id)"
-                                        class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-white transition-colors">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
-                                </span>
-                            </div>
-
-                            <div class="relative mb-3">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                    </svg>
-                                </div>
-                                <input v-model="busquedaDependencia" type="text"
-                                    placeholder="Buscar dependencia por nombre o siglas..."
-                                    class="w-full pl-10 pr-3 py-2.5 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 transition-colors">
-                            </div>
-
-                            <div
-                                class="max-h-48 overflow-y-auto space-y-1 border border-gray-200 dark:border-gray-700 rounded-md p-2 bg-white dark:bg-gray-800 shadow-inner">
-                                <label v-for="dep in dependenciasFiltradas" :key="dep.id"
-                                    class="flex items-start gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg cursor-pointer transition-colors">
-                                    <input type="checkbox" :value="dep.id" v-model="form.dependencias_ids"
-                                        class="mt-1 w-5 h-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
-                                    <div class="flex flex-col">
-                                        <span class="text-base font-semibold text-gray-700 dark:text-gray-200">{{
-                                            dep.nombre_oficial }}</span>
-                                        <span v-if="dep.siglas" class="text-xs font-bold text-gray-400 mt-0.5">{{
-                                            dep.siglas }}</span>
-                                    </div>
-                                </label>
-                                <div v-if="dependenciasFiltradas.length === 0"
-                                    class="text-center py-6 text-base text-gray-500">
-                                    No se encontraron dependencias con "{{ busquedaDependencia }}"
-                                </div>
-                            </div>
-                        </div>
-
-                        <div v-if="mostrarAreaDestino"
-                            class="bg-indigo-50/50 dark:bg-indigo-900/10 p-5 rounded-xl border border-indigo-100 dark:border-indigo-800/30">
-                            <div
-                                class="flex justify-between items-center mb-4 border-b border-indigo-200 dark:border-indigo-800/50 pb-2">
-                                <h3 class="text-base font-bold text-indigo-800 dark:text-indigo-300">
-                                    3. Área Destino (Turnar a)
-                                </h3>
-                            </div>
-
-                            <div v-if="!isEditing" class="space-y-3">
-                                <p
-                                    class="text-sm text-indigo-600 dark:text-indigo-400 mb-2 font-medium bg-indigo-100/50 dark:bg-indigo-900/30 p-3 rounded">
-                                    <span class="font-bold">Nota:</span> Si no seleccionas ningún destino, el oficio se
-                                    registrará como un <strong>Trámite Interno Local</strong> para tu propia área.
-                                </p>
-                                <div class="max-h-48 overflow-y-auto space-y-1">
-                                    <label v-for="sec in catalogoSeccionesAFiltrar" :key="sec.id"
-                                        class="flex items-center gap-3 p-3 hover:bg-white dark:hover:bg-gray-800 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-gray-200 dark:hover:border-gray-700">
-                                        <input type="checkbox" :value="sec.id" v-model="form.areas_destino"
-                                            class="w-5 h-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
-                                        <span class="text-base text-gray-700 dark:text-gray-200"><strong
-                                                class="text-indigo-600 dark:text-indigo-400">{{ sec.codigo }}</strong> -
-                                            {{ sec.seccion }}</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div v-else>
-                                <select v-model="form.id_seccion_turnada"
-                                    class="w-full px-3 py-2.5 text-base bg-white dark:bg-gray-800 border border-indigo-200 dark:border-indigo-800/50 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
-                                    <option v-for="sec in catalogoSeccionesAFiltrar" :key="sec.id" :value="sec.id">
-                                        {{ sec.codigo }} - {{ sec.seccion }}
-                                    </option>
-                                </select>
-                                <p class="text-sm text-indigo-600/70 dark:text-indigo-400/70 mt-2">Al editar, solo
-                                    puedes modificar el destino de esta copia en específico.</p>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div
-                        class="p-5 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/40 shrink-0">
-                        <button @click="cerrarModal" :disabled="procesando"
-                            class="px-5 py-2.5 text-base text-gray-600 dark:text-gray-300 font-semibold border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50">Cancelar</button>
-                        <button @click="isEditing ? ejecutarEdicion() : ejecutarTurnado()" :disabled="procesando"
-                            class="px-6 py-2.5 text-base bg-blue-600 text-white rounded-lg font-bold shadow-md hover:bg-blue-700 transform transition-all active:scale-95 disabled:opacity-70 flex items-center gap-2">
-                            <span v-if="procesando">Procesando...</span>
-                            <span v-else>Registrar y Turnar</span>
                         </button>
                     </div>
                 </div>
@@ -383,7 +408,7 @@ watch(() => form.value.tipo_registro, (nuevoTipo) => {
     if (props.esOficialia && nuevoTipo === 'Enviado') {
         form.value.areas_destino = []
         form.value.id_seccion_turnada = null
-    } 
+    }
     else if (!props.esOficialia && nuevoTipo === 'Recibido') {
         form.value.areas_destino = []
         form.value.id_seccion_turnada = props.origenId
@@ -439,7 +464,7 @@ const cargarCatalogos = async () => {
 
         if (catalogoDependencias.value.length === 0 || catalogoSecciones.value.length === 0) {
             const catalogos = await inventarioService.obtenerCatalogosParaRegistro()
-            
+
             if (catalogoDependencias.value.length === 0) {
                 catalogoDependencias.value = catalogos.dependencias || []
             }
@@ -594,7 +619,7 @@ const ejecutarEdicion = async () => {
         await inventarioService.actualizarExpedienteEdicion(props.datosEditar.id, payload)
 
         toast.success("Registro actualizado correctamente")
-        emit('guardado',[props.datosEditar.id])
+        emit('guardado', [props.datosEditar.id])
         procesando.value = false
         cerrarModal()
     } catch (err) {
