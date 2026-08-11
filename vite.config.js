@@ -17,8 +17,8 @@ export default defineConfig({
         name: 'Sistema Integral de  Archivos - CJ',
         short_name: 'SIA-CJ',
         description: 'Bandeja y gestor de tareas de la Consejería Jurídica',
-        theme_color: '#ffffff', // Color de la barra de estado del celular
-        background_color: '#ffffff',
+        theme_color: '#0e0000', // Color de la barra de estado del celular
+        background_color: '#000000',
         display: 'standalone', // Hace que se vea como una app nativa, sin barra de direcciones
         icons: [
           {
