@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import './style.css' // Aquí está cargando Tailwind
 import App from './App.vue'
 import router from './router'
+import 'virtual:pwa-register'
 
 const app = createApp(App)
 
