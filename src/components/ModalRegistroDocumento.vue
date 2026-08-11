@@ -93,7 +93,7 @@
                                     <label class="block text-sm font-bold text-gray-500 uppercase mb-1.5">Asunto</label>
                                     <textarea ref="asuntoInput" v-model="form.asunto"
                                         placeholder="Descripción breve del oficio..." required
-                                        class="w-full h-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 resize-auto">
+                                        class="w-full h-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 resize-none">
                                     </textarea>
                                 </div>
                             </div>
