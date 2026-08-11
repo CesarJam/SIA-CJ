@@ -34,60 +34,136 @@
                 </div>
             </div>
 
-            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                <select v-model="seccionSeleccionada" @change="cargarBandeja"
-                    class="w-full md:w-72 truncate max-w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer">
-                    <option v-for="area in areasUsuario" :key="area.id" :value="area.id">
-                        {{ area.codigo }} - {{ area.seccion }}
-                    </option>
-                </select>
-
-                <select v-model="filtroAnio" @change="cargarBandeja"
-                    class="w-full md:w-auto px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer font-bold">
-                    <option v-for="anio in opcionesAnios" :key="anio" :value="anio">
-                        Año {{ anio }}
-                    </option>
-                </select>
-
-                <select v-model="filtroEstatus"
-                    class="w-full md:w-auto px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer">
-                    <option value="Todos">Todos los estatus</option>
-                    <option value="Recepcionado">Recepcionado (Nuevos)</option>
-                    <option value="En trámite">En trámite</option>
-                    <option value="Concluido">Concluido (Archivados)</option>
-                    <option value="Cancelado">Cancelados</option>
-                </select>
-
-                <button @click="abrirModalExportar"
-                    class="w-full md:w-auto px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2">
-                    <svg class="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                        </path>
-                    </svg>
-                    CSV
+            <!-- CONTENEDOR PRINCIPAL DE HERRAMIENTAS -->
+            <div class="w-full md:w-auto">
+                
+                <!-- Botón Toggle para Móviles (Visible solo en pantallas pequeñas) -->
+                <button @click="menuFiltrosAbierto = !menuFiltrosAbierto"
+                    class="md:hidden w-full flex items-center justify-between px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 rounded-lg shadow-sm transition-colors mb-3 md:mb-0">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                        Filtros y Acciones
+                    </span>
+                    <svg class="w-4 h-4 transition-transform duration-200" :class="{'rotate-180': menuFiltrosAbierto}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </button>
 
-                <button @click="abrirModalExportarPDF"
-                    class="w-full md:w-auto px-4 py-2 text-sm font-semibold text-white bg-[#AB0033] hover:bg-[#8A0029] rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2">
-                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z">
-                        </path>
-                    </svg>
-                    PDF
-                </button>
+                <!-- Área Colapsable (Oculta en móvil por defecto, siempre visible en PC) -->
+                <div :class="{'hidden md:flex': !menuFiltrosAbierto, 'flex': menuFiltrosAbierto}" 
+                    class="flex-col md:flex-row flex-wrap items-center gap-3 w-full md:w-auto transition-all">
+                    
+                    <!--Filtro de area -->
+                    <select v-model="seccionSeleccionada" @change="cargarBandeja"
+                        class="w-full md:w-72 truncate max-w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer">
+                        <option v-for="area in areasUsuario" :key="area.id" :value="area.id">
+                            {{ area.codigo }} - {{ area.seccion }}
+                        </option>
+                    </select>
 
-                <button @click="abrirModalNuevoInterno"
-                    class="w-full md:w-auto px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-                    title="Nuevo registro (Ctrl + Espacio)">
-                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    Nuevo
-                </button>
+                    <!--Filtro de año -->
+                    <select v-model="filtroAnio" @change="cargarBandeja"
+                        class="w-full md:w-auto px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer font-bold">
+                        <option v-for="anio in opcionesAnios" :key="anio" :value="anio">
+                            Año {{ anio }}
+                        </option>
+                    </select>
 
+                    <!--Filtro de estatus -->
+                    <select v-model="filtroEstatus"
+                        class="w-full md:w-auto px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer">
+                        <option value="Todos">Todos los estatus</option>
+                        <option value="Recepcionado">Recepcionado (Nuevos)</option>
+                        <option value="En trámite">En trámite</option>
+                        <option value="Concluido">Concluido (Archivados)</option>
+                        <option value="Cancelado">Cancelados</option>
+                    </select>
+
+                    <!--Botón y Menú de Filtro Avanzado -->
+                    <div class="relative w-full md:w-auto">
+                        <button @click="filtroAvanzadoAbierto = !filtroAvanzadoAbierto"
+                            class="w-full md:w-auto px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2"
+                            :class="{'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/30': filtroSerieSeleccionada}">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                            </svg>
+                            Filtros
+                            <span v-if="filtroSerieSeleccionada" class="flex h-2.5 w-2.5 relative ml-1">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500"></span>
+                            </span>
+                        </button>
+
+                        <div v-if="filtroAvanzadoAbierto" @click="filtroAvanzadoAbierto = false" class="fixed inset-0 z-30"></div>
+
+                        <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+                            <div v-if="filtroAvanzadoAbierto"
+                                class="absolute left-0 right-0 md:left-auto md:right-0 mt-2 w-full md:w-80 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-40 p-4 origin-top md:origin-top-right">
+                                <h3 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-3">Filtro Avanzado</h3>
+                                
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1.5">Serie / Subserie (CADIDO)</label>
+                                        <select v-model="filtroSerieSeleccionada"
+                                            class="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500">
+                                            <option value="">Todas (Sin filtro)</option>
+                                            <optgroup v-for="serie in seriesDisponiblesEnBandeja" 
+                                                :key="serie.codigo_serie" 
+                                                :label="`${serie.codigo_serie} - ${serie.nombre_serie}`"
+                                                class="font-bold text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-800">
+                                                <option v-for="sub in serie.subseries" 
+                                                    :key="sub.codigo_subserie" 
+                                                    :value="sub.codigo_subserie"
+                                                    class="font-normal text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900">
+                                                    {{ sub.codigo_subserie }} - {{ sub.nombre_subserie }}
+                                                </option>
+                                            </optgroup>
+                                        </select>
+                                    </div>
+
+                                    <div class="flex gap-2">
+                                        <button @click="filtroSerieSeleccionada = ''; filtroAvanzadoAbierto = false" 
+                                            class="w-full px-3 py-2 text-xs font-semibold text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                                            Limpiar
+                                        </button>
+                                        <button @click="filtroAvanzadoAbierto = false" 
+                                            class="w-full px-3 py-2 text-xs font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                                            Aplicar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </transition>
+                    </div>
+
+                    <button @click="abrirModalExportar"
+                        class="w-full md:w-auto px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        CSV
+                    </button>
+
+                    <button @click="abrirModalExportarPDF"
+                        class="w-full md:w-auto px-4 py-2 text-sm font-semibold text-white bg-[#AB0033] hover:bg-[#8A0029] rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z">
+                            </path>
+                        </svg>
+                        PDF
+                    </button>
+
+                    <button @click="abrirModalNuevoInterno"
+                        class="w-full md:w-auto px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                        title="Nuevo registro (Ctrl + Espacio)">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Nuevo
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -97,7 +173,7 @@
                 <div class="w-[10%]">Folio / Fecha</div>
                 <div class="w-[50%]">Asunto y Seguimiento</div>
                 <div class="w-[15%]">{{ vistaActual === 'entrada' ? 'Origen (Remitente)' : 'Destino (Turnado a)' }}</div>
-                <div class="w-[15%]">Dependencias/Código</div>
+                <div class="w-[15%]">Dependencias/Serie</div>
                 <div class="w-[10%] text-center">Estatus / Acción</div>
             </div>
 
@@ -651,6 +727,7 @@ const registrosPorPagina = ref(25); //si se cambia este valor tambien modificarl
 
 watch([filtroEstatus, filtroAnio, seccionSeleccionada, vistaActual], () => {
     paginaActual.value = 1;
+    filtroSerieSeleccionada.value = ""; // Limpia el filtro avanzado automáticamente si cambiamos de vista
 });
 
 const totalPaginas = computed(() => {
@@ -707,11 +784,62 @@ const abrirModalCancelar = (item) => { expedienteACancelar.value = item; modalCa
 const abrirModalEdicionAdmin = (item) => { expedienteAdmin.value = item; modalEdicionAdminAbierto.value = true; };
 
 // === COMPUTADOS ===
+// Extrae y agrupa las series/subseries únicas de la bandeja actual
+const seriesDisponiblesEnBandeja = computed(() => {
+    const seriesMap = new Map();
+    
+    listaExpedientes.value.forEach(exp => {
+        const cadido = exp.snapshot_cadido;
+        // Verificamos que tenga los datos completos del padre y de la subserie
+        if (cadido && cadido.codigo_subserie && cadido.codigo_padre) {
+            
+            // Si la serie padre no existe en el mapa, la creamos
+            if (!seriesMap.has(cadido.codigo_padre)) {
+                seriesMap.set(cadido.codigo_padre, {
+                    codigo_serie: cadido.codigo_padre,
+                    nombre_serie: cadido.nombre_padre || 'Serie',
+                    subseriesMap: new Map() // Sub-mapa para evitar subseries duplicadas
+                });
+            }
+            
+            // Extraemos la serie del mapa y le agregamos la subserie
+            const serie = seriesMap.get(cadido.codigo_padre);
+            if (!serie.subseriesMap.has(cadido.codigo_subserie)) {
+                serie.subseriesMap.set(cadido.codigo_subserie, {
+                    codigo_subserie: cadido.codigo_subserie,
+                    nombre_subserie: cadido.nombre_subserie
+                });
+            }
+        }
+    });
+    
+    // Convertimos los mapas en arreglos para Vue y ordenamos alfabéticamente
+    return Array.from(seriesMap.values()).map(serie => ({
+        codigo_serie: serie.codigo_serie,
+        nombre_serie: serie.nombre_serie,
+        // Ordenamos las subseries
+        subseries: Array.from(serie.subseriesMap.values())
+                        .sort((a, b) => a.codigo_subserie.localeCompare(b.codigo_subserie))
+    })).sort((a, b) => a.codigo_serie.localeCompare(b.codigo_serie)); // Ordenamos las series padre
+}); 
+
 const expedientesFiltrados = computed(() => {
-    if (filtroEstatus.value === "Todos") return listaExpedientes.value;
-    return listaExpedientes.value.filter(
-        (exp) => exp.estatus === filtroEstatus.value,
-    );
+    let filtrados = listaExpedientes.value;
+
+    // 1. Filtro base por Estatus
+    if (filtroEstatus.value !== "Todos") {
+        filtrados = filtrados.filter(exp => exp.estatus === filtroEstatus.value);
+    }
+
+    // 2. Filtro Avanzado (Serie/Subserie)
+    if (filtroSerieSeleccionada.value) {
+        filtrados = filtrados.filter(exp => 
+            exp.snapshot_cadido && 
+            exp.snapshot_cadido.codigo_subserie === filtroSerieSeleccionada.value
+        );
+    }
+
+    return filtrados;
 });
 
 // UTILIDAD PARA ARREGLOS DE BD
@@ -824,6 +952,11 @@ const onRegistroInternoExitoso = async (idsInsertados) => {
         }
     }
 };
+
+// == FILTRO AVANZADO ==
+const menuFiltrosAbierto = ref(false);
+const filtroAvanzadoAbierto = ref(false);
+const filtroSerieSeleccionada = ref("");
 
 // == EXPORTACIÓN ===
 const modalExportarAbierto = ref(false);
