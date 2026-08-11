@@ -42,7 +42,9 @@
                         <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
                             1. Datos Generales del Documento
                         </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        
+                        <!-- CAMBIO CLAVE: Cambiamos a md:grid-cols-5 para acomodar el nuevo campo -->
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">No. Consecutivo</label>
                                 <input v-model="form.numero_consecutivo" type="text"
@@ -67,7 +69,17 @@
                                     <option value="Extraordinario">Extraordinario</option>
                                 </select>
                             </div>
-                            <div class="md:col-span-4">
+                            
+                            <!-- Tipo de Registro -->
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Tipo</label>
+                                <select v-model="form.tipo_registro"
+                                    class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">
+                                    <option value="Enviado">Enviado</option>
+                                    <option value="Recibido">Recibido</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-5">
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Asunto</label>
                                 <textarea v-model="form.asunto" rows="2"
                                     class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md"></textarea>
@@ -318,6 +330,7 @@ watch(() => props.modelValue, async (isOpen) => {
             fecha_registro: props.expediente.fecha_registro,
             fojas: props.expediente.fojas,
             caracter: props.expediente.caracter,
+            tipo_registro: props.expediente.tipo_registro,
             asunto: props.expediente.asunto,
             dependencias_ids: props.expediente.dependencias_ids || [],
             responsable_tramite: props.expediente.responsable_tramite || '',
