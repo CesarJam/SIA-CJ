@@ -27,37 +27,37 @@
                             </div>
                             <div class="flex flex-col w-full">
                                 <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Folio / No. Expediente</span>
-                                <span class="text-sm font-bold text-gray-900 dark:text-white">{{ expediente?.numero_consecutivo }}</span>
+                                <span class="text-base font-bold text-gray-900 dark:text-white">{{ expediente?.numero_consecutivo }}</span>
                                 
                                 <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-2">Asunto</span>
-                                <span class="text-sm text-gray-700 dark:text-gray-300 leading-snug">{{ expediente?.asunto }}</span>
+                                <span class="text-base text-gray-700 dark:text-gray-300 leading-snug">{{ expediente?.asunto }}</span>
                             </div>
                         </div>
 
                         <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shrink-0">
-                            <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 border-b border-gray-200 dark:border-gray-700 pb-2">
+                            <h3 class="text-base font-bold text-gray-700 dark:text-gray-300 mb-3 border-b border-gray-200 dark:border-gray-700 pb-2">
                                 1. Control de Tareas
                             </h3>
                             <div class="space-y-4">
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Responsable del Trámite</label>
-                                    <input v-model="form.responsable_tramite" type="text" placeholder="Ej: Lic. Arturo (Opcional)" class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500" />
+                                    <input v-model="form.responsable_tramite" type="text" placeholder="Ej: Lic. Arturo (Opcional)" class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500" />
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Indicaciones / Observaciones</label>
-                                    <textarea v-model="form.indicaciones_tramite" rows="2" placeholder="Ej: Responder oficio antes del viernes." class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"></textarea>
+                                    <textarea v-model="form.indicaciones_tramite" rows="2" placeholder="Ej: Responder oficio antes del viernes." class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"></textarea>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="bg-indigo-50/50 dark:bg-indigo-900/10 p-4 rounded-xl border border-indigo-100 dark:border-indigo-800/30 shrink-0">
-                            <h3 class="text-sm font-bold text-indigo-800 dark:text-indigo-300 mb-3 border-b border-indigo-200 dark:border-indigo-800/50 pb-2">
+                        <div class="bg-blue-50/50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-800/30 shrink-0">
+                            <h3 class="text-base font-bold text-blue-800 dark:text-blue-300 mb-3 border-b border-blue-200 dark:border-blue-800/50 pb-2">
                                 2. Naturaleza Física (Pre-CADIDO)
                             </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Tradición</label>
-                                    <select v-model="form.tradicion" class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+                                    <select v-model="form.tradicion" class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
                                         <option value="Copia">Copia</option>
                                         <option value="Original">Original</option>
                                         <option value="Electrónico">Electrónico</option>
@@ -65,7 +65,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Soporte</label>
-                                    <select v-model="form.soporte" class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+                                    <select v-model="form.soporte" class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
                                         <option value="Papel">Papel</option>
                                         <option value="Óptico">Óptico (CD/DVD)</option>
                                         <option value="Digital">Digital / Nube</option>
@@ -73,7 +73,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Acceso</label>
-                                    <select v-model="form.condicion_acceso" class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+                                    <select v-model="form.condicion_acceso" class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
                                         <option value="Pública">Pública</option>
                                         <option value="Reservada">Reservada</option>
                                         <option value="Confidencial">Confidencial</option>
@@ -81,7 +81,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Gaveta</label>
-                                    <input v-model="form.inmueble" type="text" placeholder="Ej: Archivo" class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500" />
+                                    <input v-model="form.inmueble" type="text" placeholder="Ej: Archivo" class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500" />
                                 </div>
                             </div>
                         </div>
@@ -89,8 +89,8 @@
 
                     <div class="lg:col-span-7 flex flex-col bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                         <div class="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shrink-0">
-                            <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                            <h3 class="text-base font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
                                 3. Archivos Digitales (Anexos)
                             </h3>
                         </div>
@@ -109,10 +109,10 @@
                 </div>
 
                 <div class="p-5 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/40 shrink-0">
-                    <button @click="cerrarModal" :disabled="procesando" class="px-5 py-2.5 text-sm text-gray-600 dark:text-gray-300 font-bold border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                    <button @click="cerrarModal" :disabled="procesando" class="px-5 py-2.5 text-base text-gray-600 dark:text-gray-300 font-bold border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                         Cancelar
                     </button>
-                    <button @click="ejecutarAtencion" :disabled="procesando" class="px-6 py-2.5 text-sm bg-blue-600 text-white rounded-lg font-bold shadow-md hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50 transition-colors">
+                    <button @click="ejecutarAtencion" :disabled="procesando" class="px-6 py-2.5 text-base bg-blue-600 text-white rounded-lg font-bold shadow-md hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50 transition-colors">
                         <span v-if="procesando" class="animate-pulse">Guardando...</span>
                         <span v-else>Guardar y Comenzar Trámite</span>
                     </button>

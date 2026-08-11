@@ -9,14 +9,14 @@
                 :class="[
                     'flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors',
                     isDragging 
-                        ? 'border-indigo-500 bg-indigo-100 dark:bg-indigo-900/40' // Color activo al arrastrar encima
-                        : 'border-indigo-300 bg-indigo-50/30 dark:bg-indigo-900/10 hover:bg-indigo-50 dark:hover:bg-indigo-900/20' // Color normal
+                        ? 'border-blue-500 bg-blue-100 dark:bg-blue-900/40' // Color activo al arrastrar encima
+                        : 'border-blue-300 bg-blue-50/30 dark:bg-blue-900/10 hover:bg-blue-50 dark:hover:bg-blue-900/20' // Color normal
                 ]"
             >
                 <div class="flex flex-col items-center justify-center pt-5 pb-6 pointer-events-none">
-                    <svg :class="['w-8 h-8 mb-3 transition-colors', isDragging ? 'text-indigo-600' : 'text-indigo-500']" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                    <svg :class="['w-8 h-8 mb-3 transition-colors', isDragging ? 'text-blue-600' : 'text-blue-500']" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
                     <p class="mb-1 text-sm text-gray-600 dark:text-gray-300">
-                        <span class="font-bold text-indigo-600 dark:text-indigo-400">
+                        <span class="font-bold text-blue-600 dark:text-blue-400">
                             {{ isDragging ? 'Suelta tus archivos aquí' : 'Haz clic para subir o arrastra tus archivos' }}
                         </span>
                     </p>
@@ -26,12 +26,12 @@
             </label>
 
             <div v-if="subiendo" class="mt-4">
-                <div class="flex justify-between text-xs font-bold text-indigo-600 dark:text-indigo-400 mb-1">
+                <div class="flex justify-between text-xs font-bold text-blue-600 dark:text-blue-400 mb-1">
                     <span>Subiendo archivo(s)...</span>
                     <span>Procesando</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700 overflow-hidden">
-                    <div class="bg-indigo-600 h-1.5 rounded-full animate-pulse w-full"></div>
+                    <div class="bg-blue-600 h-1.5 rounded-full animate-pulse w-full"></div>
                 </div>
             </div>
         </div>
@@ -71,7 +71,7 @@
                             </svg>
                         </button>
 
-                        <button @click="descargarArchivo(archivo)" title="Descargar" class="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-md transition-colors">
+                        <button @click="descargarArchivo(archivo)" title="Descargar" class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                         </button>
 
