@@ -91,9 +91,10 @@
 
                                 <div class="flex flex-col flex-1 min-h-[120px]">
                                     <label class="block text-sm font-bold text-gray-500 uppercase mb-1.5">Asunto</label>
-                                    <textarea v-model="form.asunto" placeholder="Descripción breve del oficio..."
-                                        required
-                                        class="w-full h-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+                                    <textarea ref="asuntoInput" v-model="form.asunto"
+                                        placeholder="Descripción breve del oficio..." required
+                                        class="w-full h-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 resize-auto">
+                                    </textarea>
                                 </div>
                             </div>
                         </div>
@@ -187,7 +188,7 @@
                                             class="mt-0.5 w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
                                         <span class="text-sm text-gray-700 dark:text-gray-200 leading-tight">
                                             <strong class="text-blue-600 dark:text-blue-400 block mb-0.5">{{ sec.codigo
-                                                }}</strong>
+                                            }}</strong>
                                             {{ sec.seccion }}
                                         </span>
                                     </label>
@@ -305,7 +306,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useToast } from '@/composables/useToast'
 import { inventarioService } from '@/services/inventarioService'
 
@@ -356,10 +357,14 @@ const form = ref({
 
 // === ESTADOS DE EDICIÓN ===
 const isEditing = computed(() => !!props.datosEditar)
+const asuntoInput = ref(null)
 
 watch(() => props.modelValue, async (nuevoValor) => {
     if (nuevoValor) {
+        // 1. Cargamos los catálogos
         await cargarCatalogos()
+        
+        // 2. Llenado del formulario
         if (isEditing.value) {
             form.value = {
                 numero_consecutivo: props.datosEditar.numero_consecutivo,
@@ -385,11 +390,19 @@ watch(() => props.modelValue, async (nuevoValor) => {
                 fecha_registro: obtenerFechaActual()
             }
         }
+
+        // 3. Esperamos a que la interfaz termine de dibujarse con los nuevos datos
+        await nextTick()
+        
+        // 4. Ponemos el foco en el campo Asunto
+        if (asuntoInput.value) {
+            asuntoInput.value.focus()
+        }
     }
 })
 
 
-// === NUEVO: LÓGICA DE VISIBILIDAD DE ÁREA DESTINO ===
+// === LÓGICA DE VISIBILIDAD DE ÁREA DESTINO ===
 const mostrarAreaDestino = computed(() => {
     // REGLA 1: Si estamos en Oficialía y es un envío (Salida externa), se oculta destino interno
     if (props.esOficialia && form.value.tipo_registro === 'Enviado') {
