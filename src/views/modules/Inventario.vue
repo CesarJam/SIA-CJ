@@ -167,9 +167,9 @@
             </div>
         </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 min-h-[700px]">
+        <div class="bg-gray-100 dark:bg-gray-900 rounded-xl min-h-[700px] p-4 md:p-6">
             <div
-                class="hidden md:flex items-center gap-4 px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-900/50 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                class="hidden md:flex items-center gap-4 px-6 py-4 mb-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 <div class="w-[10%]">Folio / Fecha</div>
                 <div class="w-[50%]">Asunto y Seguimiento</div>
                 <div class="w-[15%]">{{ vistaActual === 'entrada' ? 'Origen (Remitente)' : 'Destino (Turnado a)' }}</div>
@@ -177,13 +177,13 @@
                 <div class="w-[10%] text-center">Estatus / Acción</div>
             </div>
 
-            <div class="divide-y divide-gray-100 dark:divide-gray-700/50">
+            <div class="flex flex-col space-y-4 relative">
                 <div v-if="menuActivoId" @click="cerrarMenu" class="fixed inset-0 z-10"></div>
 
                 <!-- 1. SKELETONS (Se muestran mientras Supabase carga) -->
                 <template v-if="loading">
                     <!-- Dibujamos 6 filas falsas simulando las proporciones reales -->
-                    <div v-for="i in 6" :key="'skel-' + i" class="p-4 md:px-6 md:py-4 flex flex-col md:flex-row md:items-start gap-2 md:gap-4 animate-pulse bg-white dark:bg-gray-800">
+                    <div v-for="i in 6" :key="'skel-' + i" class="p-4 md:px-6 md:py-4 flex flex-col md:flex-row md:items-center gap-2 md:gap-4 animate-pulse bg-white dark:bg-gray-800 rounded-xl shadow-sm">
                         
                         <!-- Columna 1: Folio / Fecha (10%) -->
                         <div class="w-full md:w-[10%] flex flex-col gap-2 mt-1">
@@ -220,7 +220,7 @@
                 </template>
 
                 <!-- 2. ESTADO VACÍO (Sin registros) -->
-                <div v-else-if="expedientesPaginados.length === 0" class="text-center py-12 text-gray-500 dark:text-gray-400">
+                <div v-else-if="expedientesPaginados.length === 0" class="text-center py-12 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
                     <svg class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
                     </svg>
@@ -231,23 +231,23 @@
                 <template v-else>
                     <div v-for="(item, index) in expedientesPaginados" :key="item.id"
                         :id="`expediente-${item.id}`"
-                        class="p-4 md:px-6 md:py-4 flex flex-col md:flex-row md:items-start gap-2 md:gap-4 transition-all duration-1000 ease-out last:rounded-b-xl"
+                        class="p-4 md:px-6 md:py-4 flex flex-col md:flex-row md:items-center gap-2 md:gap-4 transition-all duration-300 ease-out bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md"
                         :class="{
-                            'bg-gray-50/50 dark:bg-gray-900/40': item.estatus === 'Concluido' && registroResaltado !== item.id,
-                            'hover:bg-gray-50 dark:hover:bg-gray-700/20': registroResaltado !== item.id,
+                            'opacity-75 bg-gray-50 dark:bg-gray-800/60': item.estatus === 'Concluido' && registroResaltado !== item.id,
+                            'hover:bg-gray-50 dark:hover:bg-gray-700/50': registroResaltado !== item.id,
                             'relative z-20': menuActivoId === item.id,
                             'relative z-10': registroResaltado === item.id,
                             'relative z-0': menuActivoId !== item.id && registroResaltado !== item.id,
-                            'bg-blue-100/80 dark:bg-blue-900/50 ring-2 ring-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.4)] scale-[1.01]': registroResaltado === item.id
+                            'bg-blue-50 dark:bg-gray-700 ring-2 ring-blue-500 shadow-[0_4px_20px_rgba(59,130,246,0.3)] scale-[1.01]': registroResaltado === item.id
                         }">
                         
                         <div class="w-full md:w-[10%] flex flex-col md:block">
-                            <span class="font-bold text-gray-900 dark:text-white text-sm">{{ item.numero_consecutivo }}</span>
+                            <span class="font-bold text-gray-900 dark:text-gray-100 text-sm">{{ item.numero_consecutivo }}</span>
                             <span v-if="item.caracter === 'Urgente' || item.caracter === 'Extraordinario'"
                                 :class="claseBadgeCaracter(item.caracter)">
                                 {{ item.caracter }}
                             </span>
-                            <div class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                            <div class="mt-0.5 text-xs text-gray-500 dark:text-gray-500">
                                 {{ formatFecha(item.fecha_registro) }}
                             </div>
                         </div>
@@ -256,13 +256,13 @@
                             <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">Asunto:</span>
                             <div class="flex items-start gap-2">
                             <!-- El Asunto -->
-                            <span class="text-lg text-gray-800 dark:text-white line-clamp-2 flex-1" :title="item.asunto">
+                            <span class="text-base md:text-lg text-gray-800 dark:text-gray-200 line-clamp-2 flex-1" :title="item.asunto">
                                 {{ item.asunto }}
                             </span>
                             
                             <!-- El Ojito (Solo se muestra si está Concluido o En trámite para no estorbar en nuevos) -->
                             <button v-if="item.estatus !== 'Recepcionado'" @click.stop="verPrimerPDF(item.id)" 
-                                class="mt-1 p-1.5 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 dark:hover:text-blue-400 transition-colors shrink-0"
+                                class="mt-1 p-1.5 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-gray-700 dark:hover:text-gray-200 transition-colors shrink-0"
                                 title="Ver documento principal">
                                 
                                 <!-- Spinner mientras carga -->
@@ -280,20 +280,20 @@
                         </div>
 
                             <div v-if="item.responsable_tramite"
-                                class="mt-2 flex items-start gap-1.5 p-2 bg-blue-50 dark:bg-blue-900/40 rounded-md border border-blue-100 dark:border-blue-800/50">
-                                <svg class="w-4 h-4 text-blue-500 dark:text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor"
+                                class="mt-2 flex items-start gap-1.5 p-2 bg-blue-50 dark:bg-gray-900/60 rounded-md border border-blue-100 dark:border-gray-700/50">
+                                <svg class="w-4 h-4 text-blue-500 dark:text-gray-400 shrink-0 mt-0.5" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
                                     </path>
                                 </svg>
                                 <div class="flex flex-col">
-                                    <span class="text-[10px] font-semibold text-blue-700 dark:text-blue-200">
+                                    <span class="text-[10px] font-semibold text-blue-700 dark:text-gray-300">
                                         Responsable: {{
                                         item.responsable_tramite }}
                                     </span>
                                     <span v-if="item.indicaciones_tramite"
-                                        class="text-[10px] text-blue-600/80 dark:text-blue-300 italic mt-0.5 line-clamp-1"
+                                        class="text-[10px] text-blue-600/80 dark:text-gray-500 italic mt-0.5 line-clamp-1"
                                         :title="item.indicaciones_tramite">"{{ item.indicaciones_tramite }}"
                                     </span>
                                 </div>
@@ -309,13 +309,13 @@
                                 class="text-sm font-medium text-gray-700 dark:text-gray-300">
                                 {{ item.area_origen?.codigo || "Externo" }} - {{ item.area_origen?.seccion || "No definido" }}
                             </span>
-                            <span v-else class="text-sm font-medium text-white-600 dark:text-white-400">
+                            <span v-else class="text-sm font-medium text-gray-600 dark:text-gray-400">
                                 {{ item.area_destino?.codigo }} - {{ item.area_destino?.seccion }}
                             </span>
 
                             <div class="mt-1.5">
                                 <span class="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded-md"
-                                    :class="obtenerValorArreglo(item.tradicion) === 'Original' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'">
+                                    :class="obtenerValorArreglo(item.tradicion) === 'Original' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-700/50 dark:text-slate-400'">
                                     {{ obtenerValorArreglo(item.tradicion) }}
                                 </span>
                             </div>
@@ -327,22 +327,22 @@
                             <div class="flex flex-wrap gap-1">
                                 <template v-if="obtenerNombresDependencias(item.dependencias_ids).length > 0">
                                     <span v-for="dep in obtenerNombresDependencias(item.dependencias_ids)" :key="dep.id"
-                                        class="inline-block px-2 py-1 rounded text-[10px] font-bold bg-sky-500/75 text-sky-700 border border-sky-200 dark:bg-sky-900/30 dark:text-sky-300 dark:border-sky-800/50 max-w-full whitespace-normal break-words leading-tight"
+                                        class="inline-block px-2 py-1 rounded text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-100 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 max-w-full whitespace-normal break-words leading-tight"
                                         :title="dep.nombre_oficial">
                                         {{ dep.siglas ? `${dep.siglas} - ${dep.nombre_oficial}` : dep.nombre_oficial }}
                                     </span>
                                 </template>
-                                <span v-else class="text-[11px] text-gray-400 dark:text-gray-500 italic bg-gray-50 dark:bg-gray-800 px-2 py-0.5 rounded border border-gray-100 dark:border-gray-700">Ninguna</span>
+                                <span v-else class="text-[11px] text-gray-400 dark:text-gray-600 italic bg-gray-50 dark:bg-gray-900/50 px-2 py-0.5 rounded border border-gray-100 dark:border-gray-800">Ninguna</span>
                             </div>
 
-                            <div v-if="item.snapshot_cadido && item.snapshot_cadido.codigo_padre" class="mt-3 pt-2.5 border-t border-gray-200 dark:border-gray-700/60">
+                            <div v-if="item.snapshot_cadido && item.snapshot_cadido.codigo_padre" class="mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-700/60">
                                 <div class="flex flex-col gap-1.5">
-                                    <div class="text-[10px] text-gray-600 dark:text-gray-300 leading-tight">
-                                        <span class="font-bold text-white-700 dark:text-white-400">{{ item.snapshot_cadido.codigo_padre }}</span>
+                                    <div class="text-[10px] text-gray-500 dark:text-gray-400 leading-tight">
+                                        <span class="font-bold text-gray-700 dark:text-gray-300">{{ item.snapshot_cadido.codigo_padre }}</span>
                                         <span class="block line-clamp-2" :title="item.snapshot_cadido.nombre_padre">{{ item.snapshot_cadido.nombre_padre }}</span>
                                     </div>
-                                    <div class="text-[10px] text-gray-600 dark:text-gray-300 leading-tight">
-                                        <span class="font-bold text-white-700 dark:text-white-400">{{ item.snapshot_cadido.codigo_subserie }}</span>
+                                    <div class="text-[10px] text-gray-500 dark:text-gray-400 leading-tight">
+                                        <span class="font-bold text-gray-700 dark:text-gray-300">{{ item.snapshot_cadido.codigo_subserie }}</span>
                                         <span class="block line-clamp-2" :title="item.snapshot_cadido.nombre_subserie">{{ item.snapshot_cadido.nombre_subserie }}</span>
                                     </div>
                                 </div>
@@ -360,7 +360,7 @@
 
                                 <div class="relative w-full mt-2">
                                     <button @click.stop="toggleMenu(item.id)"
-                                        class="w-full px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 rounded-md transition-colors flex items-center justify-center gap-2 shadow-sm relative z-20">
+                                        class="w-full px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600 rounded-md transition-colors flex items-center justify-center gap-2 shadow-sm relative z-20">
                                         <span>Acciones</span>
                                         <svg class="w-3.5 h-3.5 transition-transform duration-200"
                                             :class="{ 'rotate-180': menuActivoId === item.id }" fill="none"
@@ -403,7 +403,7 @@
                                             <template v-else>
                                                 <template v-if="item.estatus === 'Recepcionado'">
                                                     <button @click="abrirModalAtender(item); cerrarMenu();"
-                                                        class="w-full text-left px-4 py-2.5 text-xs font-semibold text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
+                                                        class="w-full text-left px-4 py-2.5 text-xs font-semibold text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                             viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -412,7 +412,7 @@
                                                         Asignar Trámite
                                                     </button>
                                                     <button @click="abrirModalEditar(item); cerrarMenu();"
-                                                        class="w-full text-left px-4 py-2.5 text-xs font-semibold text-amber-600 hover:bg-amber-50 dark:text-amber-500 dark:hover:bg-amber-900/30 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
+                                                        class="w-full text-left px-4 py-2.5 text-xs font-semibold text-amber-600 hover:bg-amber-50 dark:text-amber-500 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                             viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -440,7 +440,7 @@
 
                                                 <template v-if="item.estatus === 'En trámite'">
                                                     <button @click="abrirModalConcluir(item); cerrarMenu();"
-                                                        class="w-full text-left px-4 py-2.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/30 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
+                                                        class="w-full text-left px-4 py-2.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors border-b border-gray-50 dark:border-gray-700/50">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                             viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -477,7 +477,7 @@
 
                                                 <template v-if="item.estatus === 'Concluido'">
                                                     <button @click="abrirModalDetalles(item); cerrarMenu();"
-                                                        class="w-full text-left px-4 py-2.5 text-xs font-semibold text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 flex items-center gap-2.5 transition-colors">
+                                                        class="w-full text-left px-4 py-2.5 text-xs font-semibold text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                             viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -492,7 +492,7 @@
                                                     </button>
                                                     <button v-if="rolUsuario === 'admin'"
                                                         @click="abrirModalEdicionAdmin(item); cerrarMenu();"
-                                                        class="w-full text-left px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 flex items-center gap-2.5 transition-colors border-t border-gray-100 dark:border-gray-700/50">
+                                                        class="w-full text-left px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors border-t border-gray-100 dark:border-gray-700/50">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                             viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -509,7 +509,7 @@
 
                                                 <template v-if="item.estatus === 'Cancelado'">
                                                     <button @click="abrirModalDetalles(item); cerrarMenu();"
-                                                        class="w-full text-left px-4 py-2.5 text-xs font-semibold text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 flex items-center gap-2.5 transition-colors">
+                                                        class="w-full text-left px-4 py-2.5 text-xs font-semibold text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                             viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -526,7 +526,7 @@
                                                 <button
                                                     v-if="item.id_seccion_registro === item.id_seccion_turnada && item.estatus !== 'Concluido' && item.estatus !== 'Cancelado' && item.estatus !== 'En trámite'"
                                                     @click="abrirModalCancelar(item); cerrarMenu();"
-                                                    class="w-full text-left px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 flex items-center gap-2.5 transition-colors border-t border-gray-100 dark:border-gray-700">
+                                                    class="w-full text-left px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors border-t border-gray-100 dark:border-gray-700">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -545,7 +545,7 @@
                     </div>
                 </template>
             </div>
-            <div v-if="expedientesFiltrados.length > 100" class="flex flex-col sm:flex-row justify-between items-center px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 gap-4">
+            <div v-if="expedientesFiltrados.length > 100" class="mt-6 flex flex-col sm:flex-row justify-between items-center px-6 py-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm gap-4">
                 
                 <span class="text-sm text-gray-500 dark:text-gray-400">
                     <template v-if="registrosPorPagina === 0">
@@ -563,15 +563,15 @@
                     <button @click="toggleVerTodos"
                         class="px-3 py-1.5 text-sm font-bold rounded-md transition-colors shadow-sm"
                         :class="registrosPorPagina === 0 
-                            ? 'bg-blue-100 text-blue-700 border border-blue-300 hover:bg-blue-200 dark:bg-blue-900/40 dark:text-blue-400 dark:border-blue-800'
-                            : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700'">
+                            ? 'bg-blue-100 text-blue-700 border border-blue-300 hover:bg-blue-200 dark:bg-gray-700 dark:text-blue-400 dark:border-gray-600'
+                            : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600'">
                         {{ registrosPorPagina === 0 ? 'Paginar vista' : 'Ver todos' }}
                     </button>
 
                     <!-- Controles de Paginación (Se ocultan si está en Ver Todos) -->
                     <div v-show="registrosPorPagina > 0" class="flex items-center gap-1 border-l border-gray-300 dark:border-gray-600 pl-2">
                         <button @click="irAPagina(paginaActual - 1)" :disabled="paginaActual === 1"
-                            class="px-3 py-1.5 text-sm font-medium rounded-md text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors shadow-sm">
+                            class="px-3 py-1.5 text-sm font-medium rounded-md text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600 transition-colors shadow-sm">
                             Anterior
                         </button>
                         
@@ -580,7 +580,7 @@
                         </span>
                         
                         <button @click="irAPagina(paginaActual + 1)" :disabled="paginaActual === totalPaginas"
-                            class="px-3 py-1.5 text-sm font-medium rounded-md text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors shadow-sm">
+                            class="px-3 py-1.5 text-sm font-medium rounded-md text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600 transition-colors shadow-sm">
                             Siguiente
                         </button>
                     </div>
