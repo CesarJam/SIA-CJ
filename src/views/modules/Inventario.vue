@@ -146,12 +146,10 @@
                     </button>
 
                     <button @click="abrirModalExportarPDF"
-                        class="w-full md:w-auto px-4 py-2 text-sm font-semibold text-white bg-[#AB0033] hover:bg-[#8A0029] rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z">
-                            </path>
-                        </svg>
+                        class="w-full md:w-auto px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4 text-red-600 dark:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
                         PDF
                     </button>
 
@@ -170,11 +168,10 @@
         <div class="bg-gray-100 dark:bg-gray-900 rounded-xl min-h-[700px] p-4 md:p-6">
             <div
                 class="hidden md:flex items-center gap-4 px-6 py-4 mb-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                <div class="w-[10%]">Folio / Fecha</div>
-                <div class="w-[50%]">Asunto y Seguimiento</div>
-                <div class="w-[15%]">{{ vistaActual === 'entrada' ? 'Origen (Remitente)' : 'Destino (Turnado a)' }}</div>
-                <div class="w-[15%]">Dependencias/Serie</div>
-                <div class="w-[10%] text-center">Estatus / Acción</div>
+                <div class="w-[60%]">Folio y Asunto</div>
+<div class="w-[15%]">{{ vistaActual === 'entrada' ? 'Origen' : 'Destino' }}</div>
+<div class="w-[15%]">Clasificación</div>
+<div class="w-[10%] text-center">Estatus</div>
             </div>
 
             <div class="flex flex-col space-y-4 relative">
@@ -185,14 +182,10 @@
                     <!-- Dibujamos 6 filas falsas simulando las proporciones reales -->
                     <div v-for="i in 6" :key="'skel-' + i" class="p-4 md:px-6 md:py-4 flex flex-col md:flex-row md:items-center gap-2 md:gap-4 animate-pulse bg-white dark:bg-gray-800 rounded-xl shadow-sm">
                         
-                        <!-- Columna 1: Folio / Fecha (10%) -->
-                        <div class="w-full md:w-[10%] flex flex-col gap-2 mt-1">
-                            <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
-                            <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
-                        </div>
+                        
 
                         <!-- Columna 2: Asunto (50%) -->
-                        <div class="w-full md:w-[50%] mt-1 md:mt-0 flex flex-col gap-2">
+                        <div class="w-full md:w-[60%] mt-1 md:mt-0 flex flex-col gap-2">
                             <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
                             <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded w-4/5"></div>
                             <div class="mt-2 h-12 bg-gray-100 dark:bg-gray-900 rounded-md border border-gray-100 dark:border-gray-700/50 w-3/4"></div>
@@ -241,59 +234,64 @@
                             'bg-blue-50 dark:bg-gray-700 ring-2 ring-blue-500 shadow-[0_4px_20px_rgba(59,130,246,0.3)] scale-[1.01]': registroResaltado === item.id
                         }">
                         
-                        <div class="w-full md:w-[10%] flex flex-col md:block">
-                            <span class="font-bold text-gray-900 dark:text-gray-100 text-sm">{{ item.numero_consecutivo }}</span>
-                            <span v-if="item.caracter === 'Urgente' || item.caracter === 'Extraordinario'"
-                                :class="claseBadgeCaracter(item.caracter)">
-                                {{ item.caracter }}
-                            </span>
-                            <div class="mt-0.5 text-xs text-gray-500 dark:text-gray-500">
-                                {{ formatFecha(item.fecha_registro) }}
-                            </div>
-                        </div>
-
-                        <div class="w-full md:w-[50%] flex flex-col md:block mt-1 md:mt-0">
-                            <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">Asunto:</span>
-                            <div class="flex items-start gap-2">
-                            <!-- El Asunto -->
-                            <span class="text-base md:text-lg text-gray-800 dark:text-gray-200 line-clamp-2 flex-1" :title="item.asunto">
-                                {{ item.asunto }}
-                            </span>
+                        <div class="w-full md:w-[60%] flex flex-col gap-2 mt-1 md:mt-0">
                             
-                            <!-- El Ojito (Solo se muestra si está Concluido o En trámite para no estorbar en nuevos) -->
-                            <button v-if="item.estatus !== 'Recepcionado'" @click.stop="verPrimerPDF(item.id)" 
-                                class="mt-1 p-1.5 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-gray-700 dark:hover:text-gray-200 transition-colors shrink-0"
-                                title="Ver documento principal">
-                                
-                                <!-- Spinner mientras carga -->
-                                <svg v-if="cargandoPreviewId === item.id" class="w-5 h-5 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                
-                                <!-- Ícono del Ojo -->
-                                <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                </svg>
-                            </button>
-                        </div>
+                            <!-- 1. Encabezado del Registro: Folio, Fecha y Prioridad en una sola línea -->
+                            <div class="flex flex-wrap items-center gap-2.5">
+                               <div class="flex items-center gap-2.5">
+                                <span class="font-mono font-semibold text-gray-600 dark:text-gray-400 text-xs md:text-sm bg-gray-50 dark:bg-gray-900 px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700">
+                                    {{ item.numero_consecutivo }}
+                                </span>
+                                <span class="text-xs font-medium text-gray-500 dark:text-gray-500">
+                                    {{ formatFecha(item.fecha_registro) }}
+                                </span>
+                            </div>
+                                <span v-if="item.caracter === 'Urgente' || item.caracter === 'Extraordinario'"
+                                    :class="claseBadgeCaracter(item.caracter)" class="text-[10px] px-1.5 py-0.5">
+                                    {{ item.caracter }}
+                                </span>
+                            </div>
 
+                            <!-- 2. Bloque del Asunto -->
+                            <div>
+                                <span class="md:hidden text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Asunto:</span>
+                                <div class="flex items-start gap-3">
+                                    <p class="text-sm md:text-base text-gray-800 dark:text-gray-200 line-clamp-2 flex-1 font-medium leading-snug" :title="item.asunto">
+                                        {{ item.asunto }}
+                                    </p>
+                                    
+                                    <!-- El Ojito (Alineado a la derecha del asunto) -->
+                                    <button v-if="item.estatus !== 'Recepcionado'" @click.stop="verPrimerPDF(item.id)" 
+                                        class="p-1.5 -mt-1 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-gray-700 dark:hover:text-gray-200 transition-colors shrink-0"
+                                        title="Ver documento principal">
+                                        
+                                        <!-- Spinner mientras carga -->
+                                        <svg v-if="cargandoPreviewId === item.id" class="w-5 h-5 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        
+                                        <!-- Ícono del Ojo -->
+                                        <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 3. Responsable -->
                             <div v-if="item.responsable_tramite"
-                                class="mt-2 flex items-start gap-1.5 p-2 bg-blue-50 dark:bg-gray-900/60 rounded-md border border-blue-100 dark:border-gray-700/50">
-                                <svg class="w-4 h-4 text-blue-500 dark:text-gray-400 shrink-0 mt-0.5" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
-                                    </path>
+                                class="mt-1 flex items-start gap-2 p-2 bg-blue-50/50 dark:bg-gray-900/40 rounded-lg border border-blue-100/50 dark:border-gray-700/30 w-fit pr-4">
+                                <svg class="w-3.5 h-3.5 text-blue-500 dark:text-gray-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                 </svg>
                                 <div class="flex flex-col">
-                                    <span class="text-[10px] font-semibold text-blue-700 dark:text-gray-300">
-                                        Responsable: {{
-                                        item.responsable_tramite }}
+                                    <span class="text-[11px] font-semibold text-blue-700 dark:text-gray-300 tracking-tight">
+                                        {{ item.responsable_tramite }}
                                     </span>
                                     <span v-if="item.indicaciones_tramite"
-                                        class="text-[10px] text-blue-600/80 dark:text-gray-500 italic mt-0.5 line-clamp-1"
+                                        class="text-[10px] text-blue-600/70 dark:text-gray-500 italic line-clamp-1"
                                         :title="item.indicaciones_tramite">"{{ item.indicaciones_tramite }}"
                                     </span>
                                 </div>
