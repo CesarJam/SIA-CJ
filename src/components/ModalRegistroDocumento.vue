@@ -91,7 +91,7 @@
 
                                 <div class="flex flex-col flex-1 min-h-[120px]">
                                     <label class="block text-sm font-bold text-gray-500 uppercase mb-1.5">Asunto</label>
-                                    <textarea ref="asuntoInput" v-model="form.asunto"
+                                    <textarea ref="asuntoInput" v-model="form.asunto" @blur="extraerFechaDeAsunto"
                                         placeholder="Descripción breve del oficio..." required
                                         class="w-full h-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 resize-none">
                                     </textarea>
@@ -188,7 +188,7 @@
                                             class="mt-0.5 w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
                                         <span class="text-sm text-gray-700 dark:text-gray-200 leading-tight">
                                             <strong class="text-blue-600 dark:text-blue-400 block mb-0.5">{{ sec.codigo
-                                            }}</strong>
+                                                }}</strong>
                                             {{ sec.seccion }}
                                         </span>
                                     </label>
@@ -363,7 +363,7 @@ watch(() => props.modelValue, async (nuevoValor) => {
     if (nuevoValor) {
         // 1. Cargamos los catálogos
         await cargarCatalogos()
-        
+
         // 2. Llenado del formulario
         if (isEditing.value) {
             form.value = {
@@ -393,7 +393,7 @@ watch(() => props.modelValue, async (nuevoValor) => {
 
         // 3. Esperamos a que la interfaz termine de dibujarse con los nuevos datos
         await nextTick()
-        
+
         // 4. Ponemos el foco en el campo Asunto
         if (asuntoInput.value) {
             asuntoInput.value.focus()
@@ -642,6 +642,46 @@ const ejecutarEdicion = async () => {
             toast.error(err.message || "Error al actualizar el registro.")
         }
         procesando.value = false
+    }
+}
+
+// === LÓGICA DE EXTRACCIÓN DE FECHA Y FOLIO EN ASUNTO ===
+const extraerFechaDeAsunto = () => {
+    if (!form.value.asunto) return;
+
+    // Regex actualizada: 
+    // Grupo 1: (\d{4}-\d{2}-\d{2}) -> Extrae la fecha
+    // Grupo 2: (?:\s+(\d+))?      -> Extrae los números que sigan después de un espacio (Opcional)
+    const regex = /^(\d{4}-\d{2}-\d{2})(?:\s+(\d+))?/;
+    const match = form.value.asunto.match(regex);
+
+    if (match) {
+        // 1. Asignamos siempre la fecha encontrada (Grupo 1)
+        form.value.fecha_registro = match[1];
+
+        // 2. Si existe un número de oficio después de la fecha (Grupo 2)
+        if (match[2]) {
+            const numeroOficio = match[2]; // Ej: "001"
+
+            // Tomamos la nomenclatura base (Ej: "CJ/DA//2026") y reemplazamos "//" por "/001/"
+            if (nomenclaturaUsuario.value.includes('//')) {
+                form.value.numero_consecutivo = nomenclaturaUsuario.value.replace('//', `/${numeroOficio}/`);
+            } else {
+                // Respaldo por si la nomenclatura base cambia en la BD
+                form.value.numero_consecutivo = `${nomenclaturaUsuario.value}${numeroOficio}`;
+            }
+
+            // Al tener número, sabemos por regla de negocio que es un oficio enviado
+            form.value.tipo_registro = 'Enviado';
+        }
+
+        // 3. Limpiamos el texto extraído para que el asunto quede limpio (Opcional pero recomendado)
+        //form.value.asunto = form.value.asunto.replace(regex, '').trim();
+
+        // Si el asunto quedó comenzando con un guion (ej. "- Desarrollo de Personal"), se lo quitamos
+        if (form.value.asunto.startsWith('-')) {
+            form.value.asunto = form.value.asunto.substring(1).trim();
+        }
     }
 }
 
