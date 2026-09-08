@@ -645,45 +645,97 @@ const ejecutarEdicion = async () => {
     }
 }
 
-// === LÓGICA DE EXTRACCIÓN DE FECHA Y FOLIO EN ASUNTO ===
+// === LÓGICA DE EXTRACCIÓN AVANZADA EN ASUNTO ===
+
+// Función auxiliar para generar siglas (Ej: "Contraloría y Transparencia" -> "CyT")
+const generarSiglas = (texto) => {
+    // Palabras que no llevan sigla (se ignoran)
+    const palabrasIgnoradas = ['de', 'del', 'la', 'las', 'el', 'los', 'en', 'para', 'por'];
+    const palabras = texto.trim().split(/\s+/);
+    
+    // Si ya es un acrónimo corto de 1 palabra ingresado por el usuario (Ej: SLEN)
+    if (palabras.length === 1 && /^[A-Z0-9]+$/.test(palabras[0])) {
+        return palabras[0];
+    }
+    
+    let siglas = '';
+    palabras.forEach(palabra => {
+        const min = palabra.toLowerCase();
+        if (min === 'y') {
+            siglas += 'y'; // Conservar la 'y' minúscula como puente
+        } else if (!palabrasIgnoradas.includes(min)) {
+            siglas += palabra.charAt(0).toUpperCase();
+        }
+    });
+    
+    return siglas;
+};
+
 const extraerFechaDeAsunto = () => {
     if (!form.value.asunto) return;
+    const texto = form.value.asunto.trim();
 
-    // Regex actualizada: 
-    // Grupo 1: (\d{4}-\d{2}-\d{2}) -> Extrae la fecha
-    // Grupo 2: (?:\s+(\d+))?      -> Extrae los números que sigan después de un espacio (Opcional)
-    const regex = /^(\d{4}-\d{2}-\d{2})(?:\s+(\d+))?/;
-    const match = form.value.asunto.match(regex);
+    // 1. Patrón RECIBIDO: Fecha + Área (Letras) + Número + Asunto
+    // Ej: 2026-09-07 SLEN 443 - Justificación...
+    // Ej: 2026-02-23 Contraloría y Transparencia 0345 - Código...
+    const regexRecibido = /^(\d{4}-\d{2}-\d{2})\s+([A-Za-záéíóúÁÉÍÓÚñÑ\s]+?)\s+(\d+)\s*(?:-)?\s*(.*)$/;
+    
+    // 2. Patrón ENVIADO: Fecha + Número + Asunto (Nuestra regla anterior)
+    // Ej: 2026-09-01 001 - Asunto
+    const regexEnviado = /^(\d{4}-\d{2}-\d{2})\s+(\d+)\s*(?:-)?\s*(.*)$/;
+    
+    // 3. Patrón SOLO FECHA (Respaldo por si no tiene números)
+    const regexSoloFecha = /^(\d{4}-\d{2}-\d{2})\s*(?:-)?\s*(.*)$/;
 
+    // Evaluamos primero si cumple estrictamente como RECIBIDO
+    let match = texto.match(regexRecibido);
     if (match) {
-        // 1. Asignamos siempre la fecha encontrada (Grupo 1)
-        form.value.fecha_registro = match[1];
-
-        // 2. Si existe un número de oficio después de la fecha (Grupo 2)
-        if (match[2]) {
-            const numeroOficio = match[2]; // Ej: "001"
-
-            // Tomamos la nomenclatura base (Ej: "CJ/DA//2026") y reemplazamos "//" por "/001/"
-            if (nomenclaturaUsuario.value.includes('//')) {
-                form.value.numero_consecutivo = nomenclaturaUsuario.value.replace('//', `/${numeroOficio}/`);
-            } else {
-                // Respaldo por si la nomenclatura base cambia en la BD
-                form.value.numero_consecutivo = `${nomenclaturaUsuario.value}${numeroOficio}`;
-            }
-
-            // Al tener número, sabemos por regla de negocio que es un oficio enviado
-            form.value.tipo_registro = 'Enviado';
-        }
-
-        // 3. Limpiamos el texto extraído para que el asunto quede limpio (Opcional pero recomendado)
-        //form.value.asunto = form.value.asunto.replace(regex, '').trim();
-
-        // Si el asunto quedó comenzando con un guion (ej. "- Desarrollo de Personal"), se lo quitamos
-        if (form.value.asunto.startsWith('-')) {
-            form.value.asunto = form.value.asunto.substring(1).trim();
-        }
+        const [ _, fecha, area, numero, restoAsunto ] = match;
+        const year = fecha.split('-')[0];
+        const siglas = generarSiglas(area); // Crea las iniciales
+        
+        form.value.fecha_registro = fecha;
+        form.value.tipo_registro = 'Recibido';
+        form.value.numero_consecutivo = `${siglas}/${numero}/${year}`;
+        
+        //limpiarAsunto(restoAsunto);
+        return; // Terminamos la ejecución
     }
-}
+
+    // Si no fue recibido, evaluamos si es ENVIADO
+    match = texto.match(regexEnviado);
+    if (match) {
+        const [ _, fecha, numero, restoAsunto ] = match;
+        
+        form.value.fecha_registro = fecha;
+        form.value.tipo_registro = 'Enviado';
+        
+        if (nomenclaturaUsuario.value.includes('//')) {
+            form.value.numero_consecutivo = nomenclaturaUsuario.value.replace('//', `/${numero}/`);
+        } else {
+            form.value.numero_consecutivo = `${nomenclaturaUsuario.value}${numero}`;
+        }
+        
+        //limpiarAsunto(restoAsunto);
+        return;
+    }
+
+    // Si no detectó números, pero sí una fecha, asignamos la pura fecha
+    match = texto.match(regexSoloFecha);
+    if (match) {
+        form.value.fecha_registro = match[1];
+        limpiarAsunto(match[2] || texto);
+    }
+};
+
+// Función auxiliar para dejar el asunto limpio y sin guiones sueltos
+const limpiarAsunto = (textoRestante) => {
+    let nuevoAsunto = textoRestante.trim();
+    if (nuevoAsunto.startsWith('-')) {
+        nuevoAsunto = nuevoAsunto.substring(1).trim();
+    }
+    form.value.asunto = nuevoAsunto;
+};
 
 // === LÓGICA DE TECLADO (Cerrar con ESC) ===
 const handleKeydown = (e) => {
