@@ -115,9 +115,12 @@
 
                                 <div class="flex flex-wrap gap-2 mb-4" v-if="dependenciasSeleccionadasInfo.length > 0">
                                     <span v-for="dep in dependenciasSeleccionadasInfo" :key="dep.id"
-                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-bold bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 shadow-sm border border-blue-200 dark:border-blue-800">
+                                        @click="aplicarSiglasAlFolio(dep)"
+                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-bold bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 shadow-sm border border-blue-200 dark:border-blue-800 cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-800/80 transition-colors">
+
                                         {{ dep.siglas || dep.nombre_oficial }}
-                                        <button @click.prevent="removerDependencia(dep.id)"
+
+                                        <button @click.prevent.stop="removerDependencia(dep.id)"
                                             class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-white transition-colors p-1">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -188,7 +191,7 @@
                                             class="mt-0.5 w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
                                         <span class="text-sm text-gray-700 dark:text-gray-200 leading-tight">
                                             <strong class="text-blue-600 dark:text-blue-400 block mb-0.5">{{ sec.codigo
-                                                }}</strong>
+                                            }}</strong>
                                             {{ sec.seccion }}
                                         </span>
                                     </label>
@@ -652,12 +655,12 @@ const generarSiglas = (texto) => {
     // Palabras que no llevan sigla (se ignoran)
     const palabrasIgnoradas = ['de', 'del', 'la', 'las', 'el', 'los', 'en', 'para', 'por'];
     const palabras = texto.trim().split(/\s+/);
-    
+
     // Si ya es un acrónimo corto de 1 palabra ingresado por el usuario (Ej: SLEN)
     if (palabras.length === 1 && /^[A-Z0-9]+$/.test(palabras[0])) {
         return palabras[0];
     }
-    
+
     let siglas = '';
     palabras.forEach(palabra => {
         const min = palabra.toLowerCase();
@@ -667,7 +670,7 @@ const generarSiglas = (texto) => {
             siglas += palabra.charAt(0).toUpperCase();
         }
     });
-    
+
     return siglas;
 };
 
@@ -679,25 +682,25 @@ const extraerFechaDeAsunto = () => {
     // Ej: 2026-09-07 SLEN 443 - Justificación...
     // Ej: 2026-02-23 Contraloría y Transparencia 0345 - Código...
     const regexRecibido = /^(\d{4}-\d{2}-\d{2})\s+([A-Za-záéíóúÁÉÍÓÚñÑ\s]+?)\s+(\d+)\s*(?:-)?\s*(.*)$/;
-    
+
     // 2. Patrón ENVIADO: Fecha + Número + Asunto (Nuestra regla anterior)
     // Ej: 2026-09-01 001 - Asunto
     const regexEnviado = /^(\d{4}-\d{2}-\d{2})\s+(\d+)\s*(?:-)?\s*(.*)$/;
-    
+
     // 3. Patrón SOLO FECHA (Respaldo por si no tiene números)
     const regexSoloFecha = /^(\d{4}-\d{2}-\d{2})\s*(?:-)?\s*(.*)$/;
 
     // Evaluamos primero si cumple estrictamente como RECIBIDO
     let match = texto.match(regexRecibido);
     if (match) {
-        const [ _, fecha, area, numero, restoAsunto ] = match;
+        const [_, fecha, area, numero, restoAsunto] = match;
         const year = fecha.split('-')[0];
         const siglas = generarSiglas(area); // Crea las iniciales
-        
+
         form.value.fecha_registro = fecha;
         form.value.tipo_registro = 'Recibido';
         form.value.numero_consecutivo = `${siglas}/${numero}/${year}`;
-        
+
         //limpiarAsunto(restoAsunto);
         return; // Terminamos la ejecución
     }
@@ -705,17 +708,17 @@ const extraerFechaDeAsunto = () => {
     // Si no fue recibido, evaluamos si es ENVIADO
     match = texto.match(regexEnviado);
     if (match) {
-        const [ _, fecha, numero, restoAsunto ] = match;
-        
+        const [_, fecha, numero, restoAsunto] = match;
+
         form.value.fecha_registro = fecha;
         form.value.tipo_registro = 'Enviado';
-        
+
         if (nomenclaturaUsuario.value.includes('//')) {
             form.value.numero_consecutivo = nomenclaturaUsuario.value.replace('//', `/${numero}/`);
         } else {
             form.value.numero_consecutivo = `${nomenclaturaUsuario.value}${numero}`;
         }
-        
+
         //limpiarAsunto(restoAsunto);
         return;
     }
@@ -750,6 +753,29 @@ const handleKeydown = (e) => {
         }
     }
 }
+
+// === APLICAR SIGLAS AL FOLIO AL HACER CLIC ===
+const aplicarSiglasAlFolio = (dependencia) => {
+    // REGLA DE NEGOCIO: Esto SOLO aplica para oficios recibidos.
+    if (form.value.tipo_registro !== 'Recibido') return;
+
+    // 1. Obtenemos las siglas (si no tiene, generamos unas automáticas a partir de su nombre)
+    const textoBase = dependencia.siglas ? dependencia.siglas : generarSiglas(dependencia.nombre_oficial);
+
+    // 2. Extraemos el año de la fecha actual del registro (Ej: 2026-09-01 -> "2026")
+    const year = form.value.fecha_registro.split('-')[0] || new Date().getFullYear();
+
+    // 3. Revisamos qué tiene actualmente el número consecutivo para intentar extraer el número de oficio
+    const numeroActual = form.value.numero_consecutivo || '';
+
+    // Usamos una Regex para encontrar cualquier bloque numérico dentro del consecutivo actual
+    // Ej: Si era "CJ/DA/236/2026" o "236", extraerá "236"
+    const matchNumero = numeroActual.match(/\d+/);
+    const numeroOficio = matchNumero ? matchNumero[0] : 'S-N'; // S-N por "Sin Número" si está vacío
+
+    // 4. Armamos el nuevo folio y lo reemplazamos
+    form.value.numero_consecutivo = `${textoBase}/${numeroOficio}/${year}`;
+};
 
 onMounted(() => {
     window.addEventListener('keydown', handleKeydown)
