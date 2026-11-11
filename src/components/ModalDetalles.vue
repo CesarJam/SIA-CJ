@@ -84,6 +84,19 @@
                                     {{ expediente?.indicaciones_tramite || "Ninguna indicación registrada." }}
                                 </p>
                             </div>
+                            <div class="md:col-span-3 pt-2">
+                                <span class="block text-[11px] font-bold text-gray-500 uppercase mb-1">Enlace Externo (URL)</span>
+                                <a v-if="expediente?.url" :href="expediente.url" target="_blank" rel="noopener noreferrer" 
+                                   class="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline transition-colors break-all bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-md border border-blue-100 dark:border-blue-800/50">
+                                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                    </svg>
+                                    {{ expediente.url }}
+                                </a>
+                                <p v-else class="text-sm text-gray-500 dark:text-gray-400 italic">
+                                    No se registró ningún enlace.
+                                </p>
+                            </div>
                         </div>
                     </div>
 
