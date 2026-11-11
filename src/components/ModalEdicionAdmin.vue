@@ -139,9 +139,33 @@
                             3. Atención y Ubicación Física
                         </h3>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
+                            <!-- Responsable con selector de etiquetas -->
+                            <div class="md:col-span-3">
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Responsable</label>
+                                
+                                <!-- Lista interactiva de empleados del área (Selección única) -->
+                                <div v-if="empleadosDisponibles.length > 0" class="flex flex-wrap gap-1.5 mb-2 p-2.5 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <button 
+                                        v-for="(emp, idx) in empleadosDisponibles" 
+                                        :key="idx"
+                                        type="button"
+                                        @click="seleccionarResponsable(emp)"
+                                        :class="[
+                                            'inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold transition-all cursor-pointer border',
+                                            form.responsable_tramite === emp
+                                                ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                                                : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-blue-50 hover:text-blue-700 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600'
+                                        ]"
+                                    >
+                                        <svg v-if="form.responsable_tramite === emp" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        {{ emp }}
+                                    </button>
+                                </div>
+
                                 <input v-model="form.responsable_tramite" type="text"
+                                    placeholder="Selecciona de la lista o escribe el nombre..."
                                     class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">
                             </div>
                             <div class="md:col-span-2">
@@ -289,6 +313,16 @@ const props = defineProps({
     usuarioActual: { type: String, required: true }
 })
 
+// === LÓGICA DE RESPONSABLE DEL ÁREA ===
+const empleadosDisponibles = computed(() => {
+    if (!props.expediente) return []
+    return props.expediente.area_destino?.empleados_area || props.expediente.area_origen?.empleados_area || []
+})
+
+const seleccionarResponsable = (nombre) => {
+    form.value.responsable_tramite = form.value.responsable_tramite === nombre ? '' : nombre
+}
+
 const emit = defineEmits(['update:modelValue', 'guardado'])
 const toast = useToast()
 const procesando = ref(false)
@@ -338,7 +372,7 @@ watch(() => props.modelValue, async (isOpen) => {
             tipo_registro: props.expediente.tipo_registro,
             asunto: props.expediente.asunto,
             dependencias_ids: props.expediente.dependencias_ids || [],
-            responsable_tramite: props.expediente.responsable_tramite || '',
+            responsable_tramite: props.expediente.responsable_tramite === 'No especificado' ? '' : (props.expediente.responsable_tramite || ''),
             indicaciones_tramite: props.expediente.indicaciones_tramite || '',
             tradicion: obtenerValorArreglo(props.expediente.tradicion) || 'Original',
             soporte: obtenerValorArreglo(props.expediente.soporte) || 'Papel',
