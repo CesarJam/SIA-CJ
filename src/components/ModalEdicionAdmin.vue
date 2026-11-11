@@ -81,8 +81,8 @@
                             </div>
                             <div class="md:col-span-5">
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Asunto</label>
-                                <textarea v-model="form.asunto" rows="2"
-                                    class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md"></textarea>
+                                <textarea v-model="form.asunto" 
+                                    class="field-sizing-content w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md"></textarea>
                             </div>
                         </div>
                     </div>
