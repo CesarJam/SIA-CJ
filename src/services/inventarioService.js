@@ -53,7 +53,7 @@ export const inventarioService = {
     let query = supabase
       .from("expedientes")
       .select(
-        "*, area_origen:id_seccion_registro (codigo, seccion), area_destino:id_seccion_turnada (codigo, seccion)",
+        "*, area_origen:id_seccion_registro (codigo, seccion, empleados_area), area_destino:id_seccion_turnada (codigo, seccion, empleados_area)",
       )
       .gte("fecha_registro", `${filtroAnio}-01-01`)
       .lte("fecha_registro", `${filtroAnio}-12-31`)

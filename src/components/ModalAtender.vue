@@ -41,8 +41,31 @@
                             <div class="space-y-4">
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Responsable del Trámite</label>
-                                    <input v-model="form.responsable_tramite" type="text" placeholder="Ej: Lic. Arturo (Opcional)" class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500" />
-                                </div>
+                                    
+                                    <!-- Lista interactiva de empleados del área (Selección única) -->
+                                    <div v-if="empleadosDisponibles.length > 0" class="flex flex-wrap gap-1.5 mb-2 p-2.5 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                        <button 
+                                            v-for="(emp, idx) in empleadosDisponibles" 
+                                            :key="idx"
+                                            type="button"
+                                            @click="seleccionarResponsable(emp)"
+                                            :class="[
+                                                'inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold transition-all cursor-pointer border',
+                                                form.responsable_tramite === emp
+                                                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                                                    : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-blue-50 hover:text-blue-700 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600'
+                                            ]"
+                                        >
+                                            <svg v-if="form.responsable_tramite === emp" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                            {{ emp }}
+                                        </button>
+                                    </div>
+
+                                    <!-- Input de respaldo (se llena al dar clic arriba o permite escribir manualmente) -->
+                                    <input v-model="form.responsable_tramite" type="text" placeholder="Selecciona de la lista o escribe el nombre..." class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500" />
+                                </div>  
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Indicaciones / Observaciones</label>
                                     <textarea v-model="form.indicaciones_tramite" rows="2" placeholder="Ej: Responder oficio antes del viernes." class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"></textarea>
@@ -129,7 +152,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onUnmounted} from 'vue'
+import { ref, watch, computed, onMounted, onUnmounted} from 'vue'
 import { useToast } from '@/composables/useToast'
 import GestorDocumental from '@/components/GestorDocumental.vue'
 import { inventarioService } from '@/services/inventarioService'
@@ -153,6 +176,17 @@ const form = ref({
     inmueble: '',
     url: ''
 })
+
+// Obtenemos la lista de empleados del área turnada (o del área origen como respaldo)
+const empleadosDisponibles = computed(() => {
+    if (!props.expediente) return []
+    return props.expediente.area_destino?.empleados_area || props.expediente.area_origen?.empleados_area || []
+})
+
+// Selección única: asigna el empleado al hacer clic, o lo limpia si ya estaba seleccionado
+const seleccionarResponsable = (nombre) => {
+    form.value.responsable_tramite = form.value.responsable_tramite === nombre ? '' : nombre
+}
 
 // Utilidad local para limpiar datos de arreglos provenientes de PostgreSQL
 const obtenerValorArreglo = (valor) => {
