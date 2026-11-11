@@ -20,6 +20,7 @@ export const cuadroGeneralService = {
             .insert([{
                 codigo: datos.codigo.trim(),
                 seccion: datos.seccion.trim(),
+                empleados_area: datos.empleados_area || [],
                 funcion: datos.funcion
             }])
 
@@ -33,6 +34,7 @@ export const cuadroGeneralService = {
             .from('cuadro_general')
             .update({ 
                 seccion: datos.seccion.trim(), 
+                empleados_area: datos.empleados_area || [],
                 funcion: datos.funcion 
             })
             .eq('id', id)

@@ -6,7 +6,7 @@
             <div>
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Cuadro General de Clasificación</h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Catálogo de secciones y funciones
-                    sustantivas/comunes.</p>
+                    sustantiva/común.</p>
             </div>
 
             <div class="flex items-center gap-3 w-full md:w-auto">
@@ -22,7 +22,9 @@
                 <button @click="exportarPDF"
                     class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold text-white bg-[#AB0033] hover:bg-[#8A0029] rounded-lg shadow-sm transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z">
+                        </path>
                     </svg>
                     PDF
                 </button>
@@ -39,10 +41,11 @@
 
             <div
                 class="hidden md:flex items-center gap-4 px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-900/50 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                <div class="w-1/5">Código</div>
-                <div class="w-1/5">Sección</div>
-                <div class="w-1/5">Función</div>
-                <div v-if="userRole === 'admin'" class="w-1/5 text-center">Acción</div>
+                <div class="w-1/6">Código</div>
+                <div class="w-1/4">Sección</div>
+                <div class="w-1/4">Empleados</div>
+                <div class="w-1/6">Función</div>
+                <div v-if="userRole === 'admin'" class="w-1/6 text-center">Acción</div>
             </div>
 
             <div class="divide-y divide-gray-100 dark:divide-gray-700/50">
@@ -57,6 +60,18 @@
                     <div class="ww-full md:w-1/5 flex items-center justify-between md:justify-start">
                         <span class="md:hidden text-xs font-bold text-gray-400 uppercase mb-0.5">Sección:</span>
                         <span class="text-gray-800 dark:text-gray-200">{{ item.seccion }}</span>
+                    </div>
+
+                    <div class="w-full md:w-1/4 flex items-center justify-between md:justify-start mt-1 md:mt-0">
+                        <span class="md:hidden text-xs font-bold text-gray-400 uppercase">Empleados:</span>
+                        <div class="flex flex-wrap gap-1">
+                            <span v-if="!item.empleados_area || item.empleados_area.length === 0"
+                                class="text-xs text-gray-400 italic">Ninguno</span>
+                            <span v-else v-for="(emp, idx) in item.empleados_area" :key="idx"
+                                class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                                {{ emp }}
+                            </span>
+                        </div>
                     </div>
 
                     <div class="w-full md:w-1/4 flex items-center justify-between md:justify-start mt-1 md:mt-0">
@@ -152,13 +167,52 @@
                             <input v-model="form.seccion" type="text" placeholder="Ej: PRUEBA LOCAL"
                                 class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
                         </div>
+
+                        <!-- NUEVO GESTOR DE EMPLEADOS (UX MEJORADA) -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                Empleados del Área
+                            </label>
+
+                            <!-- Input + Botón Agregar -->
+                            <div class="flex gap-2 mb-3">
+                                <input v-model="nuevoEmpleado" @keydown.enter.prevent="agregarEmpleado" type="text"
+                                    placeholder="Nombre del empleado (Enter para agregar)"
+                                    class="flex-1 px-4 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                                <button @click.prevent="agregarEmpleado" type="button"
+                                    class="px-4 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-sm transition-colors shrink-0">
+                                    + Agregar
+                                </button>
+                            </div>
+
+                            <!-- Lista de Empleados Agregados (Pills) -->
+                            <div v-if="form.empleados_area.length > 0"
+                                class="flex flex-wrap gap-2 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700 max-h-40 overflow-y-auto">
+                                <span v-for="(emp, index) in form.empleados_area" :key="index"
+                                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-sm">
+                                    {{ emp }}
+                                    <button @click.prevent="removerEmpleado(index)" type="button"
+                                        class="text-blue-600 hover:text-red-600 dark:text-blue-400 dark:hover:text-red-400 transition-colors p-0.5"
+                                        title="Quitar empleado">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </span>
+                            </div>
+                            <p v-else class="text-xs text-gray-400 italic">
+                                No hay empleados asignados a esta sección.
+                            </p>
+                        </div>
+
                         <div>
                             <label
                                 class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Función</label>
                             <select v-model="form.funcion"
                                 class="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
-                                <option value="Sustantivas">Sustantivas</option>
-                                <option value="Comunes">Comunes</option>
+                                <option value="Sustantiva">Sustantiva</option>
+                                <option value="Común">Común</option>
                             </select>
                         </div>
                     </div>
@@ -203,11 +257,13 @@ const loading = ref(true)
 const listaCuadro = ref([])
 const modalAbierto = ref(false)
 const editandoId = ref(null)
+const nuevoEmpleado = ref('')
 
 const form = ref({
     codigo: '',
     seccion: '',
-    funcion: 'Sustantivas'
+    empleados_area: [],
+    funcion: 'listaCuadro'
 })
 
 const modalEliminar = ref({
@@ -215,6 +271,24 @@ const modalEliminar = ref({
     id: null,
     codigo: ''
 })
+
+const agregarEmpleado = () => {
+    const nombre = nuevoEmpleado.value.trim()
+    if (!nombre) return
+
+    // Evitar duplicados exactos (opcional pero recomendado)
+    if (!form.value.empleados_area.includes(nombre)) {
+        form.value.empleados_area.push(nombre)
+    } else {
+        toast.info('Este empleado ya está en la lista')
+    }
+    nuevoEmpleado.value = '' // Limpiamos el input
+}
+
+const removerEmpleado = (index) => {
+    form.value.empleados_area.splice(index, 1)
+}
+
 
 // === CARGA DE DATOS (REFACTORIZADO) ===
 const cargarDatos = async () => {
@@ -251,13 +325,13 @@ onUnmounted(() => {
 // === GESTIÓN DEL MODAL ===
 const abrirModalNuevo = () => {
     editandoId.value = null
-    form.value = { codigo: '', seccion: '', funcion: 'Sustantivas' }
+    form.value = { codigo: '', seccion: '', empleados_area: [], funcion: 'Sustantiva' }
     modalAbierto.value = true
 }
 
 const abrirModalEdicion = (item) => {
     editandoId.value = item.id
-    form.value = { codigo: item.codigo, seccion: item.seccion, funcion: item.funcion }
+    form.value = { codigo: item.codigo, seccion: item.seccion, empleados_area: item.empleados_area ? [...item.empleados_area] : [], funcion: item.funcion }
     modalAbierto.value = true
 }
 
@@ -277,6 +351,7 @@ const guardarRegistro = async () => {
             // Llamada al servicio de actualización
             await cuadroGeneralService.actualizarRegistro(editandoId.value, {
                 seccion: form.value.seccion,
+                empleados_area: form.value.empleados_area,
                 funcion: form.value.funcion
             })
             toast.success('Sección actualizada correctamente')
@@ -285,6 +360,7 @@ const guardarRegistro = async () => {
             await cuadroGeneralService.crearRegistro({
                 codigo: form.value.codigo,
                 seccion: form.value.seccion,
+                empleados_area: form.value.empleados_area,
                 funcion: form.value.funcion
             })
             toast.success('Nueva sección registrada con éxito')
@@ -371,10 +447,10 @@ const exportarCSV = () => {
     link.href = url;
     link.download = "CuadroGeneral.csv";
     link.click();
-    
+
     // 7. Limpieza de memoria
     setTimeout(() => URL.revokeObjectURL(url), 100);
-    
+
     toast.success("Catálogo exportado correctamente.");
 }
 
@@ -389,7 +465,7 @@ const exportarPDF = async () => {
         // --- 1. CONFIGURAR EL DOCUMENTO PDF ---
         // Al ser 3 columnas, usamos 'portrait' (Vertical) en tamaño 'legal' (Oficio)
         const doc = new jsPDF({
-            orientation: 'portrait', 
+            orientation: 'portrait',
             unit: 'mm',
             format: 'legal'
         });
@@ -411,7 +487,7 @@ const exportarPDF = async () => {
         doc.text('CUADRO GENERAL DE CLASIFICACIÓN ARCHIVÍSTICA', pageWidth / 2, 20, { align: 'center' });
         doc.text("CONSEJERÍA JURÍDICA DEL", pageWidth / 2, 26, { align: 'center' });
         doc.text("PODER EJECUTIVO DEL ESTADO DE GUERRERO", pageWidth / 2, 32, { align: 'center' });
-        
+
         const fechaActual = new Date().toLocaleDateString('es-MX', {
             day: '2-digit',
             month: 'long',
@@ -425,7 +501,7 @@ const exportarPDF = async () => {
 
         // --- 2. CABECERAS DE LA TABLA ---
         const cabeceras = ["CÓDIGO", "SECCIÓN", "FUNCIÓN"];
-        
+
         // --- 3. MAPEAMOS LOS DATOS ---
         const filas = listaCuadro.value.map(item => [
             item.codigo || "",
@@ -435,17 +511,17 @@ const exportarPDF = async () => {
 
         // --- 4. DIBUJAR LA TABLA CON AUTOTABLE ---
         autoTable(doc, {
-            startY: 45, 
+            startY: 45,
             head: [cabeceras],
             body: filas,
-            headStyles: { 
+            headStyles: {
                 fillColor: '#AB0033', // Guinda Institucional
                 textColor: '#FFFFFF', // Texto Blanco
                 fontSize: 10,
                 halign: 'center'
             },
-            styles: { 
-                fontSize: 9, 
+            styles: {
+                fontSize: 9,
                 cellPadding: 4,
                 overflow: 'linebreak'
             },
