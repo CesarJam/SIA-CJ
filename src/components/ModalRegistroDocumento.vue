@@ -93,7 +93,7 @@
                                     <label class="block text-sm font-bold text-gray-500 uppercase mb-1.5">Asunto</label>
                                     <textarea ref="asuntoInput" v-model="form.asunto" @blur="extraerFechaDeAsunto"
                                         placeholder="Descripción breve del oficio..." required
-                                        class="w-full h-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 resize-none">
+                                        class="field-sizing-content w-full h-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 resize-none">
                                     </textarea>
                                 </div>
                             </div>
@@ -679,30 +679,28 @@ const extraerFechaDeAsunto = () => {
     const texto = form.value.asunto.trim();
 
     // 1. Patrón RECIBIDO: Fecha + Área (Letras) + Número + Asunto
-    // Ej: 2026-09-07 SLEN 443 - Justificación...
-    // Ej: 2026-02-23 Contraloría y Transparencia 0345 - Código...
     const regexRecibido = /^(\d{4}-\d{2}-\d{2})\s+([A-Za-záéíóúÁÉÍÓÚñÑ\s]+?)\s+(\d+)\s*(?:-)?\s*(.*)$/;
 
-    // 2. Patrón ENVIADO: Fecha + Número + Asunto (Nuestra regla anterior)
-    // Ej: 2026-09-01 001 - Asunto
+    // 2. Patrón ENVIADO: Fecha + Número + Asunto
     const regexEnviado = /^(\d{4}-\d{2}-\d{2})\s+(\d+)\s*(?:-)?\s*(.*)$/;
 
-    // 3. Patrón SOLO FECHA (Respaldo por si no tiene números)
+    // 3. Patrón SOLO FECHA al inicio
     const regexSoloFecha = /^(\d{4}-\d{2}-\d{2})\s*(?:-)?\s*(.*)$/;
+
+    // 4. NUEVO: Primera coincidencia de fecha D/MM/YYYY o DD/MM/YYYY en cualquier parte del texto
+    const regexFechaIntermedia = /\b(\d{1,2})\/(\d{1,2})\/(\d{4})\b/;
 
     // Evaluamos primero si cumple estrictamente como RECIBIDO
     let match = texto.match(regexRecibido);
     if (match) {
         const [_, fecha, area, numero, restoAsunto] = match;
         const year = fecha.split('-')[0];
-        const siglas = generarSiglas(area); // Crea las iniciales
+        const siglas = generarSiglas(area);
 
         form.value.fecha_registro = fecha;
         form.value.tipo_registro = 'Recibido';
         form.value.numero_consecutivo = `${siglas}/${numero}/${year}`;
-
-        //limpiarAsunto(restoAsunto);
-        return; // Terminamos la ejecución
+        return;
     }
 
     // Si no fue recibido, evaluamos si es ENVIADO
@@ -718,16 +716,23 @@ const extraerFechaDeAsunto = () => {
         } else {
             form.value.numero_consecutivo = `${nomenclaturaUsuario.value}${numero}`;
         }
-
-        //limpiarAsunto(restoAsunto);
         return;
     }
 
-    // Si no detectó números, pero sí una fecha, asignamos la pura fecha
+    // Si no detectó números, pero sí una fecha al inicio, asignamos la pura fecha
     match = texto.match(regexSoloFecha);
     if (match) {
         form.value.fecha_registro = match[1];
         limpiarAsunto(match[2] || texto);
+        return; // <--- Agregamos return para que no pase al siguiente si ya coincidió aquí
+    }
+
+    // NUEVO: Si es un texto pegado (ej. de Excel) con fecha DD/MM/YYYY intermedia
+    match = texto.match(regexFechaIntermedia);
+    if (match) {
+        const [_, dia, mes, anio] = match;
+        // Formateamos a YYYY-MM-DD asegurando 2 dígitos en mes y día para el input type="date"
+        form.value.fecha_registro = `${anio}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
     }
 };
 

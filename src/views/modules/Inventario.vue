@@ -169,9 +169,9 @@
             <div
                 class="hidden md:flex items-center gap-4 px-6 py-4 mb-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 <div class="w-[60%]">Folio y Asunto</div>
-<div class="w-[15%]">{{ vistaActual === 'entrada' ? 'Origen' : 'Destino' }}</div>
-<div class="w-[15%]">Clasificación</div>
-<div class="w-[10%] text-center">Estatus</div>
+                <div class="w-[15%]">{{ vistaActual === 'entrada' ? 'Origen' : 'Destino' }}</div>
+                <div class="w-[15%]">Clasificación</div>
+                <div class="w-[10%] text-center">Estatus</div>
             </div>
 
             <div class="flex flex-col space-y-4 relative">
