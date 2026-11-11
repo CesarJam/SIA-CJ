@@ -47,6 +47,12 @@
                                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Indicaciones / Observaciones</label>
                                     <textarea v-model="form.indicaciones_tramite" rows="2" placeholder="Ej: Responder oficio antes del viernes." class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"></textarea>
                                 </div>
+                                <div class="flex flex-col">
+                                    <label class="block text-sm font-bold text-gray-500 uppercase mb-1.5">Enlace / URL (Opcional)</label>
+                                    <input v-model="form.url" type="url"
+                                        placeholder="Ej: https://drive.google.com/..."
+                                        class="w-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+                                </div>
                             </div>
                         </div>
 
@@ -144,7 +150,8 @@ const form = ref({
     tradicion: 'Copia',
     soporte: 'Papel',
     condicion_acceso: 'Pública',
-    inmueble: ''
+    inmueble: '',
+    url: ''
 })
 
 // Utilidad local para limpiar datos de arreglos provenientes de PostgreSQL
@@ -166,7 +173,8 @@ watch(() => props.expediente, (nuevoExpediente) => {
             tradicion: obtenerValorArreglo(nuevoExpediente.tradicion) || "Copia",
             soporte: obtenerValorArreglo(nuevoExpediente.soporte) || "Papel",
             condicion_acceso: obtenerValorArreglo(nuevoExpediente.condicion_acceso) || "Pública",
-            inmueble: nuevoExpediente.inmueble || ""
+            inmueble: nuevoExpediente.inmueble || "",
+            url: nuevoExpediente.url || ""
         }
     }
 }, { immediate: true })
@@ -192,6 +200,7 @@ const ejecutarAtencion = async () => {
             soporte: form.value.soporte,
             tradicion: form.value.tradicion,
             condicion_acceso: form.value.condicion_acceso,
+            url: form.value.url
         }
 
         // --- LLAMADA LIMPIA AL SERVICIO ---
