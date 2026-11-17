@@ -1,100 +1,131 @@
 <template>
-    <div :class="['fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6', modelValue ? 'pointer-events-auto' : 'pointer-events-none']">
-        
-        <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0" enter-to-class="opacity-100" leave-active-class="ease-in duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0">
+    <div
+        :class="['fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6', modelValue ? 'pointer-events-auto' : 'pointer-events-none']">
+
+        <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0" enter-to-class="opacity-100"
+            leave-active-class="ease-in duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0">
             <div v-if="modelValue" class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="cerrarModal"></div>
         </transition>
 
-        <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0 scale-95" enter-to-class="opacity-100 scale-100" leave-active-class="ease-in duration-200" leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
-            <div v-if="modelValue" class="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-6xl overflow-hidden flex flex-col border border-blue-200 dark:border-blue-900/50 max-h-[95vh]">
-                
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20 flex justify-between items-center shrink-0">
+        <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0 scale-95"
+            enter-to-class="opacity-100 scale-100" leave-active-class="ease-in duration-200"
+            leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
+            <div v-if="modelValue"
+                class="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-[95vw] 2xl:max-w-[1600px] overflow-hidden flex flex-col border border-blue-200 dark:border-blue-900/50 max-h-[95vh]">
+
+                <div
+                    class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20 flex justify-between items-center shrink-0">
                     <h2 class="text-xl font-bold text-blue-800 dark:text-blue-400">
                         Asignar Trámite y Datos Físicos
                     </h2>
                     <button @click="cerrarModal" class="text-gray-400 hover:text-gray-600 transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
                     </button>
                 </div>
 
                 <div class="p-6 flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-hidden">
-                    
+
                     <div class="lg:col-span-5 flex flex-col space-y-5 overflow-y-auto pr-2 pb-2 custom-scrollbar">
-                        
-                        <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex items-start gap-4 shadow-sm shrink-0">
-                            <div class="p-2.5 bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400 rounded-lg shrink-0 mt-0.5">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+
+                        <div
+                            class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex items-start gap-4 shadow-sm shrink-0">
+                            <div
+                                class="p-2.5 bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400 rounded-lg shrink-0 mt-0.5">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                    </path>
+                                </svg>
                             </div>
                             <div class="flex flex-col w-full">
-                                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Folio / No. Expediente</span>
-                                <span class="text-base font-bold text-gray-900 dark:text-white">{{ expediente?.numero_consecutivo }}</span>
-                                
-                                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-2">Asunto</span>
-                                <span class="text-base text-gray-700 dark:text-gray-300 leading-snug">{{ expediente?.asunto }}</span>
+                                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Folio /
+                                    No. Expediente</span>
+                                <span class="text-base font-bold text-gray-900 dark:text-white">{{
+                                    expediente?.numero_consecutivo }}</span>
+
+                                <span
+                                    class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-2">Asunto</span>
+                                <span class="text-base text-gray-700 dark:text-gray-300 leading-snug">{{
+                                    expediente?.asunto }}</span>
                             </div>
                         </div>
 
-                        <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shrink-0">
-                            <h3 class="text-base font-bold text-gray-700 dark:text-gray-300 mb-3 border-b border-gray-200 dark:border-gray-700 pb-2">
+                        <div
+                            class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shrink-0">
+                            <h3
+                                class="text-base font-bold text-gray-700 dark:text-gray-300 mb-3 border-b border-gray-200 dark:border-gray-700 pb-2">
                                 1. Control de Tareas
                             </h3>
                             <div class="space-y-4">
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Responsable del Trámite</label>
-                                    
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Responsable
+                                        del Trámite</label>
+
                                     <!-- Lista interactiva de empleados del área (Selección única) -->
-                                    <div v-if="empleadosDisponibles.length > 0" class="flex flex-wrap gap-1.5 mb-2 p-2.5 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                                        <button 
-                                            v-for="(emp, idx) in empleadosDisponibles" 
-                                            :key="idx"
-                                            type="button"
-                                            @click="seleccionarResponsable(emp)"
-                                            :class="[
+                                    <div v-if="empleadosDisponibles.length > 0"
+                                        class="flex flex-wrap gap-1.5 mb-2 p-2.5 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                        <button v-for="(emp, idx) in empleadosDisponibles" :key="idx" type="button"
+                                            @click="seleccionarResponsable(emp)" :class="[
                                                 'inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold transition-all cursor-pointer border',
                                                 form.responsable_tramite === emp
                                                     ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
                                                     : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-blue-50 hover:text-blue-700 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600'
-                                            ]"
-                                        >
-                                            <svg v-if="form.responsable_tramite === emp" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                                            ]">
+                                            <svg v-if="form.responsable_tramite === emp" class="w-3.5 h-3.5 shrink-0"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                    d="M5 13l4 4L19 7"></path>
                                             </svg>
                                             {{ emp }}
                                         </button>
                                     </div>
 
                                     <!-- Input de respaldo (se llena al dar clic arriba o permite escribir manualmente) -->
-                                    <input v-model="form.responsable_tramite" type="text" placeholder="Selecciona de la lista o escribe el nombre..." class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500" />
-                                </div>  
+                                    <input v-model="form.responsable_tramite" type="text"
+                                        placeholder="Selecciona de la lista o escribe el nombre..."
+                                        class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500" />
+                                </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Indicaciones / Observaciones</label>
-                                    <textarea v-model="form.indicaciones_tramite" rows="2" placeholder="Ej: Responder oficio antes del viernes." class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"></textarea>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Indicaciones /
+                                        Observaciones</label>
+                                    <textarea v-model="form.indicaciones_tramite" rows="2"
+                                        placeholder="Ej: Responder oficio antes del viernes."
+                                        class="field-sizing-content w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"></textarea>
                                 </div>
                                 <div class="flex flex-col">
-                                    <label class="block text-sm font-bold text-gray-500 uppercase mb-1.5">Enlace / URL (Opcional)</label>
-                                    <input v-model="form.url" type="url"
-                                        placeholder="Ej: https://drive.google.com/..."
+                                    <label class="block text-sm font-bold text-gray-500 uppercase mb-1.5">Enlace / URL
+                                        (Opcional)</label>
+                                    <input v-model="form.url" type="url" placeholder="Ej: https://drive.google.com/..."
                                         class="w-full px-4 py-3 text-base sm:text-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
                                 </div>
                             </div>
                         </div>
 
-                        <div class="bg-blue-50/50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-800/30 shrink-0">
-                            <h3 class="text-base font-bold text-blue-800 dark:text-blue-300 mb-3 border-b border-blue-200 dark:border-blue-800/50 pb-2">
+                        <div
+                            class="bg-blue-50/50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-800/30 shrink-0">
+                            <h3
+                                class="text-base font-bold text-blue-800 dark:text-blue-300 mb-3 border-b border-blue-200 dark:border-blue-800/50 pb-2">
                                 2. Naturaleza Física (Pre-CADIDO)
                             </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Tradición</label>
-                                    <select v-model="form.tradicion" class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Tradición</label>
+                                    <select v-model="form.tradicion"
+                                        class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
                                         <option value="Copia">Copia</option>
                                         <option value="Original">Original</option>
                                         <option value="Electrónico">Electrónico</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Soporte</label>
-                                    <select v-model="form.soporte" class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Soporte</label>
+                                    <select v-model="form.soporte"
+                                        class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
                                         <option value="Papel">Papel</option>
                                         <option value="Óptico">Óptico (CD/DVD)</option>
                                         <option value="Digital">Digital / Nube</option>
@@ -102,7 +133,8 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Acceso</label>
-                                    <select v-model="form.condicion_acceso" class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+                                    <select v-model="form.condicion_acceso"
+                                        class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
                                         <option value="Pública">Pública</option>
                                         <option value="Reservada">Reservada</option>
                                         <option value="Confidencial">Confidencial</option>
@@ -110,38 +142,95 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5">Gaveta</label>
-                                    <input v-model="form.inmueble" type="text" placeholder="Ej: Archivo" class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500" />
+                                    <input v-model="form.inmueble" type="text" placeholder="Ej: Archivo"
+                                        class="w-full px-3 py-2 text-base bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MATRIZ DINÁMICA DE DETALLES / SEGUIMIENTO (Solo para CJ.SLEN.4S) -->
+                        <div v-if="esAreaSLEN4S"
+                            class="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-700">
+                            <div
+                                class="flex justify-between items-center mb-3 pb-2 border-b border-gray-200 dark:border-gray-700">
+                                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                    Seguimiento y Detalles ({{ form.detalles.length }})
+                                </h3>
+                                <div class="flex gap-1.5">
+                                    <button @click.prevent="agregarCampoDetalle('date')" type="button"
+                                        class="px-2.5 py-1 text-[11px] font-bold text-red-800 bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 rounded transition-colors"
+                                        title="Agregar celda de fecha">
+                                        + Fecha
+                                    </button>
+                                    <button @click.prevent="agregarCampoDetalle('text')" type="button"
+                                        class="px-2.5 py-1 text-[11px] font-bold text-green-800 bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300 rounded transition-colors"
+                                        title="Agregar celda de texto">
+                                        + Texto
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Cuadrícula de celdas estilo Excel -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                                <div v-for="(celda, idx) in form.detalles" :key="idx"
+                                    class="rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-xs flex flex-col">
+                                    <!-- Cabecera de celda -->
+                                    <div :class="[
+                                        'px-2.5 py-1 flex justify-between items-center gap-1',
+                                        celda.tipo === 'date' ? 'bg-[#8B0000] text-white' : 'bg-[#6AA84F] text-white'
+                                    ]">
+                                        <input v-model="celda.titulo" type="text" placeholder="Título del campo..."
+                                            class="w-full text-[11px] font-bold bg-transparent text-white placeholder-white/70 focus:outline-none border-b border-transparent focus:border-white" />
+                                        <button @click.prevent="eliminarCampoDetalle(idx)" type="button"
+                                            class="text-white/70 hover:text-white text-xs px-1 shrink-0"
+                                            title="Quitar celda">
+                                            ✕
+                                        </button>
+                                    </div>
+
+                                    <!-- Valor de la celda -->
+                                    <div class="p-1.5">
+                                        <input v-model="celda.valor" :type="celda.tipo || 'text'"
+                                            placeholder="Capturar..."
+                                            class="w-full px-2 py-1 text-xs bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500 dark:[color-scheme:dark]" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="lg:col-span-7 flex flex-col bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                        <div class="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shrink-0">
+                    <div
+                        class="lg:col-span-7 flex flex-col bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                        <div
+                            class="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shrink-0">
                             <h3 class="text-base font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                    </path>
+                                </svg>
                                 3. Archivos Digitales (Anexos)
                             </h3>
                         </div>
-                        
+
                         <div class="flex-1 overflow-y-auto p-4 custom-scrollbar">
-                            <GestorDocumental 
-                                v-if="expediente" 
-                                :expedienteId="expediente.id" 
-                                :grupoId="expediente.grupo_id"  
-                                :folio="expediente.numero_consecutivo" 
-                                modo="escritura"
-                            />
+                            <GestorDocumental v-if="expediente" :expedienteId="expediente.id"
+                                :grupoId="expediente.grupo_id" :folio="expediente.numero_consecutivo"
+                                modo="escritura" />
                         </div>
                     </div>
 
                 </div>
 
-                <div class="p-5 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/40 shrink-0">
-                    <button @click="cerrarModal" :disabled="procesando" class="px-5 py-2.5 text-base text-gray-600 dark:text-gray-300 font-bold border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                <div
+                    class="p-5 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/40 shrink-0">
+                    <button @click="cerrarModal" :disabled="procesando"
+                        class="px-5 py-2.5 text-base text-gray-600 dark:text-gray-300 font-bold border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                         Cancelar
                     </button>
-                    <button @click="ejecutarAtencion" :disabled="procesando" class="px-6 py-2.5 text-base bg-blue-600 text-white rounded-lg font-bold shadow-md hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50 transition-colors">
+                    <button @click="ejecutarAtencion" :disabled="procesando"
+                        class="px-6 py-2.5 text-base bg-blue-600 text-white rounded-lg font-bold shadow-md hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50 transition-colors">
                         <span v-if="procesando" class="animate-pulse">Guardando...</span>
                         <span v-else>Guardar y Comenzar Trámite</span>
                     </button>
@@ -152,7 +241,7 @@
 </template>
 
 <script setup>
-import { ref, watch, computed, onMounted, onUnmounted} from 'vue'
+import { ref, watch, computed, onMounted, onUnmounted } from 'vue'
 import { useToast } from '@/composables/useToast'
 import GestorDocumental from '@/components/GestorDocumental.vue'
 import { inventarioService } from '@/services/inventarioService'
@@ -174,7 +263,8 @@ const form = ref({
     soporte: 'Papel',
     condicion_acceso: 'Pública',
     inmueble: '',
-    url: ''
+    url: '',
+    detalles: []
 })
 
 // Obtenemos la lista de empleados del área turnada (o del área origen como respaldo)
@@ -188,6 +278,40 @@ const seleccionarResponsable = (nombre) => {
     form.value.responsable_tramite = form.value.responsable_tramite === nombre ? '' : nombre
 }
 
+
+// Plantilla base con las 9 columnas del Excel
+const crearPlantillaDetalles = () => [
+    { titulo: 'Externo - Fecha Emisión', valor: '', tipo: 'date' },
+    { titulo: 'CJ - Fecha Recepción', valor: '', tipo: 'date' },
+    { titulo: 'CJ - Fecha Emisión', valor: '', tipo: 'date' },
+    { titulo: 'SUBLEN - Fecha Recepción', valor: '', tipo: 'date' },
+    { titulo: 'SUBLEN - Fecha Salida', valor: '', tipo: 'date' },
+    { titulo: 'CJ - Fecha Recepción (Retorno)', valor: '', tipo: 'date' },
+    { titulo: 'Oficio CJ', valor: '', tipo: 'text' },
+    { titulo: 'CJ - Fecha Salida', valor: '', tipo: 'date' },
+    { titulo: 'Externa - Fecha Recepción', valor: '', tipo: 'date' }
+]
+
+// Verifica si el expediente pertenece al área CJ.SLEN.4S (ya sea como área destino o área origen)
+const esAreaSLEN4S = computed(() => {
+    if (!props.expediente) return false
+    const codigoDestino = props.expediente.area_destino?.codigo
+    const codigoOrigen = props.expediente.area_origen?.codigo
+    return codigoDestino === 'CJ.SLEN.4S' || codigoOrigen === 'CJ.SLEN.4S'
+})
+
+const agregarCampoDetalle = (tipo = 'text') => {
+    form.value.detalles.push({
+        titulo: tipo === 'date' ? 'Nueva Fecha' : 'Nuevo Dato',
+        valor: '',
+        tipo
+    })
+}
+
+const eliminarCampoDetalle = (index) => {
+    form.value.detalles.splice(index, 1)
+}
+
 // Utilidad local para limpiar datos de arreglos provenientes de PostgreSQL
 const obtenerValorArreglo = (valor) => {
     if (!valor) return ''
@@ -196,11 +320,9 @@ const obtenerValorArreglo = (valor) => {
     return valor
 }
 
-// Al abrir el modal (cuando cambia expediente), poblamos los datos
-watch(() => props.expediente, (nuevoExpediente) => {
-    if (nuevoExpediente) {
-        // Si al recuperar de BD dice "No especificado", mostramos en blanco para que no sea confuso, 
-        // o lo dejamos tal cual. En este caso lo dejamos como viene de la BD.
+// Al abrir el modal o cambiar de expediente, poblamos los datos limpios
+watch([() => props.modelValue, () => props.expediente], ([abierto, nuevoExpediente]) => {
+    if (abierto && nuevoExpediente) {
         form.value = {
             responsable_tramite: nuevoExpediente.responsable_tramite === 'No especificado' ? '' : (nuevoExpediente.responsable_tramite || ""),
             indicaciones_tramite: nuevoExpediente.indicaciones_tramite || "",
@@ -208,7 +330,10 @@ watch(() => props.expediente, (nuevoExpediente) => {
             soporte: obtenerValorArreglo(nuevoExpediente.soporte) || "Papel",
             condicion_acceso: obtenerValorArreglo(nuevoExpediente.condicion_acceso) || "Pública",
             inmueble: nuevoExpediente.inmueble || "",
-            url: nuevoExpediente.url || ""
+            url: nuevoExpediente.url || "",
+            detalles: (nuevoExpediente.detalles && nuevoExpediente.detalles.length > 0)
+                ? JSON.parse(JSON.stringify(nuevoExpediente.detalles))
+                : (esAreaSLEN4S.value ? crearPlantillaDetalles() : [])
         }
     }
 }, { immediate: true })
@@ -234,7 +359,8 @@ const ejecutarAtencion = async () => {
             soporte: form.value.soporte,
             tradicion: form.value.tradicion,
             condicion_acceso: form.value.condicion_acceso,
-            url: form.value.url
+            url: form.value.url,
+            detalles: form.value.detalles
         }
 
         // --- LLAMADA LIMPIA AL SERVICIO ---
@@ -257,7 +383,7 @@ const ejecutarAtencion = async () => {
 const handleKeydown = (e) => {
     // Solo cierra si el modal está abierto y NO está procesando/guardando
     if (e.key === 'Escape' && props.modelValue && !procesando.value) {
-        cerrarModal() 
+        cerrarModal()
     }
 }
 

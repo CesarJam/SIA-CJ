@@ -100,6 +100,47 @@
                         </div>
                     </div>
 
+                    <!-- SEGUIMIENTO Y DETALLES (Solo lectura para CJ.SLEN.4S) -->
+                    <div v-if="esAreaSLEN4S" class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <h3 class="text-sm font-bold text-red-800 dark:text-red-400 mb-4 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                            </svg>
+                            Seguimiento y Detalles (SUBLEN)
+                        </h3>
+
+                        <div v-if="!detallesVisualizar || detallesVisualizar.length === 0" class="text-sm text-gray-500 dark:text-gray-400 italic bg-gray-50 dark:bg-gray-900/50 p-3 rounded border border-gray-100 dark:border-gray-700/50">
+                            No se han registrado detalles de seguimiento para este expediente.
+                        </div>
+
+                        <!-- Cuadrícula de celdas estilo Excel (Solo lectura) -->
+                        <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                            <div 
+                                v-for="(celda, idx) in detallesVisualizar" 
+                                :key="idx"
+                                class="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 shadow-xs flex flex-col"
+                            >
+                                <!-- Cabecera de celda -->
+                                <div :class="[
+                                    'px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide truncate',
+                                    celda.tipo === 'date' ? 'bg-[#8B0000] text-white' : 'bg-[#6AA84F] text-white'
+                                ]" :title="celda.titulo">
+                                    {{ celda.titulo || 'Sin título' }}
+                                </div>
+
+                                <!-- Valor de la celda -->
+                                <div class="p-2.5 text-xs font-semibold text-gray-800 dark:text-gray-200">
+                                    <span v-if="celda.valor">
+                                        {{ celda.tipo === 'date' ? formatearFechaCorta(celda.valor) : celda.valor }}
+                                    </span>
+                                    <span v-else class="text-gray-400 dark:text-gray-500 italic font-normal">
+                                        Sin capturar
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
                         <h3 class="text-sm font-bold text-purple-700 dark:text-purple-400 mb-4 flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
@@ -235,7 +276,7 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, computed } from 'vue'
 import GestorDocumental from '@/components/GestorDocumental.vue'
 import { inventarioService } from '@/services/inventarioService'
 
@@ -253,6 +294,27 @@ const dependenciasVinculadas = ref([])
 const loadingDependencias = ref(false)
 
 const detallesContenedor = ref(null)
+
+// === LÓGICA DE DETALLES SLEN (CJ.SLEN.4S) ===
+const esAreaSLEN4S = computed(() => {
+    if (!props.expediente) return false
+    const codigoDestino = props.expediente.area_destino?.codigo
+    const codigoOrigen = props.expediente.area_origen?.codigo
+    return codigoDestino === 'CJ.SLEN.4S' || codigoOrigen === 'CJ.SLEN.4S'
+})
+
+const detallesVisualizar = computed(() => {
+    if (!props.expediente || !Array.isArray(props.expediente.detalles)) return []
+    return props.expediente.detalles
+})
+
+// Convierte YYYY-MM-DD a DD/MM/YYYY para lectura cómoda
+const formatearFechaCorta = (fechaStr) => {
+    if (!fechaStr || !fechaStr.includes('-')) return fechaStr
+    const partes = fechaStr.split('-')
+    if (partes.length !== 3) return fechaStr
+    return `${partes[2]}/${partes[1]}/${partes[0]}`
+}
 
 // Cargar información cuando se abre el modal
 watch(() => props.modelValue, async (isOpen) => {

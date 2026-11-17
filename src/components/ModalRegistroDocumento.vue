@@ -97,6 +97,73 @@
                                     </textarea>
                                 </div>
                             </div>
+
+                            <!-- MATRIZ DINÁMICA DE DETALLES / SEGUIMIENTO -->
+                                <div v-if="esAreaSLEN4S" class="mt-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                            Detalles de Seguimiento ({{ form.detalles.length }})
+                                        </label>
+                                        <div class="flex gap-1.5">
+                                            <button 
+                                                @click.prevent="agregarCampoDetalle('date')" 
+                                                type="button"
+                                                class="px-2 py-1 text-[11px] font-bold text-red-800 bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 rounded transition-colors"
+                                                title="Agregar celda de fecha"
+                                            >
+                                                + Fecha
+                                            </button>
+                                            <button 
+                                                @click.prevent="agregarCampoDetalle('text')" 
+                                                type="button"
+                                                class="px-2 py-1 text-[11px] font-bold text-green-800 bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300 rounded transition-colors"
+                                                title="Agregar celda de texto"
+                                            >
+                                                + Texto
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Cuadrícula de celdas estilo Excel -->
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                        <div 
+                                            v-for="(celda, idx) in form.detalles" 
+                                            :key="idx"
+                                            class="rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-xs flex flex-col"
+                                        >
+                                            <!-- Cabecera de celda (Guinda para fechas, Verde para texto/oficio como tu imagen) -->
+                                            <div :class="[
+                                                'px-2.5 py-1 flex justify-between items-center gap-1',
+                                                celda.tipo === 'date' ? 'bg-[#8B0000] text-white' : 'bg-[#6AA84F] text-white'
+                                            ]">
+                                                <input 
+                                                    v-model="celda.titulo" 
+                                                    type="text"
+                                                    placeholder="Título del campo..."
+                                                    class="w-full text-[11px] font-bold bg-transparent text-white placeholder-white/70 focus:outline-none border-b border-transparent focus:border-white"
+                                                />
+                                                <button 
+                                                    @click.prevent="eliminarCampoDetalle(idx)" 
+                                                    type="button"
+                                                    class="text-white/70 hover:text-white text-xs px-1 shrink-0"
+                                                    title="Quitar celda"
+                                                >
+                                                    ✕
+                                                </button>
+                                            </div>
+
+                                            <!-- Valor de la celda -->
+                                            <div class="p-1.5">
+                                                <input 
+                                                    v-model="celda.valor" 
+                                                    :type="celda.tipo || 'text'"
+                                                    placeholder="Capturar..."
+                                                    class="w-full px-2 py-1 text-xs bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500 dark:[color-scheme:dark]"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                         </div>
 
                         <!-- COLUMNA 2: Dependencias Involucradas -->
@@ -319,7 +386,8 @@ const props = defineProps({
     titulo: { type: String, default: 'Registrar Documento' },
     datosEditar: { type: Object, default: null }, // Si viene lleno, es modo edición
     esOficialia: { type: Boolean, default: false },
-    tipoRegistroDefecto: { type: String, default: 'Enviado' }
+    tipoRegistroDefecto: { type: String, default: 'Enviado' },
+    anioActivo: { type: [String, Number], default: () => new Date().getFullYear() }
 })
 
 const emit = defineEmits(['update:modelValue', 'guardado'])
@@ -342,7 +410,54 @@ const obtenerFechaActual = () => {
     return `${year}-${month}-${day}` // Formato YYYY-MM-DD que requiere el input date
 }
 
-const nomenclaturaUsuario = ref('')
+// Genera dinámicamente el formato (Ej: de "CJ.SLEN.4S" y "2026" -> "CJ/SLEN//2026")
+const nomenclaturaDinamica = computed(() => {
+    const seccionActual = catalogoSecciones.value.find(sec => String(sec.id) === String(props.origenId))
+    
+    // Tomamos el año del combo filtroAnio (anioActivo) o de la fecha del documento
+    const anio = props.anioActivo || (form.value?.fecha_registro ? form.value.fecha_registro.split('-')[0] : new Date().getFullYear())
+
+    if (!seccionActual || !seccionActual.codigo) {
+        return `CJ//${anio}`
+    }
+
+    // Separamos por punto (Ej: ["CJ", "SLEN", "4S"]) -> "CJ/SLEN"
+    const partesCodigo = seccionActual.codigo.split('.')
+    const siglasArea = partesCodigo.length > 2 
+        ? partesCodigo.slice(0, 2).join('/') 
+        : partesCodigo.join('/')
+
+    return `${siglasArea}//${anio}`
+})
+
+
+// Plantilla base con las 9 columnas del Excel (Imagen 1)
+const crearPlantillaDetalles = () => [
+    { titulo: 'No Ofico Externo', valor: '', tipo: 'text' },
+    { titulo: 'Externo - Fecha Emisión', valor: '', tipo: 'date' },
+    { titulo: 'CJ - Fecha Recepción', valor: '', tipo: 'date' },
+    { titulo: 'Referencia', valor: '', tipo: 'text' },
+    { titulo: 'CJ - Fecha Emisión', valor: '', tipo: 'date' },
+    { titulo: 'SUBLEN - Fecha Recepción', valor: '', tipo: 'date' },
+    { titulo: 'No Ofico SLEN', valor: '', tipo: 'text' },
+    { titulo: 'SUBLEN - Fecha Salida', valor: '', tipo: 'date' },
+    { titulo: 'CJ - Fecha Recepción (Retorno)', valor: '', tipo: 'date' },
+    { titulo: 'Oficio CJ', valor: '', tipo: 'text' },
+    { titulo: 'CJ - Fecha Salida', valor: '', tipo: 'date' },
+    { titulo: 'Externa - Fecha Recepción', valor: '', tipo: 'date' }
+]
+
+const agregarCampoDetalle = (tipo = 'text') => {
+    form.value.detalles.push({
+        titulo: tipo === 'date' ? 'Nueva Fecha' : 'Nuevo Dato',
+        valor: '',
+        tipo
+    })
+}
+
+const eliminarCampoDetalle = (index) => {
+    form.value.detalles.splice(index, 1)
+}
 
 // Formulario Principal
 const form = ref({
@@ -354,8 +469,8 @@ const form = ref({
     dependencias_ids: [],
     areas_destino: [],
     id_seccion_turnada: null,
-    caracter: 'Ordinario',
-    fecha_registro: obtenerFechaActual()
+    fecha_registro: obtenerFechaActual(),
+    detalles: crearPlantillaDetalles()
 })
 
 // === ESTADOS DE EDICIÓN ===
@@ -378,11 +493,15 @@ watch(() => props.modelValue, async (nuevoValor) => {
                 id_seccion_turnada: props.datosEditar.id_seccion_turnada,
                 caracter: props.datosEditar.caracter,
                 fecha_registro: props.datosEditar.fecha_registro || obtenerFechaActual(),
-                tipo_registro: props.datosEditar.tipo_registro || 'Recibido'
+                tipo_registro: props.datosEditar.tipo_registro || 'Recibido',
+                detalles: (props.datosEditar.detalles && props.datosEditar.detalles.length > 0)
+                    ? JSON.parse(JSON.stringify(props.datosEditar.detalles))
+                    : (esAreaSLEN4S.value ? crearPlantillaDetalles() : [])
             }
         } else {
+            const fechaInicial = `${props.anioActivo}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`
             form.value = {
-                numero_consecutivo: nomenclaturaUsuario.value,
+                numero_consecutivo: '', // Se asigna abajo tras tener la fecha
                 fojas: 1,
                 asunto: '',
                 dependencias_ids: [],
@@ -390,8 +509,10 @@ watch(() => props.modelValue, async (nuevoValor) => {
                 id_seccion_turnada: null,
                 caracter: 'Ordinario',
                 tipo_registro: props.tipoRegistroDefecto,
-                fecha_registro: obtenerFechaActual()
+                fecha_registro: obtenerFechaActual().startsWith(String(props.anioActivo)) ? obtenerFechaActual() : fechaInicial,
+                detalles: esAreaSLEN4S.value ? crearPlantillaDetalles() : []
             }
+            form.value.numero_consecutivo = nomenclaturaDinamica.value
         }
 
         // 3. Esperamos a que la interfaz termine de dibujarse con los nuevos datos
@@ -476,7 +597,6 @@ const cargarCatalogos = async () => {
     try {
         const userData = await inventarioService.obtenerDatosUsuarioParaRegistro()
         usuarioActual.value = userData.id
-        nomenclaturaUsuario.value = userData.nomenclaturaExpedienteArea || ''
 
         if (catalogoDependencias.value.length === 0 || catalogoSecciones.value.length === 0) {
             const catalogos = await inventarioService.obtenerCatalogosParaRegistro()
@@ -489,6 +609,7 @@ const cargarCatalogos = async () => {
             }
         }
     } catch (error) {
+        console.error("Error en cargarCatalogos:", error)
         toast.error("Error al cargar los catálogos.")
     }
 }
@@ -513,6 +634,11 @@ const removerDependencia = (id) => {
 // Filtramos el área actual para que no se pueda turnar a sí misma
 const catalogoSeccionesAFiltrar = computed(() => {
     return catalogoSecciones.value.filter(sec => sec.id !== props.origenId)
+})
+
+const esAreaSLEN4S = computed(() => {
+    const seccionActual = catalogoSecciones.value.find(sec => String(sec.id) === String(props.origenId))
+    return seccionActual?.codigo === 'CJ.SLEN.4S'
 })
 
 
@@ -563,7 +689,8 @@ const ejecutarTurnado = async () => {
                 estatus: 'Recepcionado',
                 tradicion: ['Copia'], // Es mi acuse
                 caracter: form.value.caracter,
-                fecha_registro: form.value.fecha_registro
+                fecha_registro: form.value.fecha_registro,
+                detalles: form.value.detalles
             });
         }
 
@@ -583,7 +710,8 @@ const ejecutarTurnado = async () => {
                 // Si es un trámite puramente local mío, es el original. Si se envió afuera, el destino tiene el original.
                 tradicion: !esTurnadoExterno ? ['Original'] : ['Original'],
                 caracter: form.value.caracter,
-                fecha_registro: form.value.fecha_registro
+                fecha_registro: form.value.fecha_registro,
+                detalles: form.value.detalles
             });
         });
 
@@ -629,7 +757,8 @@ const ejecutarEdicion = async () => {
             id_seccion_turnada: form.value.id_seccion_turnada,
             id_usuario_actualizacion: usuarioActual.value,
             caracter: form.value.caracter,
-            fecha_registro: form.value.fecha_registro
+            fecha_registro: form.value.fecha_registro,
+            detalles: form.value.detalles
         }
 
         await inventarioService.actualizarExpedienteEdicion(props.datosEditar.id, payload)
@@ -711,10 +840,10 @@ const extraerFechaDeAsunto = () => {
         form.value.fecha_registro = fecha;
         form.value.tipo_registro = 'Enviado';
 
-        if (nomenclaturaUsuario.value.includes('//')) {
-            form.value.numero_consecutivo = nomenclaturaUsuario.value.replace('//', `/${numero}/`);
+        if (nomenclaturaDinamica.value.includes('//')) {
+            form.value.numero_consecutivo = nomenclaturaDinamica.value.replace('//', `/${numero}/`);
         } else {
-            form.value.numero_consecutivo = `${nomenclaturaUsuario.value}${numero}`;
+            form.value.numero_consecutivo = `${nomenclaturaDinamica.value}${numero}`;
         }
         return;
     }

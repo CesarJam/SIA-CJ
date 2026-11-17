@@ -211,7 +211,77 @@
                                     class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">
                             </div>
                         </div>
+
+
                     </div>
+
+                                            <!-- 4. MATRIZ DINÁMICA DE DETALLES / SEGUIMIENTO (Solo para CJ.SLEN.4S) -->
+                        <div v-if="esAreaSLEN4S" class="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-700">
+                            <div class="flex justify-between items-center mb-3 pb-2 border-b border-gray-200 dark:border-gray-700">
+                                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                    Seguimiento y Detalles ({{ form.detalles.length }})
+                                </h3>
+                                <div class="flex gap-1.5">
+                                    <button 
+                                        @click.prevent="agregarCampoDetalle('date')" 
+                                        type="button"
+                                        class="px-2.5 py-1 text-[11px] font-bold text-red-800 bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 rounded transition-colors"
+                                        title="Agregar celda de fecha"
+                                    >
+                                        + Fecha
+                                    </button>
+                                    <button 
+                                        @click.prevent="agregarCampoDetalle('text')" 
+                                        type="button"
+                                        class="px-2.5 py-1 text-[11px] font-bold text-green-800 bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300 rounded transition-colors"
+                                        title="Agregar celda de texto"
+                                    >
+                                        + Texto
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Cuadrícula de celdas estilo Excel -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                                <div 
+                                    v-for="(celda, idx) in form.detalles" 
+                                    :key="idx"
+                                    class="rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-xs flex flex-col"
+                                >
+                                    <!-- Cabecera de celda -->
+                                    <div :class="[
+                                        'px-2.5 py-1 flex justify-between items-center gap-1',
+                                        celda.tipo === 'date' ? 'bg-[#8B0000] text-white' : 'bg-[#6AA84F] text-white'
+                                    ]">
+                                        <input 
+                                            v-model="celda.titulo" 
+                                            type="text"
+                                            placeholder="Título del campo..."
+                                            class="w-full text-[11px] font-bold bg-transparent text-white placeholder-white/70 focus:outline-none border-b border-transparent focus:border-white"
+                                        />
+                                        <button 
+                                            @click.prevent="eliminarCampoDetalle(idx)" 
+                                            type="button"
+                                            class="text-white/70 hover:text-white text-xs px-1 shrink-0"
+                                            title="Quitar celda"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+
+                                    <!-- Valor de la celda -->
+                                    <div class="p-1.5">
+                                        <input 
+                                            v-model="celda.valor" 
+                                            :type="celda.tipo || 'text'"
+                                            placeholder="Capturar..."
+                                            class="w-full px-2 py-1 text-xs bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500 dark:[color-scheme:dark]"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    
 
                     <!-- 4. CLASIFICACIÓN CADIDO -->
                     <div class="bg-emerald-50/30 dark:bg-emerald-900/10 p-4 rounded-xl border border-emerald-100 dark:border-emerald-800/30">
@@ -322,13 +392,45 @@ const empleadosDisponibles = computed(() => {
 const seleccionarResponsable = (nombre) => {
     form.value.responsable_tramite = form.value.responsable_tramite === nombre ? '' : nombre
 }
+// === LÓGICA DE MATRIZ DINÁMICA DE DETALLES ===
+const crearPlantillaDetalles = () => [
+    { titulo: 'Externo - Fecha Emisión', valor: '', tipo: 'date' },
+    { titulo: 'CJ - Fecha Recepción', valor: '', tipo: 'date' },
+    { titulo: 'CJ - Fecha Emisión', valor: '', tipo: 'date' },
+    { titulo: 'SUBLEN - Fecha Recepción', valor: '', tipo: 'date' },
+    { titulo: 'SUBLEN - Fecha Salida', valor: '', tipo: 'date' },
+    { titulo: 'CJ - Fecha Recepción (Retorno)', valor: '', tipo: 'date' },
+    { titulo: 'Oficio CJ', valor: '', tipo: 'text' },
+    { titulo: 'CJ - Fecha Salida', valor: '', tipo: 'date' },
+    { titulo: 'Externa - Fecha Recepción', valor: '', tipo: 'date' }
+]
+
+const esAreaSLEN4S = computed(() => {
+    if (!props.expediente) return false
+    const codigoDestino = props.expediente.area_destino?.codigo
+    const codigoOrigen = props.expediente.area_origen?.codigo
+    return codigoDestino === 'CJ.SLEN.4S' || codigoOrigen === 'CJ.SLEN.4S'
+})
+
+const agregarCampoDetalle = (tipo = 'text') => {
+    form.value.detalles.push({
+        titulo: tipo === 'date' ? 'Nueva Fecha' : 'Nuevo Dato',
+        valor: '',
+        tipo
+    })
+}
+
+const eliminarCampoDetalle = (index) => {
+    form.value.detalles.splice(index, 1)
+}
 
 const emit = defineEmits(['update:modelValue', 'guardado'])
 const toast = useToast()
 const procesando = ref(false)
 
 const form = ref({
-    dependencias_ids: []
+    dependencias_ids: [],
+    detalles: []
 })
 const modificandoCadido = ref(false)
 const terminoBusqueda = ref('')
@@ -378,7 +480,10 @@ watch(() => props.modelValue, async (isOpen) => {
             soporte: obtenerValorArreglo(props.expediente.soporte) || 'Papel',
             condicion_acceso: obtenerValorArreglo(props.expediente.condicion_acceso) || 'Pública',
             inmueble: props.expediente.inmueble || '',
-            url: props.expediente.url || ''
+            url: props.expediente.url || '',
+            detalles: (props.expediente.detalles && props.expediente.detalles.length > 0)
+            ? JSON.parse(JSON.stringify(props.expediente.detalles))
+            : (esAreaSLEN4S.value ? crearPlantillaDetalles() : [])
         }
     }
 })

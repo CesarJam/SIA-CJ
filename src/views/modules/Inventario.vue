@@ -588,9 +588,10 @@
 
         <ModalRegistroDocumento v-model="modalNuevoAbierto" 
             :origenId="seccionSeleccionada || ''"
+            :anioActivo="filtroAnio"
             :datosEditar="expedienteAEditar"
             :tipoRegistroDefecto="vistaActual === 'entrada' ? 'Recibido' : 'Enviado'"
-             @guardado="onRegistroInternoExitoso" />
+            @guardado="onRegistroInternoExitoso" />
 
         <ModalAtender v-model="modalAtenderAbierto" :expediente="expedienteAAtender"
             :usuarioActual="usuarioActual || ''" @guardado="cargarBandeja" />
